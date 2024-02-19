@@ -1,0 +1,34 @@
+import { Component } from '@angular/core';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from '@angular/material/button';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpHelperService } from '../services/http-helper.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css'
+})
+export class LoginComponent {
+
+  loginForm = new FormGroup({
+    emailadres: new FormControl('', Validators.required),
+    wachtwoord: new FormControl('', Validators.required)
+  });
+
+  constructor(private http: HttpHelperService,
+    private router: Router) {}
+
+  login(): void {
+    this.http.post('/token', this.loginForm.value).subscribe(resp => {
+      const body:any = resp.body;
+      localStorage.setItem('token', body.token);
+      this.router.navigateByUrl('/app');
+    });
+  }
+}

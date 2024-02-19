@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+    <span>Erfpacht 058</span>
+    <span class="spacer"></span>
+    <button mat-icon-button routerLink="/logout"><mat-icon class="icon">logout</mat-icon></button>
+  </mat-toolbar>
+
+<mat-drawer-container class="container">
+    <mat-drawer mode="side" opened>
+        <mat-nav-list>
+            <a mat-list-item routerLink="/test" matTooltip="Dashboard pagina"><mat-icon>home</mat-icon></a>
+        </mat-nav-list>
+    </mat-drawer>
+
+    <mat-drawer-content>
+        <div class="content">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-drawer-content>
+
+  </mat-drawer-container>
