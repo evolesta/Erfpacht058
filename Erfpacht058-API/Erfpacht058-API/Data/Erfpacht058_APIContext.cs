@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Models;
 using BCrypt.Net;
+using Erfpacht058_API.Models.Eigendom;
+using Erfpacht058_API.Models.Overeenkomst;
 
 namespace Erfpacht058_API.Data
 {
@@ -32,5 +34,12 @@ namespace Erfpacht058_API.Data
                     }
                 );
         }
+        public DbSet<Erfpacht058_API.Models.Eigendom.Eigendom> Eigendom { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Eigendom.Adres> Adres { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Eigendom.Eigenaar> Eigenaar { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Eigendom.Herziening> Herziening { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Eigendom.Kadaster> Kadaster { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Overeenkomst.Overeenkomst> Overeenkomst { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Overeenkomst.Financien> Financien { get; set; } = default!;
     }
 }

@@ -1,13 +1,16 @@
 ﻿namespace Erfpacht058_API.Models
 {
+    using Erfpacht058_API.Models.Eigendom;
     public class Bestand
     {
-        public string bestandsId { get; set; }
-        public string Naam {  get; set; }
+        public int Id { get; set; }
+        public int EigendomId { get; set; } // Foreign key naar Eigendom
+        public Eigendom.Eigendom? Eigendom { get; set; } // many-to-one relatie
+        public string? Naam {  get; set; }
         public int GrootteInKb { get; set; }
         public SoortBestand SoortBestand { get; set; }
-        public string Beschrijving {  get; set; }
-        public string Pad {  get; set; }
+        public string? Beschrijving {  get; set; }
+        public string? Pad {  get; set; }
     }
 
     public enum SoortBestand

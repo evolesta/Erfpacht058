@@ -4,9 +4,11 @@
     public class Kadaster
     {
         public int Id { get; set; }
-        public string KadastraalNummer { get; set; }
+        public int EigendomId { get; set; } // Foreign key naar Eigendom
+        public Eigendom Eigendom { get; set; } = null!; // one-to-one relatie
+        public string? KadastraalNummer { get; set; }
         public float Deeloppervlakte { get; set; }
         public float KadastraleGrootte { get; set; }
-        public string ObjectType { get; set; }
+        public string? ObjectType { get; set; }
     }
 }

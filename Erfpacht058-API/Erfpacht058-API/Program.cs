@@ -21,19 +21,16 @@ builder.Services.AddSwaggerGen();
 
 // Voeg CORS uitzondering toe voor development
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-if (builder.Environment.IsDevelopment())
+builder.Services.AddCors(options =>
 {
-    builder.Services.AddCors(options =>
-    {
-        options.AddPolicy(name: MyAllowSpecificOrigins,
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:4200")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
-                });
-    });
-}
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+            policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
+});
 
 // Voeg oauth authenticatie middels JWT bearer tokens toe
 builder.Services.AddAuthentication(options =>
@@ -61,10 +58,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseCors(MyAllowSpecificOrigins);
+    
 }
+
+app.UseCors(MyAllowSpecificOrigins);
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

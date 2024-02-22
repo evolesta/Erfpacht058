@@ -1,1 +1,7 @@
-<h1>Dashboard</h1>
+<h1>Eigendom muteren</h1>
+<p>Zoek een eigendom en muteer het object.</p>
+<p style="text-align: right;"><button mat-raised-button color="primary"><mat-icon>add</mat-icon> Nieuw eigendom</button></p>
+
+<div *ngIf="!eigendomId">
+    Geen eigendom geselecteerd. Gebruik de zoekfunctie.
+</div>

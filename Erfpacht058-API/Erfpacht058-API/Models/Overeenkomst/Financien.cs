@@ -4,6 +4,8 @@
     public class Financien
     {
         public int Id { get; set; }
+        public int OvereenkomstId { get; set; } // Foreign key naar Overeenkomst
+        public Overeenkomst? Overeenkomst { get; set; } = null!; // one-to-one relatie
         public DateTime Ingangsdatum { get; set; }
         public DateTime Einddatum { get; set; }
         public float Bedrag {  get; set; }

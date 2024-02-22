@@ -53,7 +53,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Gebruiker");
+                    b.ToTable("Gebruiker", (string)null);
 
                     b.HasData(
                         new
