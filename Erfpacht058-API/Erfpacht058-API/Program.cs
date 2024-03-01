@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.VisualBasic;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

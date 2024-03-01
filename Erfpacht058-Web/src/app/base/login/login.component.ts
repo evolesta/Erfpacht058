@@ -6,15 +6,18 @@ import {MatButtonModule} from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpHelperService } from '../services/http-helper.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule],
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+
+  error: boolean;
 
   loginForm = new FormGroup({
     emailadres: new FormControl('', Validators.required),
@@ -29,6 +32,8 @@ export class LoginComponent {
       const body:any = resp.body;
       localStorage.setItem('token', body.token);
       this.router.navigateByUrl('/app');
+    }, error => {
+      this.error = true;
     });
   }
 }

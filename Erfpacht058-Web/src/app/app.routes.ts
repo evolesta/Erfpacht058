@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './base/login/login.component';
-import { BasetemplateComponent } from './base/app/basetemplate/basetemplate.component';
+import { BasetemplateComponent } from './base/basetemplate/basetemplate.component';
 import { LogoutComponent } from './base/logout/logout.component';
 import { authGuard } from './base/services/auth.guard';
-import { DashboardComponent } from './base/app/dashboard/dashboard.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AddEigendomComponent } from './app/eigendom/add-eigendom/add-eigendom.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -16,7 +17,8 @@ export const routes: Routes = [
         component: BasetemplateComponent,
         canActivate: [authGuard],
         children: [
-            { path: '', component: DashboardComponent }
+            { path: '', component: DashboardComponent },
+            { path: 'eigendom/add', component: AddEigendomComponent },
         ]
     },
 ];

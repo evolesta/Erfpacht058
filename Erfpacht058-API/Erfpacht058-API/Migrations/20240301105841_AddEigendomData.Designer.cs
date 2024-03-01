@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240301105841_AddEigendomData")]
+    partial class AddEigendomData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,7 +165,7 @@ namespace Erfpacht058_API.Migrations
                     b.Property<string>("Complexnummer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("EconomischeWaarde")
+                    b.Property<float>("EconomischeWaarde")
                         .HasColumnType("real");
 
                     b.Property<DateTime?>("Einddatum")
@@ -177,7 +180,7 @@ namespace Erfpacht058_API.Migrations
                     b.Property<string>("Relatienummer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("VerzekerdeWaarde")
+                    b.Property<float>("VerzekerdeWaarde")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
@@ -282,7 +285,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$6hUN2Td4kL211a3WHlx6F.2pO/qLF/whuAULguAUnv7Wln8k31ilm"
+                            Wachtwoord = "$2a$11$uJIJxdKuWzAFa/0D9KZTm.GkAu07jCJH9SuDTkDLJI4cO6VBsHCIG"
                         });
                 });
 

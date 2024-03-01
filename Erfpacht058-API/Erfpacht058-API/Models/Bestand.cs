@@ -4,7 +4,6 @@
     public class Bestand
     {
         public int Id { get; set; }
-        public int EigendomId { get; set; } // Foreign key naar Eigendom
         public Eigendom.Eigendom? Eigendom { get; set; } // many-to-one relatie
         public string? Naam {  get; set; }
         public int GrootteInKb { get; set; }

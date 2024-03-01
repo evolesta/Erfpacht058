@@ -49,13 +49,25 @@ namespace Erfpacht058_API.Controllers.Eigendom
         // PUT: api/Eigendom/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEigendom(int id, Eigendom eigendom)
+        public async Task<IActionResult> PutEigendom(int id, EigendomDto eigendomDto)
         {
+            // Verkrijg het object uit de database
+            var eigendom = await _context.Eigendom.FindAsync(id);
+            
             if (id != eigendom.Id)
             {
                 return BadRequest();
             }
 
+            // Wijzig het Eigendom object met de velden uit het Dto
+            eigendom.Relatienummer = eigendomDto.Relatienummer;
+            eigendom.Ingangsdatum = eigendomDto.Ingangsdatum;
+            eigendom.Complexnummer = eigendomDto.Complexnummer;
+            eigendom.EconomischeWaarde = eigendomDto.EconomischeWaarde;
+            eigendom.VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde;
+            eigendom.Notities = eigendomDto.Notities;
+
+            // wijzig gewijzigde object naar database
             _context.Entry(eigendom).State = EntityState.Modified;
 
             try
@@ -79,9 +91,30 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
         // POST: api/Eigendom
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Aanmaken van een nieuw Eigendom object voor een erfpacht constructie
+        /// </summary>
+        /// <param name="eigendomDto"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Eigendom>> PostEigendom(Eigendom eigendom)
+        public async Task<ActionResult<Eigendom>> PostEigendom(EigendomDto eigendomDto)
         {
+            // Gebruik de Dto uit het model om een nieuw eigendom aan te maken
+            var eigendom = new Eigendom
+            {
+                Adres = null,
+                Relatienummer = eigendomDto.Relatienummer,
+                Ingangsdatum = eigendomDto.Ingangsdatum,
+                Einddatum = null,
+                Complexnummer = eigendomDto.Complexnummer,
+                EconomischeWaarde = eigendomDto.EconomischeWaarde,
+                VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde,
+                Kadaster = null,
+                Herziening = null,
+                Notities = eigendomDto.Notities,
+            };
+
+            // Nieuw object toevoegen aan database
             _context.Eigendom.Add(eigendom);
             await _context.SaveChangesAsync();
 
@@ -107,6 +140,44 @@ namespace Erfpacht058_API.Controllers.Eigendom
         private bool EigendomExists(int id)
         {
             return _context.Eigendom.Any(e => e.Id == id);
+        }
+
+        // === Adres gerelateerde routes ===
+
+        // POST: api/Eigendom/adres/1
+        /// <summary>
+        /// Voeg een nieuw adres toe aan een eigendom object
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("adres/{id}")]
+        public async Task<ActionResult<Eigendom>> AddAdresToEigendom(int id, AdresDto adresDto)
+        {
+            // Verkrijg huidig Eigendom object
+            var eigendom = _context.Eigendom.Find(id);
+            if (eigendom == null)
+                return NotFound();
+
+            // Voeg referentie toe naar Eigendom object in nieuwe Adres object en voeg toe aan database
+            var adres = new Adres
+            {
+                Eigendom = eigendom,
+                EigendomId = id,
+                Straatnaam = adresDto.Straatnaam,
+                Huisnummer = adresDto.Huisnummer,
+                Postcode = adresDto.Postcode,
+                Toevoeging = adresDto.Toevoeging,
+                Woonplaats = adresDto.Woonplaats,
+            };
+            _context.Adres.Add(adres);
+
+            // Pas nieuwe relatie toe in eigendom object
+            eigendom.Adres = adres;
+            _context.Entry(eigendom).State = EntityState.Modified;
+
+            // Pas toe naar database
+            await _context.SaveChangesAsync();
+            return eigendom;
         }
     }
 }

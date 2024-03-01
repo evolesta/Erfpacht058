@@ -4,8 +4,17 @@
     public class Adres
     {
         public int Id { get; set; }
-        public int EigendomId { get; set; } // Foreign key naar Eigendom
-        public Eigendom Eigendom { get; set; } = null!; // one-to-one relatie
+        public int? EigendomId { get; set; } // Foreign key naar Eigendom
+        public Eigendom? Eigendom { get; set; } // one-to-one relatie
+        public string? Straatnaam { get; set; }
+        public int Huisnummer { get; set; }
+        public string? Toevoeging { get; set; }
+        public string? Postcode { get; set; }
+        public string? Woonplaats { get; set; }
+    }
+
+    public class AdresDto
+    {
         public string? Straatnaam { get; set; }
         public int Huisnummer { get; set; }
         public string? Toevoeging { get; set; }

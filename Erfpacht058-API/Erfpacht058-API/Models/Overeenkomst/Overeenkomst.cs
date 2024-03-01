@@ -4,7 +4,6 @@
     public class Overeenkomst
     {
         public int Id { get; set; }
-        public int EigendomId { get; set; } // Foreign key naar Eigendom
         public Eigendom? Eigendom { get; set; } // many-to-one relatie
         public string? Dossiernummer {  get; set; }
         public DateTime Ingangsdatum { get; set; }

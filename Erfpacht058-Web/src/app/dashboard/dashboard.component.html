@@ -1,0 +1,43 @@
+<h1>Eigendom</h1>
+<p style="text-align: right;">
+    <button mat-raised-button color="primary"><mat-icon>search</mat-icon> Eigendom selecteren</button>&nbsp;
+    <button mat-raised-button color="primary" routerLink="eigendom/add"><mat-icon>add</mat-icon> Nieuw eigendom</button>
+</p>
+
+<div *ngIf="!eigendom">
+    Geen eigendom beschikbaar. Gebruik de zoekfunctie om een eigendom te selecteren.
+</div>
+
+<div *ngIf="loaded">
+    <h2>Eigendom object</h2>
+    <table class="dataTable">
+        <tr>
+            <td>Eigendomnummer</td>
+            <td>{{ eigendom.id }}</td>
+        </tr>
+        <tr>
+            <td>Unit4 relatienummer</td>
+            <td>{{ eigendom.relatienummer }}</td>
+        </tr>
+        <tr>
+            <td>Ingangsdatum</td>
+            <td>{{ eigendom.ingangsdatum | date:'dd-MM-yyyy' }}</td>
+        </tr>
+        <tr>
+            <td>Einddatum</td>
+            <td>{{ eigendom.einddatum | date:'dd-MM-yyyy' }}</td>
+        </tr>
+        <tr>
+            <td>Unit4 complexnummer</td>
+            <td>{{ eigendom.complexnummer }}</td>
+        </tr>
+        <tr>
+            <td>Economische waarde</td>
+            <td>{{ eigendom.economischeWaarde | currency:'EUR':'symbol':'' }}</td>
+        </tr>
+        <tr>
+            <td>Verzekerde waarde</td>
+            <td>{{ eigendom.verzekerdeWaarde | currency:'EUR':'symbol':'' }}</td>
+        </tr>
+    </table>
+</div>

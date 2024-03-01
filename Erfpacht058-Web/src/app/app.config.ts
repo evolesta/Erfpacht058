@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -12,6 +12,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     importProvidersFrom(HttpClientModule, CommonModule),
-    { provide: HTTP_INTERCEPTORS, useClass: AuthenticateInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthenticateInterceptor, multi: true },
   ]
 };

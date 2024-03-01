@@ -25,16 +25,25 @@ namespace Erfpacht058_API.Controllers
 
         // GET: api/Gebruikers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gebruiker>>> GetGebruiker()
+        public async Task<ActionResult<IEnumerable<GebruikerDto>>> GetGebruiker()
         {
-            return await _context.Gebruiker.ToListAsync();
+            // Dto (data transfer object) toepassen om het wachtwoord veld te excluden van de response
+            var Gebruikers = from u in _context.Gebruiker
+                             select new GebruikerDto()
+                             { Id = u.Id, Voornamen = u.Voornamen, Naam = u.Naam, Actief = u.Actief, Emailadres = u.Emailadres, Role = u.Role };
+            
+            return await Gebruikers.ToListAsync();
         }
 
         // GET: api/Gebruikers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gebruiker>> GetGebruiker(int id)
+        public async Task<ActionResult<GebruikerDto>> GetGebruiker(int id)
         {
-            var gebruiker = await _context.Gebruiker.FindAsync(id);
+            // Dto toepassen om het wachtwoord veld te excluden van de response
+            var gebruiker = await _context.Gebruiker.Select(u =>
+                new GebruikerDto()
+                { Id = u.Id, Voornamen = u.Voornamen, Naam = u.Naam, Actief = u.Actief, Emailadres = u.Emailadres, Role = u.Role })
+                .SingleOrDefaultAsync(u => u.Id == id);
 
             if (gebruiker == null)
             {
