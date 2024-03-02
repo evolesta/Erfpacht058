@@ -1,10 +1,13 @@
-﻿namespace Erfpacht058_API.Models.Eigendom
+﻿using System.Text.Json.Serialization;
+
+namespace Erfpacht058_API.Models.Eigendom
 {
     // Relationeel model onder Eigendom
     public class Adres
     {
         public int Id { get; set; }
         public int? EigendomId { get; set; } // Foreign key naar Eigendom
+        [JsonIgnore]
         public Eigendom? Eigendom { get; set; } // one-to-one relatie
         public string? Straatnaam { get; set; }
         public int Huisnummer { get; set; }

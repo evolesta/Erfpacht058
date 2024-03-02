@@ -36,7 +36,9 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpGet("{id}")]
         public async Task<ActionResult<Eigendom>> GetEigendom(int id)
         {
-            var eigendom = await _context.Eigendom.FindAsync(id);
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Adres)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eigendom == null)
             {
@@ -154,7 +156,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         public async Task<ActionResult<Eigendom>> AddAdresToEigendom(int id, AdresDto adresDto)
         {
             // Verkrijg huidig Eigendom object
-            var eigendom = _context.Eigendom.Find(id);
+            var eigendom = await _context.Eigendom.FindAsync(id);
             if (eigendom == null)
                 return NotFound();
 

@@ -33,6 +33,12 @@ namespace Erfpacht058_API.Data
                         Wachtwoord = BCrypt.Net.BCrypt.HashPassword("TEST123")
                     }
                 );
+
+            // Relaties definieren voor Eigendom
+            modelBuilder.Entity<Eigendom>()
+                .HasOne(e => e.Adres)
+                .WithOne(a => a.Eigendom)
+                .HasForeignKey<Adres>(a => a.EigendomId);
         }
         public DbSet<Erfpacht058_API.Models.Eigendom.Eigendom> Eigendom { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Adres> Adres { get; set; } = default!;
