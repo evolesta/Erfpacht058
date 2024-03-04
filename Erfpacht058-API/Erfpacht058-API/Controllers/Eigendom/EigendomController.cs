@@ -146,17 +146,28 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
         // === Adres gerelateerde routes ===
 
+        // GET: api/Eigendom/adres
+        /// <summary>
+        /// Verkrijg alle adressen
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("adres")]
+        public async Task<ActionResult<IEnumerable<Adres>>> GetAdressen()
+        {
+            return await _context.Adres.ToListAsync();
+        }
+
         // POST: api/Eigendom/adres/1
         /// <summary>
         /// Voeg een nieuw adres toe aan een eigendom object
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="eigendomId">ID van het Eigendom object</param>
         /// <returns></returns>
-        [HttpPost("adres/{id}")]
-        public async Task<ActionResult<Eigendom>> AddAdresToEigendom(int id, AdresDto adresDto)
+        [HttpPost("adres/{eigendomId}")]
+        public async Task<ActionResult<Eigendom>> AddAdresToEigendom(int eigendomId, AdresDto adresDto)
         {
             // Verkrijg huidig Eigendom object
-            var eigendom = await _context.Eigendom.FindAsync(id);
+            var eigendom = await _context.Eigendom.FindAsync(eigendomId);
             if (eigendom == null)
                 return NotFound();
 
@@ -164,7 +175,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var adres = new Adres
             {
                 Eigendom = eigendom,
-                EigendomId = id,
+                EigendomId = eigendomId,
                 Straatnaam = adresDto.Straatnaam,
                 Huisnummer = adresDto.Huisnummer,
                 Postcode = adresDto.Postcode,

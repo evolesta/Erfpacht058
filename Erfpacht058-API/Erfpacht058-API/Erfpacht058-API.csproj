@@ -8,6 +8,7 @@
     <RootNamespace>Erfpacht058_API</RootNamespace>
     <UserSecretsId>406dd5ef-965b-40f2-bf3e-192f4de69721</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

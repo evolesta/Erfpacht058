@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.VisualBasic;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Components.Web;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +18,27 @@ builder.Services.AddDbContext<Erfpacht058_APIContext>(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Swagger API Documentatie genereren
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Erfpacht058 API",
+        Version = "v1",
+        Description = "API die als back-end dient voor de Erfpacht058 webapplicatie",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "E. Langendijk",
+            Email = "erik.langendijk@leeuwarden.nl",
+        }
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 // Voeg CORS uitzondering toe voor development
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -55,12 +75,6 @@ builder.Services.AddAuthentication(options =>
     });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    
-}
 
 app.UseCors(MyAllowSpecificOrigins);
 

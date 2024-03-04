@@ -1,1 +1,33 @@
-<p>search-dialog works!</p>
+<div mat-dialog-title class="dialog-title">
+    <h2>Selecteer {{data.title}}</h2>
+    <button mat-icon-button aria-label="Sluiten" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content>
+    <p>Zoek een {{data.title}} object via de filter. Selecteer door op een rij dubbel te klikken.</p>
+
+    <!-- Filter tekstveld om data te zoeken -->
+    <mat-form-field style="width: 100%;">
+        <mat-label>Zoek {{data.title}}</mat-label>
+        <input matInput (keyup)="applyFilter($event)" #input>
+    </mat-form-field>
+
+    <!-- Data tabel met informatie van back-end -->
+    <table mat-table [dataSource]="tableData" class="mat-elevation-z8" matSort>
+        <!-- Genereer kolommen op basis van displayedColumns -->
+        <div *ngFor="let column of data.displayedColumns; index as i">
+            <ng-container [matColumnDef]="column">
+                <th mat-header-cell *matHeaderCellDef>{{ data.columnNames[i] }}</th>
+                <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+            </ng-container>
+        </div>
+
+            <tr mat-header-row *matHeaderRowDef="data.displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: data.displayedColumns;" (dblclick)="selecteerKeuze(row)"></tr>
+    </table>
+
+    <!-- Paginator om data rijen dynamisch te vergroten of te verkleinen -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+</mat-dialog-content>

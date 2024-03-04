@@ -1,6 +1,11 @@
 <h1>Eigendom</h1>
 <p style="text-align: right;">
-    <button mat-raised-button color="primary"><mat-icon>search</mat-icon> Eigendom selecteren</button>&nbsp;
+    <button mat-raised-button color="primary" [matMenuTriggerFor]="searchEigendomMenu"><mat-icon>search</mat-icon> Eigendom selecteren</button>&nbsp;
+    <mat-menu #searchEigendomMenu="matMenu">
+        <button mat-menu-item (click)="openZoekDialogEigendom()">Via eigendom</button>
+        <button mat-menu-item (click)="openZoekDialogAdres()">Via adres</button>
+    </mat-menu>
+
     <button mat-raised-button color="primary" routerLink="eigendom/add"><mat-icon>add</mat-icon> Nieuw eigendom</button>
 </p>
 
@@ -9,35 +14,43 @@
 </div>
 
 <div *ngIf="loaded">
-    <h2>Eigendom object</h2>
-    <table class="dataTable">
-        <tr>
-            <td>Eigendomnummer</td>
-            <td>{{ eigendom.id }}</td>
-        </tr>
-        <tr>
-            <td>Unit4 relatienummer</td>
-            <td>{{ eigendom.relatienummer }}</td>
-        </tr>
-        <tr>
-            <td>Ingangsdatum</td>
-            <td>{{ eigendom.ingangsdatum | date:'dd-MM-yyyy' }}</td>
-        </tr>
-        <tr>
-            <td>Einddatum</td>
-            <td>{{ eigendom.einddatum | date:'dd-MM-yyyy' }}</td>
-        </tr>
-        <tr>
-            <td>Unit4 complexnummer</td>
-            <td>{{ eigendom.complexnummer }}</td>
-        </tr>
-        <tr>
-            <td>Economische waarde</td>
-            <td>{{ eigendom.economischeWaarde | currency:'EUR':'symbol':'' }}</td>
-        </tr>
-        <tr>
-            <td>Verzekerde waarde</td>
-            <td>{{ eigendom.verzekerdeWaarde | currency:'EUR':'symbol':'' }}</td>
-        </tr>
-    </table>
+    <p><b>Geselecteerde eigendom:</b> {{ eigendom.id }}</p>
+
+    <mat-accordion class="data">
+        <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>Eigendom</mat-panel-title>
+            </mat-expansion-panel-header>
+            <table class="dataTable">
+                <tr><td>Eigendomnummer</td><td>{{ eigendom.id }}</td></tr>
+                <tr><td>Relatienummer</td><td>{{ eigendom.relatienummer }}</td></tr>
+                <tr><td>Ingangsdatum</td><td>{{ eigendom.ingangsdatum | date:'dd-MM-yyyy' }}</td></tr>
+                <tr><td>Einddatum</td><td>{{ eigendom.einddatum | date:'dd-MM-yyyy' }}</td></tr>
+                <tr><td>Complexnummer</td><td>{{ eigendom.complexnummer }}</td></tr>
+                <tr><td>Economische waarde</td><td>{{ eigendom.economischeWaarde | currency:'EUR':'symbol':'' }}</td></tr>
+                <tr><td>Verzekerde waarde</td><td>{{ eigendom.verzekerdeWaarde | currency:'EUR':'symbol':'' }}</td></tr>
+            </table>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Adres</mat-panel-title>
+            </mat-expansion-panel-header>
+            
+            <div *ngIf="eigendom.adres; then thenBlock; else elseBlock"></div>
+            <ng-template #thenBlock>
+                <p style="text-align: right;"><button mat-icon-button><mat-icon>edit</mat-icon></button></p>
+
+                <table *ngIf="eigendom.adres; else elseBlock">
+                    <tr>
+                        <tr><td>Straatnaam</td><td>{{ eigendom.adres.straatnaam }}</td></tr>
+                        <tr><td>Huisnummer</td><td>{{ eigendom.adres.huisnummer }}</td></tr>
+                        <tr><td>Toevoeging</td><td>{{ eigendom.adres.toevoeging }}</td></tr>
+                        <tr><td>Postcode</td><td>{{ eigendom.adres.postcode }}</td></tr>
+                        <tr><td>Woonplaats</td><td>{{ eigendom.adres.woonplaats }}</td></tr>
+                </table>
+            </ng-template>
+            <ng-template #elseBlock>Er is geen adres gekoppeld aan dit eigendom.</ng-template>
+        </mat-expansion-panel>
+    </mat-accordion>
 </div>

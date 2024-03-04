@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,15 +24,23 @@ namespace Erfpacht058_API.Controllers
         }
 
         /// <summary>
-        /// Authenticatie endpoint om een jwt toegangstoken te genereren
+        /// Ontvangen een Jwt Bearer token voor beveiligde endpoints
         /// </summary>
+        /// <remarks>Voorbeeld:
+        /// 
+        /// POST api/token
+        /// {
+        ///     "emailadres": "test@gebruiker.nl",
+        ///     "wachtwoord": "mijnwachtwoord"
+        /// }</remarks>
         /// <param name="credentials"></param>
-        /// <returns></returns>
+        /// <returns>JWT Bearer token</returns>
+        /// <response code="200">Een JWT Access bearer token voor beveiligde endpoint routes</response>
         [HttpPost]
         public async Task<IActionResult> authenticate(Credentials credentials)
         {
             // Controleer of het emailadres en wachtwoord aanwezig zijn in de body van het request
-            if (credentials.Emailadres == null || credentials.Wachtwoord == null)
+            if (!ModelState.IsValid)
                 return BadRequest("Geen valide credentials opgegeven.");
 
             // Verkrijg gebruiker uit Database
@@ -72,9 +81,12 @@ namespace Erfpacht058_API.Controllers
         }
     }
 
+    // Dto voor het authenticeren op de API
     public class Credentials
     {
+        [Required]
         public string Emailadres { get; set; }
+        [Required]
         public string Wachtwoord { get; set; }
     }
 }
