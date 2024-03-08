@@ -169,7 +169,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             // Verkrijg huidig Eigendom object
             var eigendom = await _context.Eigendom.FindAsync(eigendomId);
             if (eigendom == null)
-                return NotFound();
+                return BadRequest();
 
             // Voeg referentie toe naar Eigendom object in nieuwe Adres object en voeg toe aan database
             var adres = new Adres
@@ -190,7 +190,41 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
             // Pas toe naar database
             await _context.SaveChangesAsync();
-            return eigendom;
+            return Ok(eigendom);
+        }
+
+        // PUT: /eigendom/adres/1
+        /// <summary>
+        /// Wijzig een bestaand adres van een Eigendom object
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="adresDto"></param>
+        /// <returns></returns>
+        [HttpPut("adres/{eigendomId}")]
+        public async Task<ActionResult<Adres>> EditAdres(int eigendomId, AdresDto adresDto)
+        {
+            // verkrijg huidig eigendom en adres object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Adres)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) // null check
+                return BadRequest();
+            var adres = eigendom.Adres;
+            if (adres == null)
+                return BadRequest("Geen adres aanwezig in eigendom object");
+
+            // Muteer het Adres object
+            adres.Straatnaam = adresDto.Straatnaam;
+            adres.Huisnummer = adresDto.Huisnummer;
+            adres.Toevoeging = adresDto.Toevoeging;
+            adres.Postcode = adresDto.Postcode;
+            adres.Woonplaats = adresDto.Woonplaats;
+            
+            // Adres object opslaan
+            _context.Entry(adres).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(adres);
         }
     }
 }

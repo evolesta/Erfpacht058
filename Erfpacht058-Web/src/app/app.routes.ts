@@ -5,6 +5,7 @@ import { LogoutComponent } from './base/logout/logout.component';
 import { authGuard } from './base/services/auth.guard';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AddEigendomComponent } from './app/eigendom/add-eigendom/add-eigendom.component';
+import { AdresComponent } from './app/adres/adres.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -19,6 +20,8 @@ export const routes: Routes = [
         children: [
             { path: '', component: DashboardComponent },
             { path: 'eigendom/add', component: AddEigendomComponent },
+            { path: 'adres/add/:id', component: AdresComponent },
+            { path: 'adres/edit/:id', component: AdresComponent },
         ]
     },
 ];

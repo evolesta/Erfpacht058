@@ -39,7 +39,7 @@
             
             <div *ngIf="eigendom.adres; then thenBlock; else elseBlock"></div>
             <ng-template #thenBlock>
-                <p style="text-align: right;"><button mat-icon-button><mat-icon>edit</mat-icon></button></p>
+                <p style="text-align: right;"><button mat-button routerLink="adres/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Adres wijzigen</button></p>
 
                 <table *ngIf="eigendom.adres; else elseBlock">
                     <tr>
@@ -50,7 +50,7 @@
                         <tr><td>Woonplaats</td><td>{{ eigendom.adres.woonplaats }}</td></tr>
                 </table>
             </ng-template>
-            <ng-template #elseBlock>Er is geen adres gekoppeld aan dit eigendom.</ng-template>
+            <ng-template #elseBlock>Er is geen adres gekoppeld aan dit eigendom - <a routerLink="adres/add/{{eigendom.id}}">adres kopppelen</a></ng-template>
         </mat-expansion-panel>
     </mat-accordion>
 </div>
