@@ -21,6 +21,7 @@
             <mat-expansion-panel-header>
                 <mat-panel-title>Eigendom</mat-panel-title>
             </mat-expansion-panel-header>
+            <p style="text-align: right;"><button mat-button routerLink="eigendom/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Eigendom wijzigen</button></p>
             <table class="dataTable">
                 <tr><td>Eigendomnummer</td><td>{{ eigendom.id }}</td></tr>
                 <tr><td>Relatienummer</td><td>{{ eigendom.relatienummer }}</td></tr>

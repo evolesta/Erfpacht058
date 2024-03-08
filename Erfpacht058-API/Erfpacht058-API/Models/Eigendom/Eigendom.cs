@@ -27,6 +27,7 @@
         public int Id { get; set; }
         public string? Relatienummer { get; set; }
         public DateTime Ingangsdatum { get; set; }
+        public DateTime? Einddatum { get; set; }
         public string? Complexnummer { get; set; }
         public float? EconomischeWaarde { get; set; }
         public float? VerzekerdeWaarde { get; set; }

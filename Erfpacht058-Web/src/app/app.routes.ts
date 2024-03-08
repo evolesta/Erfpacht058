@@ -3,9 +3,9 @@ import { LoginComponent } from './base/login/login.component';
 import { BasetemplateComponent } from './base/basetemplate/basetemplate.component';
 import { LogoutComponent } from './base/logout/logout.component';
 import { authGuard } from './base/services/auth.guard';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { AddEigendomComponent } from './app/eigendom/add-eigendom/add-eigendom.component';
+import { DashboardComponent } from './app/dashboard/dashboard.component';
 import { AdresComponent } from './app/adres/adres.component';
+import { EigendomComponent } from './app/eigendom/eigendom.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -19,7 +19,8 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: '', component: DashboardComponent },
-            { path: 'eigendom/add', component: AddEigendomComponent },
+            { path: 'eigendom/add', component: EigendomComponent },
+            { path: 'eigendom/edit/:id', component: EigendomComponent },
             { path: 'adres/add/:id', component: AdresComponent },
             { path: 'adres/edit/:id', component: AdresComponent },
         ]

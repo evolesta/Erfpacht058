@@ -64,6 +64,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             // Wijzig het Eigendom object met de velden uit het Dto
             eigendom.Relatienummer = eigendomDto.Relatienummer;
             eigendom.Ingangsdatum = eigendomDto.Ingangsdatum;
+            eigendom.Einddatum = eigendomDto.Einddatum;
             eigendom.Complexnummer = eigendomDto.Complexnummer;
             eigendom.EconomischeWaarde = eigendomDto.EconomischeWaarde;
             eigendom.VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde;
@@ -107,7 +108,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 Adres = null,
                 Relatienummer = eigendomDto.Relatienummer,
                 Ingangsdatum = eigendomDto.Ingangsdatum,
-                Einddatum = null,
+                Einddatum = eigendomDto.Einddatum,
                 Complexnummer = eigendomDto.Complexnummer,
                 EconomischeWaarde = eigendomDto.EconomischeWaarde,
                 VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde,
@@ -225,6 +226,49 @@ namespace Erfpacht058_API.Controllers.Eigendom
             await _context.SaveChangesAsync();
 
             return Ok(adres);
+        }
+
+        // POST: /eigendom/eigenaar/1
+        /// <summary>
+        /// Voeg een nieuwe eigenaar toe aan een eigendom object
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="eigenaarDto"></param>
+        /// <returns></returns>
+        [HttpPost("eigenaar/{eigendomId}")]
+        public async Task<ActionResult<Eigenaar>> AddEigenaarToEigendom(int eigendomId, EigenaarDto eigenaarDto)
+        {
+            // Verkrijg Eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Eigenaar)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) // Null check
+                return BadRequest();
+
+            // Nieuw relatie object aanmaken en relaties leggen
+            var eigenaar = new Eigenaar
+            {
+                Naam = eigenaarDto.Naam,
+                Voornamen = eigenaarDto.Voornamen,
+                Voorletters = eigenaarDto.Voorletters,
+                Straatnaam = eigenaarDto.Straatnaam,
+                Huisnummer = eigenaarDto.Huisnummer,
+                Toevoeging = eigenaarDto.Toevoeging,
+                Postcode = eigenaarDto.Postcode,
+                Woonplaats = eigenaarDto.Woonplaats,
+                Debiteurnummer = eigenaarDto.Debiteurnummer,
+                Ingangsdatum = eigenaarDto.Ingangsdatum,
+                Einddatum = eigenaarDto.Einddatum,
+            };
+            eigenaar.Eigendom.Add(eigendom);
+            eigendom.Eigenaar.Add(eigenaar);
+
+            // Nieuwe eigenaar opslaan in database
+            _context.Eigenaar.Add(eigenaar);
+            _context.Entry(eigenaar).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return Ok(eigenaar);
         }
     }
 }

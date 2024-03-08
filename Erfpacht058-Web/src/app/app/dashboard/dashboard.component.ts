@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpHelperService } from '../base/services/http-helper.service';
+import { HttpHelperService } from '../../base/services/http-helper.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import {MatGridListModule} from '@angular/material/grid-list';
-import { SearchDialogComponent } from '../base/generic/search-dialog/search-dialog.component';
+import { SearchDialogComponent } from '../../base/generic/search-dialog/search-dialog.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatMenuModule} from '@angular/material/menu';
 
