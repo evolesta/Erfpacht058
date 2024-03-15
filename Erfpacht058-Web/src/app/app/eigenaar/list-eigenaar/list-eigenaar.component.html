@@ -1,0 +1,47 @@
+<h2>Eigenaar</h2>
+
+<p style="text-align: right;"><button mat-raised-button color="primary" routerLink="/app/eigenaar/add/0"><mat-icon>add</mat-icon> Eigenaar toevoegen</button></p>
+
+<mat-form-field>
+    <mat-label>Filter eigenaar</mat-label>
+    <input matInput (keyup)="applyFilter($event)">
+</mat-form-field>
+<table mat-table [dataSource]="eigenaarData" class="mat-elevation-z8">
+    <ng-container matColumnDef="naam">
+        <th mat-header-cell *matHeaderCellDef>Naam</th>
+        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+    </ng-container>
+    <ng-container matColumnDef="voorletters">
+        <th mat-header-cell *matHeaderCellDef>Voorletters</th>
+        <td mat-cell *matCellDef="let element">{{element.voorletters}}</td>
+    </ng-container>
+    <ng-container matColumnDef="debiteurnummer">
+        <th mat-header-cell *matHeaderCellDef>Debiteurnummer</th>
+        <td mat-cell *matCellDef="let element">{{element.debiteurnummer}}</td>
+    </ng-container>
+    <ng-container matColumnDef="ingangsdatum">
+        <th mat-header-cell *matHeaderCellDef>Ingangsdatum</th>
+        <td mat-cell *matCellDef="let element">{{element.ingangsdatum | date: 'dd-MM-yyyy'}}</td>
+    </ng-container>
+    <ng-container matColumnDef="einddatum">
+        <th mat-header-cell *matHeaderCellDef>Einddatum</th>
+        <td mat-cell *matCellDef="let element">{{element.einddatum | date: 'dd-MM-yyyy'}}</td>
+    </ng-container>
+    <ng-container matColumnDef="opties">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-menu-item [matMenuTriggerFor]="menu" [matMenuTriggerData]="{id: element.id}"><mat-icon>more_vert</mat-icon></button>
+        </td>
+    </ng-container>
+    <mat-menu #menu="matMenu">
+       <ng-template matMenuContent let-id="id">
+            <button mat-menu-item routerLink="/app/eigenaar/edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
+            <button mat-menu-item (click)="openVerwijderEigenaarDialog(id)"><mat-icon>delete</mat-icon> Verwijderen</button>
+       </ng-template>
+    </mat-menu>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[10, 25, 50]" aria-label="Selecteer pagina grootte"></mat-paginator>

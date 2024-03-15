@@ -1,0 +1,59 @@
+<h2>Eigenaar</h2>
+
+<form [formGroup]="eigenaarForm" (ngSubmit)="modEigenaar()">
+    <mat-form-field class="full-width">
+        <mat-label>Naam</mat-label>
+        <input matInput formControlName="naam">
+    </mat-form-field>
+
+    <mat-form-field class="half-width">
+        <mat-label>Voorletters</mat-label>
+        <input matInput formControlName="voorletters">
+    </mat-form-field>
+    <mat-form-field class="half-width">
+        <mat-label>Voornamen</mat-label>
+        <input matInput formControlName="voornamen">
+    </mat-form-field>
+
+    <p>Correspondentie adres</p>
+
+    <mat-form-field class="thirth-width">
+        <mat-label>Straatnaam</mat-label>
+        <input matInput formControlName="straatnaam">
+    </mat-form-field>
+    <mat-form-field class="thirth-width">
+        <mat-label>Huisnummer</mat-label>
+        <input matInput type="number" formControlName="huisnummer">
+    </mat-form-field>
+    <mat-form-field class="thirth-width">
+        <mat-label>Toevoeging</mat-label>
+        <input matInput formControlName="toevoeging">
+    </mat-form-field>
+
+    <mat-form-field class="half-width">
+        <mat-label>Postcode</mat-label>
+        <input matInput formControlName="postcode">
+    </mat-form-field>
+    <mat-form-field class="half-width">
+        <mat-label>Woonplaats</mat-label>
+        <input matInput formControlName="woonplaats">
+    </mat-form-field>
+
+    <p>Eigenaar gerelateerde informatie</p>
+
+    <mat-form-field class="full-width">
+        <mat-label>Debiteurnummer</mat-label>
+        <input matInput formControlName="debiteurnummer">
+    </mat-form-field>
+
+    <mat-form-field class="half-width">
+        <mat-label>Ingangsdatum</mat-label>
+        <input matInput type="date" formControlName="ingangsdatum">
+    </mat-form-field>
+    <mat-form-field class="half-width">
+        <mat-label>Einddatum</mat-label>
+        <input matInput type="date" formControlName="einddatum">
+    </mat-form-field>
+
+    <button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button>
+</form>

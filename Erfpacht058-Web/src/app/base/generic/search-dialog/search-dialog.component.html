@@ -15,7 +15,7 @@
     </mat-form-field>
 
     <!-- Data tabel met informatie van back-end -->
-    <table mat-table [dataSource]="tableData" class="mat-elevation-z8" matSort>
+    <table mat-table [dataSource]="tableData" matSort>
         <!-- Genereer kolommen op basis van displayedColumns -->
         <div *ngFor="let column of data.displayedColumns; index as i">
             <ng-container [matColumnDef]="column">

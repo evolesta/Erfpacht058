@@ -6,6 +6,9 @@ import { authGuard } from './base/services/auth.guard';
 import { DashboardComponent } from './app/dashboard/dashboard.component';
 import { AdresComponent } from './app/adres/adres.component';
 import { EigendomComponent } from './app/eigendom/eigendom.component';
+import { EigenaarComponent } from './app/eigenaar/eigenaar.component';
+import { ListEigenaarComponent } from './app/eigenaar/list-eigenaar/list-eigenaar.component';
+import { HerzieningComponent } from './app/herziening/herziening.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -23,6 +26,11 @@ export const routes: Routes = [
             { path: 'eigendom/edit/:id', component: EigendomComponent },
             { path: 'adres/add/:id', component: AdresComponent },
             { path: 'adres/edit/:id', component: AdresComponent },
+            { path: 'eigenaar', component: ListEigenaarComponent },
+            { path: 'eigenaar/add/:id', component: EigenaarComponent },
+            { path: 'eigenaar/edit/:id', component: EigenaarComponent },
+            { path: 'herziening/add/:id', component: HerzieningComponent },
+            { path: 'herziening/edit/:id', component: HerzieningComponent },
         ]
     },
 ];

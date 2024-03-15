@@ -26,6 +26,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         }
 
         // GET: api/Eigendom
+        /// <summary>
+        /// Verkrijg een lijst van alle eigendommen
+        /// </summary>
+        /// <param name="context"></param>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Eigendom>>> GetEigendom()
         {
@@ -33,11 +37,17 @@ namespace Erfpacht058_API.Controllers.Eigendom
         }
 
         // GET: api/Eigendom/5
+        /// <summary>
+        /// Verkrijg een enkel eigendom object
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Eigendom>> GetEigendom(int id)
         {
             var eigendom = await _context.Eigendom
                 .Include(e => e.Adres)
+                .Include(e => e.Eigenaar)
+                .Include(e => e.Herziening)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eigendom == null)
@@ -49,6 +59,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
         }
 
         // PUT: api/Eigendom/5
+        /// <summary>
+        /// Wijzig een bestaand eigendom object
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="eigendomDto"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEigendom(int id, EigendomDto eigendomDto)
@@ -125,6 +141,11 @@ namespace Erfpacht058_API.Controllers.Eigendom
         }
 
         // DELETE: api/Eigendom/5
+        /// <summary>
+        /// Verwijder een bestaand eigendom object
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEigendom(int id)
         {
@@ -228,9 +249,11 @@ namespace Erfpacht058_API.Controllers.Eigendom
             return Ok(adres);
         }
 
+        // === Eigenaar gerelateerde endpoints
+
         // POST: /eigendom/eigenaar/1
         /// <summary>
-        /// Voeg een nieuwe eigenaar toe aan een eigendom object
+        /// Voeg een nieuwe eigenaar toe en koppel deze aan het eigendom object
         /// </summary>
         /// <param name="eigendomId"></param>
         /// <param name="eigenaarDto"></param>
@@ -265,10 +288,146 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
             // Nieuwe eigenaar opslaan in database
             _context.Eigenaar.Add(eigenaar);
-            _context.Entry(eigenaar).State = EntityState.Modified;
+            _context.Entry(eigendom).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
             return Ok(eigenaar);
+        }
+
+        // PUT: /eigendom/5/eigenaar/5 
+        /// <summary>
+        /// Voeg een bestaande eigenaar toe aan een eigendom
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="eigenaarId"></param>
+        /// <returns></returns>
+        [HttpPut("eigenaar/{eigendomId}/{eigenaarId}")]
+        public async Task<ActionResult<Eigendom>> addEigenaarToEigendom(int eigendomId, int eigenaarId)
+        {
+            // Verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Eigenaar)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null)
+                return BadRequest();
+
+            // Verkrijg eigenaar object
+            var eigenaar = await _context.Eigenaar
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == eigenaarId);
+            if (eigenaar == null)
+                return BadRequest();
+
+            // Leg relaties vast in database
+            eigendom.Eigenaar.Add(eigenaar);
+            eigenaar.Eigendom.Add(eigendom);
+            _context.Entry(eigendom).State = EntityState.Modified;
+            _context.Entry(eigenaar).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(eigenaar);
+        }
+
+        // PUT: /eigendom/eigenaar/5/5
+        /// <summary>
+        /// Ontkoppel een bestaande eigenaar van een eigendom object
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="eigenaarId"></param>
+        /// <returns></returns>
+        [HttpDelete("eigenaar/{eigendomId}/{eigenaarId}")]
+        public async Task<ActionResult<Eigendom>> DeleteEigenaarFromEigendom(int eigendomId, int eigenaarId)
+        {
+            // Verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Eigenaar)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null)
+                return BadRequest();
+
+            // Verkrijg eigenaar object
+            var eigenaar = await _context.Eigenaar
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == eigenaarId);
+            if (eigenaar == null)
+                return BadRequest();
+
+            // Verwijder relatie uit eigendom en verwijder eigenaar object
+            eigendom.Eigenaar.Remove(eigenaar);
+            eigenaar.Eigendom.Remove(eigendom);
+            _context.Entry(eigendom).State = EntityState.Modified;
+            _context.Entry(eigenaar).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return Ok(eigendom);
+        }
+
+        // === HERZIENING gerelateerde velden ===
+
+        // POST /Eigendom/herziening/5
+        /// <summary>
+        /// Voeg een nieuw herziening object toe aan het Eigendom
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="herzieningDto"></param>
+        /// <returns></returns>
+        [HttpPost("herziening/{eigendomId}")]
+        public async Task<ActionResult<Eigendom>> AddHerzieningToEigendom(int eigendomId, HerzieningDto herzieningDto)
+        {
+            // Verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Herziening)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if(eigendom == null)
+                return BadRequest();
+
+            // Creeer een nieuw herziening object
+            var herziening = new Herziening
+            {
+                Herzieningsdatum = herzieningDto.Herzieningsdatum,
+                VolgendeHerziening = herzieningDto.VolgendeHerziening
+            };
+
+            // Voeg toe aan database en leg relaties
+            _context.Herziening.Add(herziening);
+            eigendom.Herziening = herziening;
+            _context.Entry(eigendom).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(eigendom);
+        }
+
+        // PUT: /eigendom/herziening/5
+        /// <summary>
+        /// Wijzig een bestaande herziening van een eigendom object
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="herzieningDto"></param>
+        /// <returns></returns>
+        [HttpPut("herziening/{eigendomId}")]
+        public async Task<ActionResult<Herziening>> UpdateHerziening(int eigendomId, HerzieningDto herzieningDto)
+        {
+            // verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+               .Include(e => e.Herziening)
+               .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null)
+                return BadRequest();
+
+            // Verkrijg herziening van eigendom object
+            var herziening = eigendom.Herziening;
+            if (herziening == null)
+                return BadRequest();
+
+            // Wijzig object
+            herziening.Herzieningsdatum = herzieningDto.Herzieningsdatum;
+            herziening.VolgendeHerziening = herzieningDto.VolgendeHerziening;
+
+            // Sla wijzigingen op naar database
+            _context.Entry(herziening).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(herziening);
         }
     }
 }

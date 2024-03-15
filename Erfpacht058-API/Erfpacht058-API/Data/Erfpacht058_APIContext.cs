@@ -39,6 +39,7 @@ namespace Erfpacht058_API.Data
                 .HasOne(e => e.Adres)
                 .WithOne(a => a.Eigendom)
                 .HasForeignKey<Adres>(a => a.EigendomId);
+
         }
         public DbSet<Erfpacht058_API.Models.Eigendom.Eigendom> Eigendom { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Adres> Adres { get; set; } = default!;

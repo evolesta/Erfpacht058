@@ -1,0 +1,17 @@
+<h2>Herziening</h2>
+
+<form [formGroup]="herzieningForm" (ngSubmit)="modHerziening()">
+    <mat-form-field class="full-width">
+        <mat-label>Volgende herziening</mat-label>
+        <input matInput type="number" formControlName="volgendeHerziening" (keyup)="berekenHerzienDatum($event)">
+        <mat-hint>Aantal jaren tot de volgende herziening</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Herzieningsdatum</mat-label>
+        <input matInput type="date" formControlName="herzieningsdatum">
+        <mat-hint>Indien leeg zal deze automatisch berekend worden</mat-hint>
+    </mat-form-field>
+
+    <p><br/><button mat-raised-button color="primary" type="submit"><mat-icon>save</mat-icon> Opslaan</button></p>
+</form>

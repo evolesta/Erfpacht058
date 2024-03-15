@@ -38,11 +38,10 @@
                 <mat-panel-title>Adres</mat-panel-title>
             </mat-expansion-panel-header>
             
-            <div *ngIf="eigendom.adres; then thenBlock; else elseBlock"></div>
-            <ng-template #thenBlock>
+            <div *ngIf="eigendom.adres; then thenBlockAdres; else elseBlockAdres"></div>
+            <ng-template #thenBlockAdres>
                 <p style="text-align: right;"><button mat-button routerLink="adres/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Adres wijzigen</button></p>
-
-                <table *ngIf="eigendom.adres; else elseBlock">
+                <table>
                     <tr>
                         <tr><td>Straatnaam</td><td>{{ eigendom.adres.straatnaam }}</td></tr>
                         <tr><td>Huisnummer</td><td>{{ eigendom.adres.huisnummer }}</td></tr>
@@ -51,7 +50,80 @@
                         <tr><td>Woonplaats</td><td>{{ eigendom.adres.woonplaats }}</td></tr>
                 </table>
             </ng-template>
-            <ng-template #elseBlock>Er is geen adres gekoppeld aan dit eigendom - <a routerLink="adres/add/{{eigendom.id}}">adres kopppelen</a></ng-template>
+            <ng-template #elseBlockAdres>Er is geen adres gekoppeld aan dit eigendom - <a routerLink="adres/add/{{eigendom.id}}">adres kopppelen</a></ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Eigenaar</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="eigendom.eigenaar.length > 0 then thenBlockEign; else elseBlockEign"></div>
+            <ng-template #thenBlockEign>
+                <p style="text-align: right;">
+                    <button mat-button (click)="openZoekDialogEignKopp()"><mat-icon>assignment_add</mat-icon> Eigenaar koppelen</button>
+                    <button mat-button routerLink="eigenaar/add/{{eigendom.id}}"><mat-icon>add</mat-icon> Nieuwe eigenaar</button>
+                </p>
+                <table mat-table [dataSource]="eigenarenTable">
+                    <ng-container matColumnDef="naam">
+                        <th mat-header-cell *matHeaderCellDef>Naam</th>
+                        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="voorletters">
+                        <th mat-header-cell *matHeaderCellDef>Voorletters</th>
+                        <td mat-cell *matCellDef="let element">{{element.voorletters}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="debiteurnummer">
+                        <th mat-header-cell *matHeaderCellDef>Debiteurnummer</th>
+                        <td mat-cell *matCellDef="let element">{{element.debiteurnummer}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="ingangsdatum">
+                        <th mat-header-cell *matHeaderCellDef>Ingangsdatum</th>
+                        <td mat-cell *matCellDef="let element">{{element.ingangsdatum | date: 'dd-MM-yyyy'}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="einddatum">
+                        <th mat-header-cell *matHeaderCellDef>Einddatum</th>
+                        <td mat-cell *matCellDef="let element">{{element.einddatum | date: 'dd-MM-yyyy'}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="options">
+                        <th mat-header-cell *matHeaderCellDef></th>
+                        <td mat-cell *matCellDef="let element">
+                            <button mat-icon-button [matMenuTriggerFor]="eigenarenOpties" [matMenuTriggerData]="{id: element.id}"><mat-icon>more_vert</mat-icon></button>
+                        </td>
+                    </ng-container>
+                    <mat-menu #eigenarenOpties="matMenu">
+                        <ng-template matMenuContent let-id="id">
+                            <button mat-menu-item routerLink="eigenaar/edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
+                            <button mat-menu-item (click)="openVerwijdDialogEign(id)"><mat-icon>close</mat-icon> Ontkoppel</button>
+                        </ng-template>
+                    </mat-menu>
+
+                    <tr mat-header-row *matHeaderRowDef="eigenarenColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: eigenarenColumns;"></tr>
+                </table>
+            </ng-template>
+            <ng-template #elseBlockEign>Er is nog geen eigenaar aan dit eigendom gekoppeld - <a (click)="openZoekDialogEignKopp()" href="javascript:;">eigenaar koppelen</a> - <a routerLink="eigenaar/add/{{eigendom.id}}">eigenaar aanmaken</a></ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Herziening</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="eigendom.herziening then thenBlockHerz; else elseBlockHerz;"></div>
+            <ng-template #thenBlockHerz>
+                <p style="text-align: right;"><button mat-button routerLink="herziening/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Herziening wijzigen</button></p>
+                <table>
+                    <tr><td>Volgende herziening</td><td>{{eigendom.herziening.volgendeHerziening}} jaar</td></tr>
+                    <tr><td>Herzieningsdatum</td><td>{{eigendom.herziening.herzieningsdatum | date: 'dd-MM-yyyy'}}</td></tr>
+                </table>
+            </ng-template>
+            <ng-template #elseBlockHerz>Er is nog geen herziening ingevuld voor dit eigendom - <a routerLink="herziening/add/{{eigendom.id}}">herziening invullen</a></ng-template>
         </mat-expansion-panel>
     </mat-accordion>
 </div>
