@@ -1,0 +1,32 @@
+[
+  {
+    "KadastraalNummer": "123456789",
+    "deeloppervlakte": "1500",
+    "kadastraleGrootte": "1750",
+    "objectType": "Woning"
+  },
+  {
+    "KadastraalNummer": "11223344",
+    "deeloppervlakte": "750",
+    "kadastraleGrootte": "800",
+    "objectType": "Appartement"
+  },
+  {
+    "KadastraalNummer": "123123123",
+    "deeloppervlakte": "2500",
+    "kadastraleGrootte": "2200",
+    "objectType": "Woning"
+  },
+  {
+    "KadastraalNummer": "145145145",
+    "deeloppervlakte": "2000",
+    "kadastraleGrootte": "2200",
+    "objectType": "Woning"
+  },
+  {
+    "KadastraalNummer": "101101101",
+    "deeloppervlakte": "150",
+    "kadastraleGrootte": "200",
+    "objectType": "Garage"
+  }
+]

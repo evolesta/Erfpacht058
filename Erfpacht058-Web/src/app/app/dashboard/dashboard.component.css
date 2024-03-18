@@ -5,3 +5,8 @@ table tr:hover {
 table td {
     width: 20%;
 }
+
+.data .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+  }

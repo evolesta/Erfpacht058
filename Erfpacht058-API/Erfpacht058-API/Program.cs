@@ -8,14 +8,20 @@ using Microsoft.VisualBasic;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components.Web;
 using System.Reflection;
+using Erfpacht058_API.Controllers.Eigendom;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Voeg Database Context toe
 builder.Services.AddDbContext<Erfpacht058_APIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Erfpacht058_APIContext") ?? throw new InvalidOperationException("Connection string 'Erfpacht058_APIContext' not found.")));
-
 // Add services to the container.
+builder.Services.AddSingleton<IKadasterAPIService, KadasterAPIService>(provider =>
+{
+    var filepath = builder.Configuration["Kadaster:JsonFile"];
+    return new KadasterAPIService(filepath);
+});
 
 builder.Services.AddControllers();
 

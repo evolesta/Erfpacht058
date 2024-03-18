@@ -1,0 +1,25 @@
+<h2>Kadaster</h2>
+
+<form [formGroup]="kadasterForm" (ngSubmit)="modKadaster()">
+<mat-form-field class="full-width">
+    <mat-label>Kadastraal nummer</mat-label>
+    <input matInput formControlName="kadastraalNummer">
+    <mat-hint>Moet exact overeenkomen met het nr. uit het Kadaster</mat-hint>
+</mat-form-field>
+
+<mat-form-field class="half-width">
+    <mat-label>Deeloppervlakte</mat-label>
+    <input matInput [disabled]="true" formControlName="deeloppervlakte">
+</mat-form-field>
+<mat-form-field class="half-width">
+    <mat-label>Kadastrale grootte</mat-label>
+    <input matInput formControlName="kadastraleGrootte">
+</mat-form-field>
+
+<mat-form-field class="full-width">
+    <mat-label>Objecttype</mat-label>
+    <input matInput formControlName="objectType">
+</mat-form-field>
+
+<br><p><button mat-raised-button color="primary" type="submit"><mat-icon>save</mat-icon> Opslaan</button></p>
+</form>

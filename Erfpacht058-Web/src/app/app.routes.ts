@@ -9,6 +9,7 @@ import { EigendomComponent } from './app/eigendom/eigendom.component';
 import { EigenaarComponent } from './app/eigenaar/eigenaar.component';
 import { ListEigenaarComponent } from './app/eigenaar/list-eigenaar/list-eigenaar.component';
 import { HerzieningComponent } from './app/herziening/herziening.component';
+import { KadasterComponent } from './app/kadaster/kadaster.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -31,6 +32,8 @@ export const routes: Routes = [
             { path: 'eigenaar/edit/:id', component: EigenaarComponent },
             { path: 'herziening/add/:id', component: HerzieningComponent },
             { path: 'herziening/edit/:id', component: HerzieningComponent },
+            { path: 'kadaster/add/:id', component: KadasterComponent },
+            { path: 'kadaster/edit/:id', component: KadasterComponent },
         ]
     },
 ];

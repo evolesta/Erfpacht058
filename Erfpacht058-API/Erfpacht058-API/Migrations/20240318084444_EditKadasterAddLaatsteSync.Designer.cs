@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240318084444_EditKadasterAddLaatsteSync")]
+    partial class EditKadasterAddLaatsteSync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,8 +54,8 @@ namespace Erfpacht058_API.Migrations
                     b.Property<int?>("EigendomId")
                         .HasColumnType("int");
 
-                    b.Property<long>("GrootteInKb")
-                        .HasColumnType("bigint");
+                    b.Property<int>("GrootteInKb")
+                        .HasColumnType("int");
 
                     b.Property<string>("Naam")
                         .HasColumnType("nvarchar(max)");
@@ -290,7 +293,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$bZsjEqm5qrUZrJvTmje33e/RaVW3.G6Bm6RJzmteOtDE5Sj6XgVFq"
+                            Wachtwoord = "$2a$11$XJSlCEqoKKfEEc8jyU/gDOriA3796G3R25Do6p0gLBSO1zyz4SB9a"
                         });
                 });
 

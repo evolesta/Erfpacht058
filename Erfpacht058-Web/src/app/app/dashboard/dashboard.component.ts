@@ -11,6 +11,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatMenuModule} from '@angular/material/menu';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-dialog.component';
+import { UploadDialogComponent } from '../../base/generic/upload-dialog/upload-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,6 +27,8 @@ export class DashboardComponent implements OnInit {
   loaded: boolean;
   eigenarenTable: MatTableDataSource<any>;
   eigenarenColumns: string[] = ['naam', 'voorletters', 'debiteurnummer', 'ingangsdatum', 'einddatum', 'options'];
+  bestandenTable: MatTableDataSource<any>;
+  bestandenColumns: string[] = ['naam', 'soortBestand', 'grootteInKb'];
 
   constructor(private http: HttpHelperService,
     private dialog: MatDialog) {}
@@ -48,6 +51,7 @@ export class DashboardComponent implements OnInit {
 
         // Tabellen opbouwen voor many relaties
         this.eigenarenTable = new MatTableDataSource(response.eigenaar);
+        this.bestandenTable = new MatTableDataSource(response.bestand);
       });
     }
   }
@@ -124,5 +128,16 @@ export class DashboardComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Aanroepen van de synchronisatie optie in de back-end met het Kadaster
+  syncKadaster(): void {
+    this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe(resp => {
+      this.initEigendom();
+    });
+  }
+
+  openUploadFileDialog(): void {
+    const dialRef = this.dialog.open(UploadDialogComponent);
   }
 }

@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
+    using Erfpacht058_API.Models;
     using Erfpacht058_API.Models.Eigendom;
+    using System.Configuration;
 
     [Route("api/[controller]")]
     [Authorize]
@@ -19,10 +21,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
     public class EigendomController : ControllerBase
     {
         private readonly Erfpacht058_APIContext _context;
+        private readonly IConfiguration _configuration;
 
-        public EigendomController(Erfpacht058_APIContext context)
+        public EigendomController(Erfpacht058_APIContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/Eigendom
@@ -48,6 +52,8 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 .Include(e => e.Adres)
                 .Include(e => e.Eigenaar)
                 .Include(e => e.Herziening)
+                .Include(e => e.Kadaster)
+                .Include(e => e.Bestand)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eigendom == null)
@@ -342,15 +348,13 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var eigendom = await _context.Eigendom
                 .Include(e => e.Eigenaar)
                 .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null)
-                return BadRequest();
+            if (eigendom == null) return BadRequest();
 
             // Verkrijg eigenaar object
             var eigenaar = await _context.Eigenaar
                 .Include(e => e.Eigendom)
                 .FirstOrDefaultAsync(e => e.Id == eigenaarId);
-            if (eigenaar == null)
-                return BadRequest();
+            if (eigenaar == null) return BadRequest();
 
             // Verwijder relatie uit eigendom en verwijder eigenaar object
             eigendom.Eigenaar.Remove(eigenaar);
@@ -378,14 +382,15 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var eigendom = await _context.Eigendom
                 .Include(e => e.Herziening)
                 .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if(eigendom == null)
-                return BadRequest();
+            if(eigendom == null) return BadRequest();
 
             // Creeer een nieuw herziening object
             var herziening = new Herziening
             {
                 Herzieningsdatum = herzieningDto.Herzieningsdatum,
-                VolgendeHerziening = herzieningDto.VolgendeHerziening
+                VolgendeHerziening = herzieningDto.VolgendeHerziening,
+                Eigendom = eigendom,
+                EigendomId = eigendomId
             };
 
             // Voeg toe aan database en leg relaties
@@ -411,8 +416,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var eigendom = await _context.Eigendom
                .Include(e => e.Herziening)
                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null)
-                return BadRequest();
+            if (eigendom == null) return BadRequest();
 
             // Verkrijg herziening van eigendom object
             var herziening = eigendom.Herziening;
@@ -429,5 +433,120 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
             return Ok(herziening);
         }
+
+        // === Kadaster gerelateerde functies ===
+        // POST: /eigendom/kadaster/5
+        /// <summary>
+        /// Voeg een nieuw kadaster object toe aan een eigendom
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="kadasterDto"></param>
+        /// <returns></returns>
+        [HttpPost("kadaster/{eigendomId}")]
+        public async Task<ActionResult<Kadaster>> AddKadasterToEigendom(int eigendomId, KadasterDto kadasterDto)
+        {
+            // verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+               .Include(e => e.Kadaster)
+               .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) return BadRequest();
+
+            // Maak een nieuw Kadaster object aan
+            var kadaster = new Kadaster
+            {
+                // Koppel enkel het kadastraal nr. voor de Sync
+                KadastraalNummer = kadasterDto.KadastraalNummer,
+                Eigendom = eigendom,
+                EigendomId = eigendomId
+            };
+
+            // Maak nieuw Kadaster object, leg relaties en voeg toe aan database
+            _context.Kadaster.Add(kadaster);
+            eigendom.Kadaster = kadaster;
+            _context.Entry(eigendom).State = EntityState.Modified;
+            
+            await _context.SaveChangesAsync();
+
+            return Ok(kadaster);
+        }
+
+        // PUT: /eigendom/kadaster/5
+        /// <summary>
+        /// Wijzig een bestaand kadaster object bij een eigendom
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="kadasterDto"></param>
+        /// <returns></returns>
+        [HttpPut("kadaster/{eigendomId}")]
+        public async Task<ActionResult<Kadaster>> EditKadaster(int eigendomId, KadasterDto kadasterDto)
+        {
+            // verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+               .Include(e => e.Kadaster)
+               .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) return BadRequest();
+            var kadaster = eigendom.Kadaster;
+            if (kadaster == null) return BadRequest();
+
+            // Wijzig kadaster object
+            kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
+
+            // Wijzig naar database
+            _context.Entry(kadaster).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(kadaster);
+        }
+
+        // POST: /eigendom/bestand/5
+        /// <summary>
+        /// Upload een nieuw bestand onder het eigendom
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <returns></returns>
+        /*[HttpPost("bestand/{eigendomId}")]
+        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, [FromForm] BestandDto bestandDto)    
+        {
+            // Verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Bestand)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) return BadRequest();
+
+            // Behandel bestand
+            if (bestandDto.Files == null || bestandDto.Files.Count == 0)
+                return BadRequest("Bestand niet aanwezig of geaccepteerd");
+
+            // Genereer storage pad
+            var storageLoc = _configuration["Bestanden:OpslagPad"] + "/" + eigendomId.ToString();
+            if (!Directory.Exists(storageLoc))
+                Directory.CreateDirectory(storageLoc);
+
+            // Schrijf het geuploade bestand naar de storage
+            var filepath = Path.Combine(storageLoc, bestandDto.Files.FileName);
+            using (var stream = new FileStream(filepath, FileMode.Create))
+            {
+                await bestandDto.Files.CopyToAsync(stream);
+            }
+
+            // Maak een nieuw database object
+            var bestand = new Bestand
+            {
+                Eigendom = eigendom,
+                Naam = bestandDto.Files.FileName,
+                Beschrijving = "",
+                GrootteInKb = bestandDto.File.Length / 1024,
+                SoortBestand = SoortBestand.Algemeen,
+                Pad = filepath
+            };
+
+            // Leg relaties en sla object op in database
+            eigendom.Bestand.Add(bestand);
+            _context.Bestand.Add(bestand);
+            _context.Entry(eigendom).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(bestand);
+        }*/
     }
 }

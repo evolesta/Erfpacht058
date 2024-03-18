@@ -46,6 +46,7 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Eigendom.Eigenaar> Eigenaar { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Herziening> Herziening { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Kadaster> Kadaster { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Bestand> Bestand { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Overeenkomst.Overeenkomst> Overeenkomst { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Overeenkomst.Financien> Financien { get; set; } = default!;
     }

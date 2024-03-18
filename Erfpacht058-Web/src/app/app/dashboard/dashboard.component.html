@@ -20,6 +20,10 @@
         <mat-expansion-panel [expanded]="true">
             <mat-expansion-panel-header>
                 <mat-panel-title>Eigendom</mat-panel-title>
+                <mat-panel-description>
+                    Eigendom object
+                    <mat-icon>real_estate_agent</mat-icon>
+                </mat-panel-description>
             </mat-expansion-panel-header>
             <p style="text-align: right;"><button mat-button routerLink="eigendom/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Eigendom wijzigen</button></p>
             <table class="dataTable">
@@ -36,6 +40,11 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Adres</mat-panel-title>
+                <mat-panel-description>
+                    Adres van eigendom
+                    <div *ngIf="!eigendom.adres; else elseAdres"><mat-icon color="warn">warning</mat-icon></div>
+                    <ng-template #elseAdres><mat-icon>home</mat-icon></ng-template>
+                </mat-panel-description>
             </mat-expansion-panel-header>
             
             <div *ngIf="eigendom.adres; then thenBlockAdres; else elseBlockAdres"></div>
@@ -56,6 +65,11 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Eigenaar</mat-panel-title>
+                <mat-panel-description>
+                    Gekoppelde eigenaar/eigenaren
+                    <div *ngIf="eigendom.eigenaar.length == 0; else elseEign"><mat-icon color="warn">warning</mat-icon></div>
+                    <ng-template #elseEign><mat-icon>groups</mat-icon></ng-template>
+                </mat-panel-description>
             </mat-expansion-panel-header>
 
             <div *ngIf="eigendom.eigenaar.length > 0 then thenBlockEign; else elseBlockEign"></div>
@@ -113,6 +127,11 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Herziening</mat-panel-title>
+                <mat-panel-description>
+                    Geplande herziening
+                    <div *ngIf="!eigendom.herziening; else elseHerz"><mat-icon color="warn">warning</mat-icon></div>
+                    <ng-template #elseHerz><mat-icon>timer</mat-icon></ng-template>
+                </mat-panel-description>
             </mat-expansion-panel-header>
 
             <div *ngIf="eigendom.herziening then thenBlockHerz; else elseBlockHerz;"></div>
@@ -124,6 +143,72 @@
                 </table>
             </ng-template>
             <ng-template #elseBlockHerz>Er is nog geen herziening ingevuld voor dit eigendom - <a routerLink="herziening/add/{{eigendom.id}}">herziening invullen</a></ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Kadaster</mat-panel-title>
+                <mat-panel-description>
+                    Gegevens uit het Kadaster
+                    <div *ngIf="!eigendom.kadaster; else elseKadast"><mat-icon color="warn">warning</mat-icon></div>
+                    <ng-template #elseKadast><mat-icon>grass</mat-icon></ng-template>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="eigendom.kadaster then thenBlockKadast; else elseBlockKadast;"></div>
+            <ng-template #thenBlockKadast>
+                <p style="text-align: right;">
+                    <button mat-button (click)="syncKadaster()"><mat-icon>sync</mat-icon> Synchroniseren</button>
+                    <button mat-button routerLink="kadaster/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Kadaster wijzigen</button>
+                </p>
+                <table>
+                    <tr><td>Kadstraal nummer</td><td>{{eigendom.kadaster.kadastraalNummer}}</td></tr>
+                    <tr><td>Deeloppervlakte</td><td>{{eigendom.kadaster.deeloppervlakte}} m2</td></tr>
+                    <tr><td>Kadastrale grootte</td><td>{{eigendom.kadaster.kadastraleGrootte}} m2</td></tr>
+                    <tr><td>Type object</td><td>{{eigendom.kadaster.objectType}}</td></tr>
+                    <tr *ngIf="eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>{{eigendom.kadaster.laatsteSynchronisatie | date: 'dd-MM-yyyy'}}</td></tr>
+                    <tr *ngIf="!eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>nooit</td></tr>
+                </table>
+            </ng-template>
+            <ng-template #elseBlockKadast>Er zijn nog geen Kadastrale gegevens bekend - <a routerLink="kadaster/add/{{eigendom.id}}">Kadaster invullen</a></ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Bestanden</mat-panel-title>
+                <mat-panel-description>
+                    Gerelateerde Bestanden
+                    <mat-icon>attach_file</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <p style="text-align: right;">
+                <button mat-button (click)="openUploadFileDialog()"><mat-icon>upload</mat-icon> Upload bestand</button>
+            </p>
+
+            <div *ngIf="eigendom.bestand.length > 0 then thenBlockBst; else elseBlockBst;"></div>    
+            <ng-template #thenBlockBst>
+                <table mat-table [dataSource]="bestandenTable">
+                    <ng-container matColumnDef="naam">
+                        <th mat-header-cell *matHeaderCellDef>Naam</th>
+                        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="soortBestand">
+                        <th mat-header-cell *matHeaderCellDef>Soort bestand</th>
+                        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="grootteInKb">
+                        <th mat-header-cell *matHeaderCellDef>Grootte in KB</th>
+                        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="bestandenColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: bestandenColumns;"></tr>
+                </table>
+            </ng-template>
+            <ng-template #elseBlockBst>
+                <p>Er zijn geen bestanden aanwezig</p>
+            </ng-template>
         </mat-expansion-panel>
     </mat-accordion>
 </div>
