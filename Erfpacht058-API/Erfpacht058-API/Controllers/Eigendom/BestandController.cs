@@ -43,6 +43,39 @@ namespace Erfpacht058_API.Controllers.Eigendom
             return bestand;
         }
 
+        // GET: /api/bestand/download/5
+        /// <summary>
+        /// Download een bestand a.d.h.v. het ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>octet-stream</returns>
+        /// <response code="200">Een octet-stream (download) met het gevraagde bestand</response>
+        [HttpGet("download/{id}")]
+        public async Task<ActionResult> DownloadBestand(int id)
+        {
+            // Verkrijg bestand object van database
+            var bestand = await _context.Bestand.FindAsync(id);
+            if (bestand == null) return BadRequest();
+
+            // Verkrijg bestandspad naar bestand
+            var filepath = bestand.Pad;
+            if (!System.IO.File.Exists(filepath)) return BadRequest();
+
+            // Converteer het bestand naar bytes om als response mee te sturen (download)
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filepath);
+
+            // Zet content-Disposition om een download te forceren in de response
+            var contentDisposition = new System.Net.Mime.ContentDisposition
+            {
+                FileName = bestand.Naam,
+                Inline = false
+            };
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+
+            // Geef het bestand als byte array terug in de octet-stream (download)
+            return File(fileBytes, "application/octet-stream");
+        }
+
         // PUT: api/Bestand/5
         /// <summary>
         /// Wijzig een bestaand bestand
@@ -76,7 +109,9 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBestand(int id)
         {
-            var bestand = await _context.Bestand.FindAsync(id);
+            var bestand = await _context.Bestand
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == id);
             if (bestand == null) return NotFound();
             var eigendom = bestand.Eigendom;
 

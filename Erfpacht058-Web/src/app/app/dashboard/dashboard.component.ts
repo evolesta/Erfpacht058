@@ -12,11 +12,13 @@ import {MatMenuModule} from '@angular/material/menu';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-dialog.component';
 import { UploadDialogComponent } from '../../base/generic/upload-dialog/upload-dialog.component';
+import { environment } from '../../../environments/environment';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, CommonModule, RouterModule, MatGridListModule, MatExpansionModule, MatMenuModule, MatTableModule, MatMenuModule],
+  imports: [MatButtonModule, MatIconModule, CommonModule, RouterModule, MatGridListModule, MatExpansionModule, MatMenuModule, MatTableModule, MatMenuModule, MatTooltipModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -28,7 +30,11 @@ export class DashboardComponent implements OnInit {
   eigenarenTable: MatTableDataSource<any>;
   eigenarenColumns: string[] = ['naam', 'voorletters', 'debiteurnummer', 'ingangsdatum', 'einddatum', 'options'];
   bestandenTable: MatTableDataSource<any>;
-  bestandenColumns: string[] = ['naam', 'soortBestand', 'grootteInKb'];
+  bestandenColumns: string[] = ['naam', 'soortBestand', 'grootteInKb', 'download', 'options'];
+  soortenBestanden = {
+    0: "Algemeen", 1: "Notitie", 2: "Bewijsstuk", 3: "Overeenkomst", 4: "Overig"
+  }
+  downloadEndpoint: string = environment.apiURL + '/bestand/download/';
 
   constructor(private http: HttpHelperService,
     private dialog: MatDialog) {}
@@ -142,6 +148,18 @@ export class DashboardComponent implements OnInit {
       data: {
         id: this.eigendom.id
       }
+    });
+    dialRef.afterClosed().subscribe(result => {
+      this.initEigendom();
+    });
+  }
+
+  openVerwijderFileDialog(id): void {
+    const dialogRef = this.dialog.open(DeleteDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      this.http.delete('/bestand/' + id).subscribe(resp => {
+        this.initEigendom();
+      });
     });
   }
 }

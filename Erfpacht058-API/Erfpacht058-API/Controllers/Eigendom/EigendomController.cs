@@ -504,8 +504,16 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// </summary>
         /// <param name="eigendomId"></param>
         /// <returns></returns>
+        /// <remarks>
+        ///     Geef een array van bestanden in de body van de request mee als formdata:
+        ///     POST /eigendom/bestand/1
+        ///     {
+        ///         "Files": binary
+        ///         "Files": binary
+        ///     }
+        /// </remarks>
         [HttpPost("bestand/{eigendomId}")]
-        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, BestandDto bestandDto)    
+        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, BestandDtoUpload bestandDto)    
         {
             // Verkrijg eigendom object
             var eigendom = await _context.Eigendom

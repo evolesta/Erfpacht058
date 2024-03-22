@@ -25,12 +25,15 @@
         Overig
     }
 
+    public class BestandDtoUpload
+    {
+        public List<IFormFile> Files { get; set; }
+    }
+
     public class BestandDto
     {
         public string? Naam { get; set; }
         public SoortBestand? SoortBestand { get; set; }
         public string? Beschrijving { get; set; }
-        [FromForm]
-        public IFormFileCollection Files { get; set; }
     }
 }

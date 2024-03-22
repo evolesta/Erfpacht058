@@ -1,0 +1,26 @@
+<h2>Bestand wijzigen</h2>
+
+<form [formGroup]="bestandForm" (ngSubmit)="submitBestand()">
+    <mat-form-field class="full-width">
+        <mat-label>Naam</mat-label>
+        <input matInput formControlName="naam">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Soort bestand</mat-label>
+        <mat-select formControlName="soortBestand">
+            <mat-option [value]="0">Algemeen</mat-option>
+            <mat-option [value]="1">Notitie</mat-option>
+            <mat-option [value]="2">Bewijsstuk</mat-option>
+            <mat-option [value]="3">Overeenkomst</mat-option>
+            <mat-option [value]="4">Overig</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Beschrijving</mat-label>
+        <textarea matInput formControlName="beschrijving"></textarea>
+    </mat-form-field>
+
+    <button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button>
+</form>

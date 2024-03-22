@@ -19,10 +19,7 @@ import { CommonModule } from '@angular/common';
 export class UploadDialogComponent {
 
   uploadFileForm = new FormGroup({
-    naam: new FormControl(''),
-    soortBestand: new FormControl(''),
-    beschrijving: new FormControl(''),
-    files: this.formbuilder.array([])
+    Files: this.formbuilder.array([])
   });
 
   filesArray: string[] = [];
@@ -33,26 +30,39 @@ export class UploadDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: {id: string},
     private dialogRef: MatDialogRef<UploadDialogComponent>) {}
 
-  uploadFiles(): void {
-    if (this.uploadFileForm.controls.files.length > 0) {
-      this.http.post('/eigendom/bestand/' + this.data.id, this.uploadFileForm.value).subscribe(resp => {
-        this.dialogRef.close();
-      });
-    }
-    else this.error = "Geen bestanden geselecteerd.";
-  } 
-
   // Functie die de formControl files bijwerkt wanneer er bestanden zijn toegevoegd aan het formulier
   onFileChange(event: any): void {
     this.filesArray = [];
-    this.uploadFileForm.controls.files.clear();
+    this.uploadFileForm.controls.Files.clear();
+
     const files = event.target.files;
-    const fileArray = this.uploadFileForm.get('files') as FormArray;
+    const fileArray = this.uploadFileForm.get('Files') as FormArray;
 
     for (let i = 0; i < files.length; i++) {
       fileArray.push(this.formbuilder.control(files[i]));
       this.filesArray.push(files[i].name);
     }
   }
+
+  // Upload de bestanden naar de back-end
+  uploadFiles(): void {
+    if (this.uploadFileForm.controls.Files.length > 0) {
+      // Omdat er ook bestanden geupload worden, wordt de FormGroup omgezet naar FormData
+      const formData = new FormData();
+      const files = (this.uploadFileForm.get('Files') as FormArray).controls;
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append('Files', (files[i] as FormControl).value);
+      }
+
+      console.log(formData)
+
+      // POST request met file upload
+      this.http.post('/eigendom/bestand/' + this.data.id, formData).subscribe(resp => {
+        this.dialogRef.close();
+      });
+    }
+    else this.error = "Geen bestanden geselecteerd.";
+  } 
 }
  
