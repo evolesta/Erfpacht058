@@ -504,8 +504,8 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// </summary>
         /// <param name="eigendomId"></param>
         /// <returns></returns>
-        /*[HttpPost("bestand/{eigendomId}")]
-        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, [FromForm] BestandDto bestandDto)    
+        [HttpPost("bestand/{eigendomId}")]
+        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, BestandDto bestandDto)    
         {
             // Verkrijg eigendom object
             var eigendom = await _context.Eigendom
@@ -522,31 +522,37 @@ namespace Erfpacht058_API.Controllers.Eigendom
             if (!Directory.Exists(storageLoc))
                 Directory.CreateDirectory(storageLoc);
 
-            // Schrijf het geuploade bestand naar de storage
-            var filepath = Path.Combine(storageLoc, bestandDto.Files.FileName);
-            using (var stream = new FileStream(filepath, FileMode.Create))
+            // Doorloop de lijst met alle bestanden
+            foreach (var file in bestandDto.Files)
             {
-                await bestandDto.Files.CopyToAsync(stream);
+                // Schrijf het geuploade bestand naar de storage
+                var filepath = Path.Combine(storageLoc, file.FileName);
+                using (var stream = new FileStream(filepath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Maak een nieuw database object
+                var bestand = new Bestand
+                {
+                    Eigendom = eigendom,
+                    Naam = file.FileName,
+                    Beschrijving = "",
+                    GrootteInKb = file.Length / 1024,
+                    SoortBestand = SoortBestand.Algemeen,
+                    Pad = filepath
+                };
+
+                // Leg relaties vast en voeg toe aan context
+                eigendom.Bestand.Add(bestand);
+                _context.Bestand.Add(bestand);
             }
 
-            // Maak een nieuw database object
-            var bestand = new Bestand
-            {
-                Eigendom = eigendom,
-                Naam = bestandDto.Files.FileName,
-                Beschrijving = "",
-                GrootteInKb = bestandDto.File.Length / 1024,
-                SoortBestand = SoortBestand.Algemeen,
-                Pad = filepath
-            };
-
-            // Leg relaties en sla object op in database
-            eigendom.Bestand.Add(bestand);
-            _context.Bestand.Add(bestand);
+            // Opslaan in database
             _context.Entry(eigendom).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return Ok(bestand);
-        }*/
+            return Ok(eigendom);
+        }
     }
 }

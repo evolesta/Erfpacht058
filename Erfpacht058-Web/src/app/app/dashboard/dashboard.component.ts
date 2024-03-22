@@ -138,6 +138,10 @@ export class DashboardComponent implements OnInit {
   }
 
   openUploadFileDialog(): void {
-    const dialRef = this.dialog.open(UploadDialogComponent);
+    const dialRef = this.dialog.open(UploadDialogComponent, {
+      data: {
+        id: this.eigendom.id
+      }
+    });
   }
 }

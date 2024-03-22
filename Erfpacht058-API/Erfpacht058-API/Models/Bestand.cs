@@ -1,6 +1,7 @@
 ﻿namespace Erfpacht058_API.Models
 {
     using Erfpacht058_API.Models.Eigendom;
+    using Microsoft.AspNetCore.Mvc;
     using System.Text.Json.Serialization;
 
     public class Bestand
@@ -29,6 +30,7 @@
         public string? Naam { get; set; }
         public SoortBestand? SoortBestand { get; set; }
         public string? Beschrijving { get; set; }
-        public List<IFormFile> Files { get; set; }
+        [FromForm]
+        public IFormFileCollection Files { get; set; }
     }
 }

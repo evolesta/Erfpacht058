@@ -51,7 +51,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="bestandDto"></param>
         /// <returns></returns> 
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPut("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> PutBestand(int id, BestandDto bestandDto)
         {
             var bestand = await _context.Bestand.FindAsync(id);
@@ -59,7 +59,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
             bestand.Naam = bestandDto.Naam;
             bestand.Beschrijving = bestandDto.Beschrijving;
-            bestand.SoortBestand = bestandDto.SoortBestand;
+            bestand.SoortBestand = (SoortBestand)bestandDto.SoortBestand;
             
             _context.Entry(bestand).State = EntityState.Modified; 
             await _context.SaveChangesAsync(); 
@@ -72,7 +72,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// Verwijder een bestand
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns> */
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBestand(int id)
         {
