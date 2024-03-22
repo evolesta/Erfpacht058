@@ -226,5 +226,28 @@
                 <p>Er zijn geen bestanden aanwezig</p>
             </ng-template>
         </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Notities</mat-panel-title>
+                <mat-panel-description>
+                    Notities gerelateerd aan het eigendom
+                    <mat-icon>notes</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="editNotities then elseBlockNot; else thenBlockNot;"></div>
+            <ng-template #thenBlockNot>
+                <p style="text-align: right;"><button mat-button (click)="editNotities = true"><mat-icon>edit</mat-icon> Bewerken</button></p>
+                <p>{{eigendom.notities}}</p>
+            </ng-template>
+            <ng-template #elseBlockNot>
+                <mat-form-field style="width: 100%;">
+                    <mat-label>Notities</mat-label>
+                    <textarea matInput [formControl]="notities"></textarea>
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="updateNotes()"><mat-icon>save</mat-icon> Opslaan</button>
+            </ng-template>
+        </mat-expansion-panel>
     </mat-accordion>
 </div>

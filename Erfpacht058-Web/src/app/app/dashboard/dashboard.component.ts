@@ -14,11 +14,15 @@ import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-d
 import { UploadDialogComponent } from '../../base/generic/upload-dialog/upload-dialog.component';
 import { environment } from '../../../environments/environment';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, CommonModule, RouterModule, MatGridListModule, MatExpansionModule, MatMenuModule, MatTableModule, MatMenuModule, MatTooltipModule],
+  imports: [MatButtonModule, MatIconModule, CommonModule, RouterModule, MatGridListModule, MatExpansionModule, MatMenuModule, MatTableModule, 
+    MatMenuModule, MatTooltipModule, MatInputModule, MatFormFieldModule, ReactiveFormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -35,6 +39,8 @@ export class DashboardComponent implements OnInit {
     0: "Algemeen", 1: "Notitie", 2: "Bewijsstuk", 3: "Overeenkomst", 4: "Overig"
   }
   downloadEndpoint: string = environment.apiURL + '/bestand/download/';
+  notities = new FormControl('');
+  editNotities: boolean;
 
   constructor(private http: HttpHelperService,
     private dialog: MatDialog) {}
@@ -58,6 +64,9 @@ export class DashboardComponent implements OnInit {
         // Tabellen opbouwen voor many relaties
         this.eigenarenTable = new MatTableDataSource(response.eigenaar);
         this.bestandenTable = new MatTableDataSource(response.bestand);
+
+        // Zet de notities van het eigendom naar de FormControl
+        this.notities.setValue(this.eigendom.notities);
       });
     }
   }
@@ -160,6 +169,15 @@ export class DashboardComponent implements OnInit {
       this.http.delete('/bestand/' + id).subscribe(resp => {
         this.initEigendom();
       });
+    });
+  }
+
+  // Wijzig de notities naar het object in de database
+  updateNotes(): void {
+    this.eigendom.notities = this.notities.value;
+    this.http.put('/eigendom/' + this.eigendom.id, this.eigendom).subscribe(resp => {
+      this.initEigendom();
+      this.editNotities = false;
     });
   }
 }
