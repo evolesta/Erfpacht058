@@ -15,6 +15,7 @@
 
 <div *ngIf="loaded">
     <p><b>Geselecteerde eigendom:</b> {{ eigendom.id }}</p>
+    <p *ngIf="eigendom.adres">{{eigendom.adres.straatnaam}} {{eigendom.adres.huisnummer}} in {{eigendom.adres.woonplaats}}</p>
 
     <mat-accordion class="data">
         <mat-expansion-panel [expanded]="true">
@@ -113,7 +114,7 @@
                     <mat-menu #eigenarenOpties="matMenu">
                         <ng-template matMenuContent let-id="id">
                             <button mat-menu-item routerLink="eigenaar/edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
-                            <button mat-menu-item (click)="openVerwijdDialogEign(id)"><mat-icon>close</mat-icon> Ontkoppel</button>
+                            <button mat-menu-item (click)="openOntkDialogEign(id)"><mat-icon>close</mat-icon> Ontkoppel</button>
                         </ng-template>
                     </mat-menu>
 
@@ -248,6 +249,25 @@
                 </mat-form-field>
                 <button mat-raised-button color="primary" (click)="updateNotes()"><mat-icon>save</mat-icon> Opslaan</button>
             </ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Overeenkomst(en)</mat-panel-title>
+                <mat-panel-description>
+                    Afgesloten overeenkomst(en) gerelateerd aan het eigendom
+                    <div *ngIf="eigendom.overeenkomst.length == 0; else elseOvereen"><mat-icon color="warn">warning</mat-icon></div>
+                    <ng-template #elseOvereen><mat-icon>gavel</mat-icon></ng-template>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="eigendom.overeenkomst.length > 0 then thenBlockOvereen; else elseBlockOvereen;"></div>
+                <ng-template #thenBlockOvereen>
+
+                </ng-template>
+                <ng-template #elseBlockOvereen>
+                    <p>Er zijn nog geen overeenkomsten gekoppeld - <a routerLink="overeenkomst/add/{{eigendom.id}}">nieuwe overeenkomst</a> of <a (click)="openKoppelOvereenkomstDialog(eigendom.id)" href="javascript:;">koppel overeenkomst</a></p>
+                </ng-template>
         </mat-expansion-panel>
     </mat-accordion>
 </div>

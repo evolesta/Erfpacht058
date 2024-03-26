@@ -22,3 +22,8 @@
 .icon {
     padding: 0 14px;
 }
+
+.content-header {
+  text-align: right;
+  font-size: 11px;
+}

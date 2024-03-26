@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Models;
 using BCrypt.Net;
 using Erfpacht058_API.Models.Eigendom;
-using Erfpacht058_API.Models.Overeenkomst;
+using Erfpacht058_API.Models.OvereenkomstNS;
 
 namespace Erfpacht058_API.Data
 {
@@ -47,7 +47,7 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Eigendom.Herziening> Herziening { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Kadaster> Kadaster { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Bestand> Bestand { get; set; } = default!;
-        public DbSet<Erfpacht058_API.Models.Overeenkomst.Overeenkomst> Overeenkomst { get; set; } = default!;
-        public DbSet<Erfpacht058_API.Models.Overeenkomst.Financien> Financien { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.OvereenkomstNS.Overeenkomst> Overeenkomst { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.OvereenkomstNS.Financien> Financien { get; set; } = default!;
     }
 }

@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Data;
-using Erfpacht058_API.Models.Overeenkomst;
 
 namespace Erfpacht058_API.Controllers.Overeenkomst
 {
-    using Erfpacht058_API.Models.Overeenkomst;
+    using Erfpacht058_API.Models.OvereenkomstNS;
     using Microsoft.AspNetCore.Authorization;
+    using Erfpacht058_API.Models.Eigendom;
 
     [Route("api/[controller]")]
     [Authorize]
@@ -77,31 +77,30 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
             return NoContent();
         }
 
-        // POST: api/Overeenkomst
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Overeenkomst>> PostOvereenkomst(Overeenkomst overeenkomst)
-        {
-            _context.Overeenkomst.Add(overeenkomst);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOvereenkomst", new { id = overeenkomst.Id }, overeenkomst);
-        }
-
         // DELETE: api/Overeenkomst/5
+        /// <summary>
+        /// Verwijder een bestaande overeenkomst en relaties
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOvereenkomst(int id)
+        public async Task<ActionResult<Eigendom>> DeleteOvereenkomst(int id)
         {
-            var overeenkomst = await _context.Overeenkomst.FindAsync(id);
-            if (overeenkomst == null)
-            {
-                return NotFound();
-            }
+            // verkrijg benodigde objecten
+            var overeenkomst = await _context.Overeenkomst
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            if (overeenkomst == null) return BadRequest();
+            var eigendom = overeenkomst.Eigendom;
+            if (eigendom == null) return BadRequest();
 
+            // Verwijder relaties en object en sla op
+            eigendom.Overeenkomst.Remove(overeenkomst);
             _context.Overeenkomst.Remove(overeenkomst);
+            _context.Entry(eigendom).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(eigendom);
         }
 
         private bool OvereenkomstExists(int id)

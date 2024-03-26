@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers
 {
+    // Usermanagement van de applicatie, alleen toegankelijk voor gebruikers met de rol 'Beheerder'
     [Route("api/[controller]")]
     [Authorize(Roles = "Beheerder")]
     [ApiController]

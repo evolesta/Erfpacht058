@@ -1,0 +1,33 @@
+<h2>Overeenkomsten</h2>
+
+<p style="text-align: right;"><button mat-raised-button color="primary" routerLink="add"><mat-icon>add</mat-icon> Nieuwe overeenkomst</button></p>
+
+<table mat-table [dataSource]="overeenkomstTable" class="mat-elevation-z8">
+    <ng-container matColumnDef="dossiernummer">
+        <th mat-header-cell *matHeaderCellDef>Dossiernummer</th>
+        <td mat-cell *matCellDef="let element">{{element.dossiernummer}}</td>
+    </ng-container>
+    <ng-container matColumnDef="ingangsdatum">
+        <th mat-header-cell *matHeaderCellDef>Ingangsdatum</th>
+        <td mat-cell *matCellDef="let element">{{element.ingangsdatum}}</td>
+    </ng-container>
+    <ng-container matColumnDef="einddatum">
+        <th mat-header-cell *matHeaderCellDef>Einddatum</th>
+        <td mat-cell *matCellDef="let element">{{element.einddatum}}</td>
+    </ng-container>
+    <ng-container matColumnDef="grondwaarde">
+        <th mat-header-cell *matHeaderCellDef>Grondwaarde</th>
+        <td mat-cell *matCellDef="let element">{{element.grondwaarde}}</td>
+    </ng-container>
+    <ng-container matColumnDef="rentepercentage">
+        <th mat-header-cell *matHeaderCellDef>Rentepercentage</th>
+        <td mat-cell *matCellDef="let element">{{element.rentepercentage}}</td>
+    </ng-container>
+
+    <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" collspan="4">Er zijn geen overeenkomsten aanwezig</td>
+    </tr>
+
+    <tr mat-header-row *matHeaderRowDef="overeenkomstColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: overeenkomstColumns;"></tr>
+</table>

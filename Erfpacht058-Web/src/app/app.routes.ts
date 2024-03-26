@@ -11,6 +11,8 @@ import { ListEigenaarComponent } from './app/eigenaar/list-eigenaar/list-eigenaa
 import { HerzieningComponent } from './app/herziening/herziening.component';
 import { KadasterComponent } from './app/kadaster/kadaster.component';
 import { BestandComponent } from './app/bestand/bestand.component';
+import { OvereenkomstComponent } from './app/overeenkomst/overeenkomst.component';
+import { ModOvereenkomstComponent } from './app/overeenkomst/mod-overeenkomst/mod-overeenkomst.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -36,6 +38,8 @@ export const routes: Routes = [
             { path: 'kadaster/add/:id', component: KadasterComponent },
             { path: 'kadaster/edit/:id', component: KadasterComponent },
             { path: 'bestand/edit/:id', component: BestandComponent },
+            { path: 'overeenkomst', component: OvereenkomstComponent },
+            { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
         ]
     },
 ];

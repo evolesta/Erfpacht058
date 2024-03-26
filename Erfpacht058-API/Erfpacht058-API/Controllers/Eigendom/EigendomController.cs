@@ -14,6 +14,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
     using Erfpacht058_API.Models;
     using Erfpacht058_API.Models.Eigendom;
     using System.Configuration;
+    using Erfpacht058_API.Models.OvereenkomstNS;
 
     [Route("api/[controller]")]
     [Authorize]
@@ -54,6 +55,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 .Include(e => e.Herziening)
                 .Include(e => e.Kadaster)
                 .Include(e => e.Bestand)
+                .Include(e => e.Overeenkomst)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eigendom == null)
@@ -558,6 +560,69 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
             // Opslaan in database
             _context.Entry(eigendom).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(eigendom);
+        }
+
+        // POST: api/overeenkomst/{eigendomId}
+        /// <summary>
+        /// Maak een nieuwe overeenkomst aan
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="overeenkomstDto"></param>
+        /// <returns></returns>
+        [HttpPost("overeenkomst/{eigendomId}")]
+        public async Task<ActionResult<Overeenkomst>> AddOvereenkomst(int eigendomId, OvereenkomstDto overeenkomstDto)
+        {
+            // Verkrijg eigendom object
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Overeenkomst)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+            if (eigendom == null) return BadRequest();
+
+            // Creeer een nieuw overeenkomst object
+            var overeenkomst = new Overeenkomst
+            {
+                Dossiernummer = overeenkomstDto.Dossiernummer,
+                Ingangsdatum = overeenkomstDto.Ingangsdatum,
+                Einddatum = overeenkomstDto.Einddatum,
+                Grondwaarde = overeenkomstDto.Grondwaarde,
+                DatumAkte = overeenkomstDto.DatumAkte,
+                Rentepercentage = overeenkomstDto.Rentepercentage,
+                Eigendom = eigendom
+            };
+
+            // Leg relaties vast en sla object op in database
+            _context.Overeenkomst.Add(overeenkomst);
+            eigendom.Overeenkomst.Add(overeenkomst);
+            _context.Entry(eigendom).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(overeenkomst);
+        }
+
+        // PUT: /eigendom/overeenkomst/5/5
+        /// <summary>
+        /// Koppel een overeenkomst aan een eigendom object
+        /// </summary>
+        /// <param name="eigendomId"></param>
+        /// <param name="overeenkomstId"></param>
+        /// <returns></returns>
+        [HttpPut("overeenkomst/{eigendomId}/{overeenkomstId}")]
+        public async Task<ActionResult<Eigendom>> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId)
+        {
+            // Verkrijg eigendom en overeenkomst objecten
+            var eigendom = await _context.Eigendom.FindAsync(eigendomId);
+            if (eigendom == null) return BadRequest();
+            var overeenkomst = await _context.Overeenkomst.FindAsync(overeenkomstId);
+            if (overeenkomst == null) return BadRequest();
+
+            // Relaties leggen en opslaan
+            eigendom.Overeenkomst.Add(overeenkomst);
+            overeenkomst.Eigendom = eigendom;
+            _context.Entry(eigendom).State = EntityState.Modified;
+            _context.Entry(overeenkomst).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return Ok(eigendom);

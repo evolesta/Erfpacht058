@@ -134,7 +134,8 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  openVerwijdDialogEign(eigenaarId): void {
+  // Ontkoppel een eigenaar vanuit het eigendom
+  openOntkDialogEign(eigenaarId): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
       if (result.delete) {
@@ -145,13 +146,14 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Aanroepen van de synchronisatie optie in de back-end met het Kadaster
+  // Aanroepen van de synchronisatie in de back-end met het Kadaster
   syncKadaster(): void {
     this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe(resp => {
       this.initEigendom();
     });
   }
 
+  // Upload een bestand dialog
   openUploadFileDialog(): void {
     const dialRef = this.dialog.open(UploadDialogComponent, {
       data: {
@@ -163,6 +165,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // Verwijder een bestaand bestand met bevestiging
   openVerwijderFileDialog(id): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
@@ -178,6 +181,29 @@ export class DashboardComponent implements OnInit {
     this.http.put('/eigendom/' + this.eigendom.id, this.eigendom).subscribe(resp => {
       this.initEigendom();
       this.editNotities = false;
+    });
+  }
+
+  // Koppel een overeenkomst aan een eigendom
+  openKoppelOvereenkomstDialog(id): void {
+    const dialogRef = this.dialog.open(SearchDialogComponent, {
+      data: {
+        endpoint: '/overeenkomst',
+        title: 'Overeenkomst',
+        displayedColumns: ['dossiernummer', 'ingangsdatum'],
+        columnNames: ['Dossiernummer', 'Ingangsdatum']
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Alleen verwerken als er een rij is aangeklikt
+      if (result.result) {
+        // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
+        const overeenkomstId = result.row.id;
+        this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
+          this.initEigendom();
+        });
+      }
     });
   }
 }

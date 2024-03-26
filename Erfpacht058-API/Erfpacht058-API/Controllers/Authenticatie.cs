@@ -54,7 +54,8 @@ namespace Erfpacht058_API.Controllers
             if (BCrypt.Net.BCrypt.Verify(credentials.Wachtwoord, gebruiker.Wachtwoord))
             {
                 // Wachtwoord is correct
-                var JwtToken = GenerateJwt(gebruiker.Emailadres, gebruiker.Role.ToString());
+                var naam = gebruiker.Voornamen + " " + gebruiker.Naam;
+                var JwtToken = GenerateJwt(gebruiker.Emailadres, naam, gebruiker.Role.ToString());
                 return Ok(new {token = JwtToken});
             }
             else
@@ -62,17 +63,20 @@ namespace Erfpacht058_API.Controllers
         }
 
         // Helper functie voor het genereren van een jwt token
-        private string GenerateJwt(string username, string role)
-        {
+        private string GenerateJwt(string username, string naam, string role)
+        { 
             var tokenkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             var SignIn = new SigningCredentials(tokenkey, SecurityAlgorithms.HmacSha256);
+            var currentTime = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
             var token = new JwtSecurityToken(
                 _configuration["JWT:Issuer"],
                 _configuration["JWT:Audience"],
                 claims: new[]
                 {
                         new Claim("Username", username),
+                        new Claim("Naam", naam),
                         new Claim(ClaimTypes.Role, role),
+                        new Claim("Login", currentTime),
                 },
                 expires: DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JWT:ExpirationInSeconds"])),
                 signingCredentials: SignIn);

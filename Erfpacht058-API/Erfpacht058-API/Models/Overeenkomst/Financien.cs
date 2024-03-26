@@ -1,4 +1,4 @@
-﻿namespace Erfpacht058_API.Models.Overeenkomst
+﻿namespace Erfpacht058_API.Models.OvereenkomstNS
 {
     // Relationeel model van Overeenkomst
     public class Financien

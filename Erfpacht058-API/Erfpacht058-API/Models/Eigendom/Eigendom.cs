@@ -1,6 +1,6 @@
 ﻿namespace Erfpacht058_API.Models.Eigendom
 {
-    using Erfpacht058_API.Models.Overeenkomst;
+    using Erfpacht058_API.Models.OvereenkomstNS;
     using System.Numerics;
 
     public class Eigendom

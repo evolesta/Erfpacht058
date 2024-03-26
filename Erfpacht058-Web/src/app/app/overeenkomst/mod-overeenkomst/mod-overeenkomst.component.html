@@ -1,0 +1,34 @@
+<h2>Overeenkomst</h2>
+
+<form [formGroup]="addOvereenkomstForm" (ngSubmit)="addOvereenkomst()">
+    <mat-form-field class="full-width">
+        <mat-label>Dossiernummer</mat-label>
+        <input matInput formControlName="dossiernummer">
+    </mat-form-field>
+
+    <mat-form-field class="half-width">
+        <mat-label>Ingangsdatum</mat-label>
+        <input matInput type="date" formControlName="ingangsdatum">
+    </mat-form-field>
+    <mat-form-field class="half-width">
+        <mat-label>Einddatum</mat-label>
+        <input matInput type="date" formControlName="einddatum">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Grondwaarde</mat-label>
+        <input matInput type="number" formControlName="grondwaarde">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Datum akte</mat-label>
+        <input matInput type="date" formControlName="datumAkte">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Rentepercentage</mat-label>
+        <input matInput type="number" formControlName="rentepercentage">
+    </mat-form-field>
+
+    <button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button>
+</form>
