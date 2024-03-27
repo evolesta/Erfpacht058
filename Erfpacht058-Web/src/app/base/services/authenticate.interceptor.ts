@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { HelperService } from './helper.service';
+import { LoadingSpinnerService } from '../generic/loading-spinner/loading-spinner.service';
 
 @Injectable()
 export class AuthenticateInterceptor implements HttpInterceptor {
@@ -15,13 +16,16 @@ export class AuthenticateInterceptor implements HttpInterceptor {
   ];
 
   constructor(private router: Router,
-    private helper: HelperService) {}
+    private helper: HelperService,
+    private spinner: LoadingSpinnerService) {}
 
   // Interceptor die voor beveiligde routes automatisch de bearer token toevoegd aan de header van het request
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Alleen uitvoeren als het geen publieke route betreft
     if (!this.publicRoutes.includes(req.url))
     {
+      this.spinner.show(); // toon laad spinner
+
       const token = localStorage.getItem('token');
 
       // Controleer of de token aanwezig is
@@ -49,6 +53,7 @@ export class AuthenticateInterceptor implements HttpInterceptor {
     }
 
     // Forceer het (gewijzigde) HTTP request naar de endpoint
+    this.spinner.hide();
     return next.handle(req);
   }
 }
