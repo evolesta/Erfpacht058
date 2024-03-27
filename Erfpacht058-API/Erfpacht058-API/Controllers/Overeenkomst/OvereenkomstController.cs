@@ -29,14 +29,20 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Overeenkomst>>> GetOvereenkomst()
         {
-            return await _context.Overeenkomst.ToListAsync();
+            return await _context.Overeenkomst
+                .Include(e => e.Financien)
+                .Include(e => e.Eigendom)
+                .ToListAsync();
         }
 
         // GET: api/Overeenkomst/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Overeenkomst>> GetOvereenkomst(int id)
         {
-            var overeenkomst = await _context.Overeenkomst.FindAsync(id);
+            var overeenkomst = await _context.Overeenkomst
+                .Include(e => e.Financien)
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
             if (overeenkomst == null)
             {
@@ -49,32 +55,30 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
         // PUT: api/Overeenkomst/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOvereenkomst(int id, Overeenkomst overeenkomst)
+        public async Task<IActionResult> PutOvereenkomst(int id, OvereenkomstDto overeenkomstDto)
         {
-            if (id != overeenkomst.Id)
-            {
-                return BadRequest();
-            }
+            // Verkrijg overenkomst object
+            var overeenkomst = await _context.Overeenkomst
+                .Include(e => e.Financien)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            if (overeenkomst == null) return BadRequest();
 
+            // Wijzig overeenkomst adhv dto
+            overeenkomst.Dossiernummer = overeenkomstDto.Dossiernummer;
+            overeenkomst.Ingangsdatum = overeenkomstDto.Ingangsdatum;
+            overeenkomst.Einddatum = overeenkomstDto.Einddatum;
+            overeenkomst.Grondwaarde = overeenkomstDto.Grondwaarde;
+            overeenkomst.DatumAkte = overeenkomstDto.DatumAkte;
+            overeenkomst.Rentepercentage = overeenkomstDto.Rentepercentage;
+            overeenkomst.Financien.Bedrag = overeenkomstDto.Financien.Bedrag;
+            overeenkomst.Financien.FactureringsWijze = overeenkomstDto.Financien.FactureringsWijze;
+            overeenkomst.Financien.Frequentie = overeenkomstDto.Financien.Frequentie;
+
+            // Sla wijzigingen op in database
             _context.Entry(overeenkomst).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OvereenkomstExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(overeenkomst);
         }
 
         // DELETE: api/Overeenkomst/5
@@ -89,23 +93,21 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
             // verkrijg benodigde objecten
             var overeenkomst = await _context.Overeenkomst
                 .Include(e => e.Eigendom)
+                .Include(e => e.Financien)
                 .FirstOrDefaultAsync(e => e.Id == id);
             if (overeenkomst == null) return BadRequest();
             var eigendom = overeenkomst.Eigendom;
             if (eigendom == null) return BadRequest();
+            var financien = overeenkomst.Financien;
 
             // Verwijder relaties en object en sla op
             eigendom.Overeenkomst.Remove(overeenkomst);
             _context.Overeenkomst.Remove(overeenkomst);
+            _context.Financien.Remove(financien);
             _context.Entry(eigendom).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return Ok(eigendom);
-        }
-
-        private bool OvereenkomstExists(int id)
-        {
-            return _context.Overeenkomst.Any(e => e.Id == id);
         }
     }
 }

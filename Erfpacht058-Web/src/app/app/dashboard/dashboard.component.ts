@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { DetailDialogComponent } from '../../base/generic/detail-dialog/detail-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,6 +39,11 @@ export class DashboardComponent implements OnInit {
   soortenBestanden = {
     0: "Algemeen", 1: "Notitie", 2: "Bewijsstuk", 3: "Overeenkomst", 4: "Overig"
   }
+  overeenkomstenTable: MatTableDataSource<any>;
+  overeenkomstenColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'rentepercentage', 'bedrag', 'frequentie', 'options'];
+  frequentieOvereenkomsten = {
+    0: 'Maandelijks', 1: 'Halfjaarlijks', 2: 'Jaarlijks'
+  }
   downloadEndpoint: string = environment.apiURL + '/bestand/download/';
   notities = new FormControl('');
   editNotities: boolean;
@@ -49,6 +55,8 @@ export class DashboardComponent implements OnInit {
     this.initEigendom();
   }
 
+  // +++ EIGENDOM FUNCTIES
+
   // Functie die informatie over het eigendom verkrijgt indien geselecteerd in localStorage
   initEigendom(): void {
     const eigendomId = localStorage.getItem('eigendomId'); // Verkrijg eigendomId uit localstorage
@@ -59,14 +67,16 @@ export class DashboardComponent implements OnInit {
         // Algemene data
         const response:any = resp.body;
         this.eigendom = response;
-        this.loaded = true;
 
         // Tabellen opbouwen voor many relaties
         this.eigenarenTable = new MatTableDataSource(response.eigenaar);
         this.bestandenTable = new MatTableDataSource(response.bestand);
+        this.overeenkomstenTable = new MatTableDataSource(response.overeenkomst);
 
         // Zet de notities van het eigendom naar de FormControl
         this.notities.setValue(this.eigendom.notities);
+
+        this.loaded = true; // voorkom undefined errors ivm async http request
       });
     }
   }
@@ -90,6 +100,8 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // +++ ADRES FUNCTIES
+
   // Open het zoekvenster
   openZoekDialogAdres(): void {
     // Gebruik het gen. zoekvenster component
@@ -111,6 +123,9 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // +++ EIGENAAR functies
+
+  // Zoek de dialog om een eigenaar te koppelen aan een eigendom
   openZoekDialogEignKopp(): void {
     const dialogRef = this.dialog.open(SearchDialogComponent, {
       data: {
@@ -146,12 +161,27 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  openDetailsEign(eigenaarId): void {
+    this.dialog.open(DetailDialogComponent, {
+      data: {
+        title: 'Eigenaar details',
+        endpoint: '/eigenaar/' + eigenaarId,
+        dataRows: ['naam', 'voornamen', 'voorletters', 'straatnaam', 'huisnummer', 'toevoeging', 'postcode', 'woonplaats', 'debiteurnummer'],
+        displayValues: ['Naam', 'Voornamen', 'Voorletters', 'Straatnaam', 'Huisnummer', 'Toevoeging', 'Postcode', 'Woonplaats', 'Debiteurnummer'],
+      }
+    });
+  }
+
+  // +++ KADASTER FUNCTIES
+
   // Aanroepen van de synchronisatie in de back-end met het Kadaster
   syncKadaster(): void {
     this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe(resp => {
       this.initEigendom();
     });
   }
+
+  // ++ BESTANDEN FUNCTIES
 
   // Upload een bestand dialog
   openUploadFileDialog(): void {
@@ -169,11 +199,15 @@ export class DashboardComponent implements OnInit {
   openVerwijderFileDialog(id): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
-      this.http.delete('/bestand/' + id).subscribe(resp => {
-        this.initEigendom();
-      });
+      if (result.delete) {
+        this.http.delete('/bestand/' + id).subscribe(resp => {
+          this.initEigendom();
+        });
+      }
     });
   }
+
+  // +++ NOTITIES FUNCTIES
 
   // Wijzig de notities naar het object in de database
   updateNotes(): void {
@@ -183,6 +217,8 @@ export class DashboardComponent implements OnInit {
       this.editNotities = false;
     });
   }
+
+  // ++ OVEREENKOMST FUNCTIES
 
   // Koppel een overeenkomst aan een eigendom
   openKoppelOvereenkomstDialog(id): void {
@@ -201,6 +237,31 @@ export class DashboardComponent implements OnInit {
         // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
         const overeenkomstId = result.row.id;
         this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
+          this.initEigendom();
+        });
+      }
+    });
+  }
+
+  // Open detail venster voor een overeenkomst
+  openBekijkOvereenkomstDialog(id): void {
+    this.dialog.open(DetailDialogComponent, {
+      data: {
+        title: 'Overeenkomst details',
+        endpoint: '/overeenkomst/' + id,
+        dataRows: ['dossiernummer', 'ingangsdatum', 'einddatum', 'grondwaarde', 'datumAkte', 'rentepercentage'],
+        displayValues: ['Dossiernummer', 'Ingangsdatum', 'Einddatum', 'Grondwaarde', 'Datum akte', 'Rentepercentage'],
+      }
+    })
+  }
+
+  // Verwijder een overeenkomst
+  openVerwijderOvereenkomstDialog(id): void {
+    const dialogRef = this.dialog.open(DeleteDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.delete) {
+        this.http.delete('/overeenkomst/' + id).subscribe(resp => {
           this.initEigendom();
         });
       }

@@ -8,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Data;
 using Erfpacht058_API.Models.Eigendom;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class EigenaarController : ControllerBase
     {

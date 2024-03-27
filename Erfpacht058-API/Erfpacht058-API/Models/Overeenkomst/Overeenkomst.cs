@@ -25,5 +25,6 @@
         public float? Grondwaarde { get; set; }
         public DateTime? DatumAkte { get; set; }
         public float? Rentepercentage { get; set; }
+        public FinancienDto? Financien { get; set; }
     }
 }

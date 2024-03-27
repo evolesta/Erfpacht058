@@ -113,6 +113,7 @@
                     </ng-container>
                     <mat-menu #eigenarenOpties="matMenu">
                         <ng-template matMenuContent let-id="id">
+                            <button mat-menu-item (click)="openDetailsEign(id)"><mat-icon>visibility</mat-icon> Details</button>
                             <button mat-menu-item routerLink="eigenaar/edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
                             <button mat-menu-item (click)="openOntkDialogEign(id)"><mat-icon>close</mat-icon> Ontkoppel</button>
                         </ng-template>
@@ -263,7 +264,51 @@
 
             <div *ngIf="eigendom.overeenkomst.length > 0 then thenBlockOvereen; else elseBlockOvereen;"></div>
                 <ng-template #thenBlockOvereen>
+                    <p style="text-align: right;">
+                        <button mat-button (click)="openKoppelOvereenkomstDialog(eigendom.id)"><mat-icon>assignment_add</mat-icon> Koppel overeenkomst</button>
+                        <button mat-button routerLink="overeenkomst/add/{{eigendom.id}}"><mat-icon>add</mat-icon> Nieuwe overeenkomst</button>
+                    </p>
 
+                    <table mat-table [dataSource]="overeenkomstenTable">
+                        <ng-container matColumnDef="dossiernummer">
+                            <th mat-header-cell *matHeaderCellDef>Dossiernummer</th>
+                            <td mat-cell *matCellDef="let element">{{element.dossiernummer}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="ingangsdatum">
+                            <th mat-header-cell *matHeaderCellDef>Ingangsdatum</th>
+                            <td mat-cell *matCellDef="let element">{{element.ingangsdatum | date: 'dd-MM-yyyy'}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="einddatum">
+                            <th mat-header-cell *matHeaderCellDef>Einddatum</th>
+                            <td mat-cell *matCellDef="let element">{{element.einddatum | date: 'dd-MM-yyyy'}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="rentepercentage">
+                            <th mat-header-cell *matHeaderCellDef>Rente %</th>
+                            <td mat-cell *matCellDef="let element">{{element.rentepercentage}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="bedrag">
+                            <th mat-header-cell *matHeaderCellDef>Bedrag</th>
+                            <td mat-cell *matCellDef="let element">{{element.financien.bedrag | currency:'EUR':'symbol':'' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="frequentie">
+                            <th mat-header-cell *matHeaderCellDef>Frequentie</th>
+                            <td mat-cell *matCellDef="let element">{{frequentieOvereenkomsten[element.financien.frequentie]}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="options">
+                            <th mat-header-cell *matHeaderCellDef></th>
+                            <td mat-cell *matCellDef="let element"><button mat-icon-button [matMenuTriggerFor]="overeenkomstOpties" [matMenuTriggerData]="{id: element.id}"><mat-icon>more_vert</mat-icon></button></td>
+                        </ng-container>
+                        <mat-menu #overeenkomstOpties="matMenu">
+                            <ng-template matMenuContent let-id="id">
+                                <button mat-menu-item (click)="openBekijkOvereenkomstDialog(id)"><mat-icon>visibility</mat-icon> Bekijk</button>
+                                <button mat-menu-item routerLink="overeenkomst/edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
+                                <button mat-menu-item (click)="openVerwijderOvereenkomstDialog(id)"><mat-icon>delete</mat-icon> Verwijderen</button>
+                            </ng-template>
+                        </mat-menu>
+                        
+                        <tr mat-header-row *matHeaderRowDef="overeenkomstenColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: overeenkomstenColumns;"></tr>
+                    </table>
                 </ng-template>
                 <ng-template #elseBlockOvereen>
                     <p>Er zijn nog geen overeenkomsten gekoppeld - <a routerLink="overeenkomst/add/{{eigendom.id}}">nieuwe overeenkomst</a> of <a (click)="openKoppelOvereenkomstDialog(eigendom.id)" href="javascript:;">koppel overeenkomst</a></p>

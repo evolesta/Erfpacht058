@@ -40,6 +40,7 @@ export const routes: Routes = [
             { path: 'bestand/edit/:id', component: BestandComponent },
             { path: 'overeenkomst', component: OvereenkomstComponent },
             { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
+            { path: 'overeenkomst/edit/:id', component: ModOvereenkomstComponent },
         ]
     },
 ];

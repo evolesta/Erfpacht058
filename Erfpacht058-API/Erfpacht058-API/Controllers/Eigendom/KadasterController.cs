@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
@@ -41,6 +42,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
     }
 
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class KadasterController : ControllerBase
     {

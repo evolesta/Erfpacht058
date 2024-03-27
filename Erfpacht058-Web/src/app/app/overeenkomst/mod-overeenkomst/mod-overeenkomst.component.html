@@ -1,6 +1,6 @@
-<h2>Overeenkomst</h2>
+<h1>Overeenkomst</h1>
 
-<form [formGroup]="addOvereenkomstForm" (ngSubmit)="addOvereenkomst()">
+<form [formGroup]="overeenkomstForm" (ngSubmit)="modOvereenkomst()">
     <mat-form-field class="full-width">
         <mat-label>Dossiernummer</mat-label>
         <input matInput formControlName="dossiernummer">
@@ -29,6 +29,34 @@
         <mat-label>Rentepercentage</mat-label>
         <input matInput type="number" formControlName="rentepercentage">
     </mat-form-field>
+
+    <h2>Financiën</h2>
+
+    <div formGroupName="financien">
+        <mat-form-field class="full-width">
+            <mat-label>Bedrag</mat-label>
+            <input matInput type="number" formControlName="bedrag">
+        </mat-form-field>
+    
+        <mat-form-field class="half-width">
+            <mat-label>Frequentie</mat-label>
+            <mat-select formControlName="frequentie">
+                <mat-option [value]="0">Vooraf</mat-option>
+                <mat-option [value]="1">Achteraf</mat-option>
+                <mat-option [value]="2">Halverwege</mat-option>
+                <mat-option [value]="3">Eenmalig</mat-option>
+            </mat-select>
+        </mat-form-field>
+    
+        <mat-form-field class="half-width">
+            <mat-label>Factureringswijze</mat-label>
+            <mat-select formControlName="factureringsWijze">
+                <mat-option [value]="0">Maandelijks</mat-option>
+                <mat-option [value]="1">Halfjaarlijks</mat-option>
+                <mat-option [value]="2">Jaarlijks</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
 
     <button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button>
 </form>

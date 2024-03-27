@@ -1,1 +1,15 @@
-<h2 mat-dialog-title></h2>
+<div mat-dialog-title class="dialog-title">
+    <h2>{{data.title}}</h2>
+    <button mat-icon-button aria-label="Sluiten" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content>
+    <table *ngIf="loaded">
+        <tr *ngFor="let item of data.dataRows; index as i;">
+            <td>{{data.displayValues[i]}}</td>
+            <td>{{showData[item]}}</td>
+        </tr>
+    </table>
+</mat-dialog-content>

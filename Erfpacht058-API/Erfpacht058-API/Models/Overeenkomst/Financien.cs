@@ -1,13 +1,14 @@
-﻿namespace Erfpacht058_API.Models.OvereenkomstNS
+﻿using System.Text.Json.Serialization;
+
+namespace Erfpacht058_API.Models.OvereenkomstNS
 {
     // Relationeel model van Overeenkomst
     public class Financien
     {
         public int Id { get; set; }
         public int OvereenkomstId { get; set; } // Foreign key naar Overeenkomst
+        [JsonIgnore]
         public Overeenkomst? Overeenkomst { get; set; } = null!; // one-to-one relatie
-        public DateTime Ingangsdatum { get; set; }
-        public DateTime Einddatum { get; set; }
         public float Bedrag {  get; set; }
         public FactureringsWijze FactureringsWijze {  get; set; } 
         public Frequentie Frequentie { get; set; }
@@ -26,5 +27,12 @@
         Maandelijks,
         Halfjaarlijks,
         Jaarlijks
+    }
+
+    public class FinancienDto
+    {
+        public float Bedrag { get; set; }
+        public FactureringsWijze FactureringsWijze { get; set; }
+        public Frequentie Frequentie { get; set; }
     }
 }

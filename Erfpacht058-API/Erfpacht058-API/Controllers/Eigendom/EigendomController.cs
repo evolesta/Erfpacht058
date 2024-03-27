@@ -56,6 +56,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 .Include(e => e.Kadaster)
                 .Include(e => e.Bestand)
                 .Include(e => e.Overeenkomst)
+                    .ThenInclude(o => o.Financien)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eigendom == null)
@@ -581,6 +582,13 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 .FirstOrDefaultAsync(e => e.Id == eigendomId);
             if (eigendom == null) return BadRequest();
 
+            // Creeer een nieuw Financien child object
+            var financien = new Financien
+            {
+                Bedrag = overeenkomstDto.Financien.Bedrag,
+                FactureringsWijze = overeenkomstDto.Financien.FactureringsWijze,
+                Frequentie = overeenkomstDto.Financien.Frequentie
+            };
             // Creeer een nieuw overeenkomst object
             var overeenkomst = new Overeenkomst
             {
@@ -590,10 +598,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 Grondwaarde = overeenkomstDto.Grondwaarde,
                 DatumAkte = overeenkomstDto.DatumAkte,
                 Rentepercentage = overeenkomstDto.Rentepercentage,
-                Eigendom = eigendom
+                Eigendom = eigendom,
+                Financien = financien
             };
 
             // Leg relaties vast en sla object op in database
+            _context.Financien.Add(financien);
             _context.Overeenkomst.Add(overeenkomst);
             eigendom.Overeenkomst.Add(overeenkomst);
             _context.Entry(eigendom).State = EntityState.Modified;
