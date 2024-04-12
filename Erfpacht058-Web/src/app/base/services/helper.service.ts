@@ -16,4 +16,12 @@ export class HelperService {
     // Als de expiration timestamp op de token aanwezig is en in de toekomst is deze nog geldig
     return (decodedToken.exp != null && decodedToken.exp > currTimestamp);
   }
+
+  isAdministrator(): boolean {
+    // Verkrijg token en decode
+    const token = localStorage.getItem('token');
+    const decodedToken:any = jwtDecode(token);
+
+    return decodedToken.Role == "Beheerder";
+  }
 }

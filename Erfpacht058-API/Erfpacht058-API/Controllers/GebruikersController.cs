@@ -25,6 +25,10 @@ namespace Erfpacht058_API.Controllers
         }
 
         // GET: api/Gebruikers
+        /// <summary>
+        /// Verkrijg alle gebruikers (admin rol)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GebruikerDto>>> GetGebruiker()
         {
@@ -56,13 +60,28 @@ namespace Erfpacht058_API.Controllers
 
         // PUT: api/Gebruikers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Wijzig een bestaande gebruiker (admin rol) (let op: geen wachtwoord!)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="gebruikerDto"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGebruiker(int id, Gebruiker gebruiker)
+        public async Task<IActionResult> PutGebruiker(int id, GebruikerDto gebruikerDto)
         {
-            if (id != gebruiker.Id)
-            {
-                return BadRequest();
-            }
+            // Verkrijg gebruiker object en wijzig
+            var gebruiker = await _context.Gebruiker.FindAsync(id);
+            if (gebruiker == null) return BadRequest();
+
+            gebruiker.Naam = gebruikerDto.Naam;
+            gebruiker.Voornamen = gebruikerDto.Voornamen;
+            gebruiker.Emailadres = gebruikerDto.Emailadres;
+            gebruiker.Role = gebruikerDto.Role;
+            gebruiker.Actief = gebruikerDto.Actief;
+
+            // Als gebruiker op actief wordt gezet, reset dan de inlogpogingen
+            if (gebruiker.Actief)
+                gebruiker.LogingPoging = 0;
 
             _context.Entry(gebruiker).State = EntityState.Modified;
 
@@ -85,11 +104,38 @@ namespace Erfpacht058_API.Controllers
             return NoContent();
         }
 
+        // PUT: api/Gebruikers/wachtwoord/5
+        /// <summary>
+        /// Wijzig het wachtwoord van een gebruiker (admin rol)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="wachtwoord"></param>
+        /// <returns></returns>
+        [HttpPut("wachtwoord/{id}")]
+        public async Task<ActionResult> UpdateWachtwoord(int id, WachtwoordDto wachtwoord)
+        {
+            // Verkrijg gebruiker
+            var gebruiker = await _context.Gebruiker.FindAsync(id);
+            if (gebruiker == null) return BadRequest();
+
+            // Hash en update het nieuwe wachtwoord
+            gebruiker.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(wachtwoord.Wachtwoord);
+
+            // Opslaan naar database
+            _context.Entry(gebruiker).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         // POST: api/Gebruikers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Gebruiker>> PostGebruiker(Gebruiker gebruiker)
         {
+            // Hash wachtwoord
+            gebruiker.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(gebruiker.Wachtwoord);
+            
             _context.Gebruiker.Add(gebruiker);
             await _context.SaveChangesAsync();
 

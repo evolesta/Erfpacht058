@@ -50,16 +50,46 @@ namespace Erfpacht058_API.Controllers
             if (gebruiker == null)
                 return BadRequest("Geen valide credentials opgegeven.");
 
+            // Controleer max. loging Pogingen
+            if (gebruiker.LogingPoging >= 3)
+            {
+                // Zet gebruiker inactief
+                gebruiker.Actief = false;
+                _context.Entry(gebruiker).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return BadRequest();
+            }
+
+            // Controleer of gebruiker actief is
+            if (!gebruiker.Actief)
+                return BadRequest("Inactief");
+
             // Controleer of het wachtwoord juist is
             if (BCrypt.Net.BCrypt.Verify(credentials.Wachtwoord, gebruiker.Wachtwoord))
             {
                 // Wachtwoord is correct
+                // Reset login pogingen
+                gebruiker.LogingPoging = 0;
+                _context.Entry(gebruiker).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                
+                // Genereer token en geef terug
                 var naam = gebruiker.Voornamen + " " + gebruiker.Naam;
                 var JwtToken = GenerateJwt(gebruiker.Emailadres, naam, gebruiker.Role.ToString());
+
                 return Ok(new {token = JwtToken});
             }
             else
+            {
+                // Wachtwoord is incorrect
+                gebruiker.LogingPoging++; // Verhoog verk. loging pogingen
+                _context.Entry(gebruiker).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
                 return BadRequest("Geen valide credentials opgegeven."); // Geen correct wachtwoord
+            }
+            
         }
 
         // Helper functie voor het genereren van een jwt token
@@ -76,6 +106,7 @@ namespace Erfpacht058_API.Controllers
                         new Claim("Username", username),
                         new Claim("Naam", naam),
                         new Claim(ClaimTypes.Role, role),
+                        new Claim("Role", role),
                         new Claim("Login", currentTime),
                 },
                 expires: DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JWT:ExpirationInSeconds"])),

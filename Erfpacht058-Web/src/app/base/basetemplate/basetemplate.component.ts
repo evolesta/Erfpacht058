@@ -7,12 +7,13 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatButtonModule} from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { HelperService } from '../services/helper.service';
 
 @Component({
   selector: 'app-basetemplate',
   standalone: true,
-  imports: [MatSidenavModule, MatListModule, MatIconModule, MatToolbarModule, MatTooltipModule, MatButtonModule, RouterModule],
+  imports: [MatSidenavModule, MatListModule, MatIconModule, MatToolbarModule, MatTooltipModule, MatButtonModule, RouterModule, CommonModule],
   templateUrl: './basetemplate.component.html',
   styleUrl: './basetemplate.component.css'
 })
@@ -21,7 +22,7 @@ export class BasetemplateComponent implements OnInit {
   naam: string;
   inlog: string;
 
-  constructor() {}
+  constructor(public helper: HelperService) {}
 
   ngOnInit(): void {
       this.getNaam();

@@ -9,6 +9,7 @@
         public string? Wachtwoord { get; set; }
         public Rol Role { get; set; }
         public bool Actief { get; set; }
+        public int LogingPoging { get; set; }
     }
 
     public enum Rol
@@ -25,5 +26,10 @@
         public string? Emailadres { get; set; }
         public Rol Role { get; set; }
         public bool Actief { get; set; }
+    }
+
+    public class WachtwoordDto
+    {
+        public string Wachtwoord { set; get; }
     }
 }

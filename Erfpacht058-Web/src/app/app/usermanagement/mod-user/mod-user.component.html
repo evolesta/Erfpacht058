@@ -1,0 +1,38 @@
+<h1>Gebruiker</h1>
+
+<form [formGroup]="userForm" (ngSubmit)="modGebruiker()">
+<mat-form-field class="half-width">
+    <mat-label>Naam</mat-label>
+    <input matInput formControlName="naam">
+</mat-form-field>
+<mat-form-field class="half-width">
+    <mat-label>Voornaam</mat-label>
+    <input matInput formControlName="voornamen">
+</mat-form-field>
+
+<mat-form-field class="full-width">
+    <mat-label>E-mailadres</mat-label>
+    <input matInput formControlName="emailadres">
+</mat-form-field>
+
+<mat-form-field class="half-width" *ngIf="!edit">
+    <mat-label>Wachtwoord</mat-label>
+    <input matInput type="password" formControlName="wachtwoord">
+</mat-form-field>
+<mat-form-field class="half-width" *ngIf="!edit">
+    <mat-label>Wachtwoord (herhalen)</mat-label>
+    <input matInput type="password" formControlName="wachtwoord2">
+</mat-form-field>
+
+<mat-form-field class="full-width">
+    <mat-label>Gebruikersrol</mat-label>
+    <mat-select formControlName="role">
+        <mat-option [value]="0">Gebruiker</mat-option>
+        <mat-option [value]="1">Beheerder</mat-option>
+    </mat-select>
+</mat-form-field>
+
+<p><mat-slide-toggle formControlName="actief">Actief</mat-slide-toggle></p>
+
+<p><button mat-raised-button color="primary" type="submit"><mat-icon>save</mat-icon> Opslaan</button></p><br>
+</form>
