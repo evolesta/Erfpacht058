@@ -1,0 +1,45 @@
+<h1>Sjablonen Rapportages</h1>
+
+<p style="text-align: right;"><button mat-raised-button color="primary" routerLink="add"><mat-icon>add</mat-icon> Toevoegen</button></p>
+
+<table mat-table [dataSource]="templatesTable" class="mat-elevation-z8">
+    <ng-container matColumnDef="naam">
+        <th mat-header-cell *matHeaderCellDef>Naam</th>
+        <td mat-cell *matCellDef="let element">{{element.naam}}</td>
+    </ng-container>
+    <ng-container matColumnDef="model">
+        <th mat-header-cell *matHeaderCellDef>Model</th>
+        <td mat-cell *matCellDef="let element">{{element.model}}</td>
+    </ng-container>
+    <ng-container matColumnDef="maker">
+        <th mat-header-cell *matHeaderCellDef>Maker</th>
+        <td mat-cell *matCellDef="let element">{{element.maker}}</td>
+    </ng-container>
+    <ng-container matColumnDef="aanmaakDatum">
+        <th mat-header-cell *matHeaderCellDef>Aanmaakdatum</th>
+        <td mat-cell *matCellDef="let element">{{element.aanmaakDatum | date: 'dd-MM-yyyy HH:mm'}}</td>
+    </ng-container>
+    <ng-container matColumnDef="wijzigingsDatum">
+        <th mat-header-cell *matHeaderCellDef>Wijzigingsdatum</th>
+        <td mat-cell *matCellDef="let element">{{element.wijzigingsDatum | date: 'dd-MM-yyyy HH:mm'}}</td>
+    </ng-container>
+    <ng-container matColumnDef="options">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-icon-button [matMenuTriggerFor]="optiesMenu" [matMenuTriggerData]="{id: element.id}"><mat-icon>more_vert</mat-icon></button>
+        </td>
+        <mat-menu #optiesMenu="matMenu">
+            <ng-template matMenuContent let-id="id">
+                <button mat-menu-item routerLink="edit/{{id}}"><mat-icon>edit</mat-icon> Bewerken</button>
+                <button mat-menu-item (click)="openVerwijderDialog(id)"><mat-icon>delete</mat-icon> Verwijder</button>
+            </ng-template>
+        </mat-menu>
+    </ng-container>
+
+    <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">Er zijn nog geen sjablonen aanwezig</td>
+    </tr>
+
+    <tr mat-header-row *matHeaderRowDef="templatesColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: templatesColumns;"></tr>
+</table>

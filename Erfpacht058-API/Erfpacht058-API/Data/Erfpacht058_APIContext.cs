@@ -49,5 +49,10 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Bestand> Bestand { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.OvereenkomstNS.Overeenkomst> Overeenkomst { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.OvereenkomstNS.Financien> Financien { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.Export> Export { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.TaskQueue> TaskQueue { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.Template> Template { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.RapportData> RapportData { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.Filter> Filter { get; set; } = default!;
     }
 }

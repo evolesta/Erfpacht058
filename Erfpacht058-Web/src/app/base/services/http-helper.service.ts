@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
@@ -23,5 +23,12 @@ export class HttpHelperService {
 
   public delete(endpoint: string) {
     return this.http.delete(environment.apiURL + endpoint, { observe: 'response' });
+  }
+
+  public download(endpoint: string) {
+    return this.http.get(environment.apiURL + endpoint, { 
+      responseType: 'blob', 
+      headers: new HttpHeaders().append('Content-Type', 'application/octet-stream')
+    });
   }
 }

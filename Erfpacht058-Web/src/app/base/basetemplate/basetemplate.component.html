@@ -10,6 +10,7 @@
             <a mat-list-item routerLink="/app" matTooltip="Eigendom"><mat-icon>real_estate_agent</mat-icon></a>
             <a mat-list-item routerLink="/app/eigenaar" matTooltip="Eigenaren"><mat-icon>group</mat-icon></a>
             <a mat-list-item routerLink="/app/overeenkomst" matTooltip="Overeenkomsten"><mat-icon>handshake</mat-icon></a>
+            <a mat-list-item routerLink="/app/rapportage" matTooltip="Rapportages"><mat-icon>summarize</mat-icon></a>
             <a mat-list-item *ngIf="helper.isAdministrator()" routerLink="/app/usermanagement" matTooltip="Gebruikersbeheer"><mat-icon>account_circle</mat-icon></a>
         </mat-nav-list>
     </mat-drawer>
@@ -17,7 +18,7 @@
     <mat-drawer-content>
         <div class="content">
             <div class="content-header">
-                <p>Welkom {{naam}} - laatste inlog {{inlog}}</p>
+                <p>Welkom {{helper.naamGebruiker()}} - laatste inlog {{inlog}}</p>
             </div>
             <router-outlet></router-outlet>
         </div>

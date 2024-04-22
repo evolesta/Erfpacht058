@@ -1,0 +1,79 @@
+<h1>Sjabloon</h1>
+
+<form [formGroup]="templateForm" (ngSubmit)="modSjabloon()">
+    <mat-form-field class="full-width">
+        <mat-label>Naam</mat-label>
+        <input matInput formControlName="naam">
+    </mat-form-field>
+    <mat-form-field class="full-width">
+        <mat-label>Maker</mat-label>
+        <input matInput formControlName="maker">
+    </mat-form-field>
+    <mat-form-field class="full-width">
+        <mat-label>Model</mat-label>
+        <mat-select formControlName="model" (valueChange)="filterModellen($event)">
+            @for (model of modelOpties; track model) {
+                <mat-option [value]="model.tableName">{{model.tableName}}</mat-option>
+            }
+        </mat-select>
+        <mat-hint>Naam van het datamodel (database) waar een rapportage op gemaakt moet worden</mat-hint>
+    </mat-form-field>
+    
+    <!-- Collectie met RapportData die uit het model uitgelezen moet worden -->
+    <h2>Rapport data</h2>
+    <p>Bepaal de kolommen die op de rapportage weergegeven worden.</p>
+    <p style="text-align: right;"><button mat-icon-button (click)="addEmptyRapportData()" type="button"><mat-icon>add</mat-icon></button></p>
+    <div formArrayName="rapportData">
+        <div *ngFor="let rapportData of rapportDataCollection.controls; let i = index">
+            <div [formGroupName]="i">
+                <mat-form-field class="half-width">
+                    <mat-label>Key (sleutel)</mat-label>
+                    <mat-select formControlName="key">
+                        @for (key of gefilterdModel.properties; track key) {
+                            <mat-option [value]="key.name">{{key.name}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="half-width">
+                    <mat-label>Weergavenaam</mat-label>
+                    <input matInput formControlName="naam">
+                </mat-form-field>
+                <button mat-icon-button (click)="removeRapportData(i)" type="button"><mat-icon>remove</mat-icon></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collectie met Filters - mag ook leeg -->
+    <h2>Filters</h2>
+    <p>Toe te passen filters op het model. Schrijf een Linq Query</p>
+    <p style="text-align: right;"><button mat-icon-button (click)="addEmptyFilterData()" type="button"><mat-icon>add</mat-icon></button></p>
+    <div formArrayName="filters">
+        <div *ngFor="let filter of filterDataCollection.controls; let i = index">
+            <div [formGroupName]="i">
+                <mat-form-field class="thirth-width">
+                    <mat-label>Key (sleutel)</mat-label>
+                    <mat-select formControlName="key">
+                        @for (key of gefilterdModel.properties; track key) {
+                            <mat-option [value]="key.name">{{key.name}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="thirth-width">
+                    <mat-label>Operator</mat-label>
+                    <mat-select formControlName="operation">
+                        @for (choice of operatorChoices; track choice; let i = $index) {
+                            <mat-option [value]="i">{{choice}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="thirth-width">
+                    <mat-label>Waarde</mat-label>
+                    <input matInput formControlName="value">
+                </mat-form-field>
+                <button mat-icon-button (click)="removeFilterData(i)" type="button"><mat-icon>remove</mat-icon></button>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button>
+</form>

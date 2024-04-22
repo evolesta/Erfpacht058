@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240416113130_AddExportTemplateModels")]
+    partial class AddExportTemplateModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,7 +304,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$SOlz6ulWACMQo6xrytW6MuOcZ0bTE/XplzVKw2CPm14ZaG3IFaHAK"
+                            Wachtwoord = "$2a$11$SFtGvsdL7IZ6Wm..I3DSreEJlCfMztpOyVkehh7cdd.RLjbwEibX2"
                         });
                 });
 
@@ -388,35 +391,6 @@ namespace Erfpacht058_API.Migrations
                     b.ToTable("Export");
                 });
 
-            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Filter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Operation")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
-
-                    b.ToTable("Filter");
-                });
-
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.RapportData", b =>
                 {
                     b.Property<int>("Id")
@@ -491,6 +465,9 @@ namespace Erfpacht058_API.Migrations
 
                     b.Property<int?>("ExportId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Filters")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Maker")
                         .IsRequired()
@@ -596,17 +573,6 @@ namespace Erfpacht058_API.Migrations
                     b.Navigation("Eigendom");
                 });
 
-            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Filter", b =>
-                {
-                    b.HasOne("Erfpacht058_API.Models.Rapport.Template", "Template")
-                        .WithMany("Filters")
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Template");
-                });
-
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.RapportData", b =>
                 {
                     b.HasOne("Erfpacht058_API.Models.Rapport.Template", "Template")
@@ -668,8 +634,6 @@ namespace Erfpacht058_API.Migrations
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Template", b =>
                 {
-                    b.Navigation("Filters");
-
                     b.Navigation("RapportData");
                 });
 #pragma warning restore 612, 618

@@ -17,6 +17,9 @@ import { LoadingSpinnerComponent } from './base/generic/loading-spinner/loading-
 import { UsermanagementComponent } from './app/usermanagement/usermanagement.component';
 import { adminGuard } from './base/services/admin.guard';
 import { ModUserComponent } from './app/usermanagement/mod-user/mod-user.component';
+import { RapportageComponent } from './app/rapportage/rapportage.component';
+import { SjablonenComponent } from './app/rapportage/sjablonen/sjablonen.component';
+import { ModSjablonenComponent } from './app/rapportage/sjablonen/mod-sjablonen/mod-sjablonen.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -46,6 +49,10 @@ export const routes: Routes = [
             { path: 'overeenkomst', component: OvereenkomstComponent },
             { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
             { path: 'overeenkomst/edit/:id', component: ModOvereenkomstComponent },
+            { path: 'rapportage', component: RapportageComponent },
+            { path: 'rapportage/sjablonen', component: SjablonenComponent, canActivate: [adminGuard]},
+            { path: 'rapportage/sjablonen/add', component: ModSjablonenComponent, canActivate: [adminGuard]},
+            { path: 'rapportage/sjablonen/edit/:id', component: ModSjablonenComponent, canActivate: [adminGuard]},
             { path: 'usermanagement', component: UsermanagementComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/add', component: ModUserComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/edit/:id', component: ModUserComponent, canActivate: [adminGuard] },

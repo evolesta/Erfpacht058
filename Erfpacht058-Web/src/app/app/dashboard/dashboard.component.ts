@@ -18,6 +18,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DetailDialogComponent } from '../../base/generic/detail-dialog/detail-dialog.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -44,7 +45,6 @@ export class DashboardComponent implements OnInit {
   frequentieOvereenkomsten = {
     0: 'Maandelijks', 1: 'Halfjaarlijks', 2: 'Jaarlijks'
   }
-  downloadEndpoint: string = environment.apiURL + '/bestand/download/';
   notities = new FormControl('');
   editNotities: boolean;
 
@@ -205,6 +205,17 @@ export class DashboardComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Download een bestand van de backend middels de HTTP client van Angular
+  downloadFile(id: string, filename: string): void {
+    this.http.download("/bestand/download/" + id).subscribe(blob => {
+      // Initieer download
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    })
   }
 
   // +++ NOTITIES FUNCTIES

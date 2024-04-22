@@ -1,4 +1,6 @@
-﻿namespace Erfpacht058_API.Models
+﻿using Erfpacht058_API.Models.Rapport;
+
+namespace Erfpacht058_API.Models
 {
     public class Gebruiker
     {
@@ -10,6 +12,8 @@
         public Rol Role { get; set; }
         public bool Actief { get; set; }
         public int LogingPoging { get; set; }
+        public int? ExportId { get; set; } // one-to-one relatie
+        public Export? Export { get; set; }
     }
 
     public enum Rol
