@@ -1,4 +1,5 @@
 ﻿using Erfpacht058_API.Models.Rapport;
+using System.Text.Json.Serialization;
 
 namespace Erfpacht058_API.Models
 {
@@ -13,6 +14,7 @@ namespace Erfpacht058_API.Models
         public bool Actief { get; set; }
         public int LogingPoging { get; set; }
         public int? ExportId { get; set; } // one-to-one relatie
+        [JsonIgnore]
         public Export? Export { get; set; }
     }
 

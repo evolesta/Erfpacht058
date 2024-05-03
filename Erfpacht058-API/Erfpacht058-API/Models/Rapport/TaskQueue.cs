@@ -8,6 +8,7 @@ namespace Erfpacht058_API.Models.Rapport
         public SoortTaak SoortTaak { get; set; }
         public Status Status { get; set; }
         public Prioriteit Prioriteit { get; set; }
+        public string? Fout { get; set; }
         public DateTime AanmaakDatum { get; set; }
         public DateTime AfgerondDatum { get; set; }
         public int? ExportId { get; set; } // Optionele one-to-one relatie

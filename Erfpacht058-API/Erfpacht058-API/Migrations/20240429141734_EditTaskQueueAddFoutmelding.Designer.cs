@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240429141734_EditTaskQueueAddFoutmelding")]
+    partial class EditTaskQueueAddFoutmelding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,7 +304,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$QkqRfsIjwS26DMlJkbLTae3pw8Cek3vx.8j6oiF3FZZ1eBy.BHKz6"
+                            Wachtwoord = "$2a$11$AFO0TL559owZKMXgNu0qneQ8N2/3jiFBGCTe1pBvwInzTNv.G9/AS"
                         });
                 });
 
@@ -379,9 +382,6 @@ namespace Erfpacht058_API.Migrations
 
                     b.Property<DateTime>("AanmaakDatum")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ExportPad")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Formaat")
                         .HasColumnType("int");

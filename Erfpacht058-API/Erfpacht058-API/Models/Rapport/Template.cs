@@ -11,6 +11,7 @@ namespace Erfpacht058_API.Models.Rapport
         public List<RapportData>? RapportData { get; } = new List<RapportData>(); // One-to-many relatie
         public List<Filter>? Filters { get; } = new List<Filter>(); // One-to-Many relatie
         public int? ExportId { get; set; } // one-to-one relatie
+        [JsonIgnore]
         public Export? Export { get; set; }
         public DateTime AanmaakDatum { get; set; }
         public DateTime WijzigingsDatum { get; set; }
