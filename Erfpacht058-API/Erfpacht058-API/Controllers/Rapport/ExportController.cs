@@ -98,7 +98,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         /// Download een voltooide Export
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <returns>octet-stream</returns>
         [HttpGet("download/{id}")]
         public async Task<ActionResult> DownloadExport(int id)
         {
@@ -131,20 +131,55 @@ namespace Erfpacht058_API.Controllers.Rapport
             return File(fileBytes, "application/octet-stream");
         }
 
+        // GET: api/Export/status/5
+        /// <summary>
+        /// Verkrijg de status van een export verzoek
+        /// </summary>
+        /// <remarks>
+        /// Status:
+        ///     0 = Nieuw
+        ///     1 = In Behandeling
+        ///     2 = Succesvol
+        ///     3 = Mislukt
+        ///     4 = Verwijderd
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("status/{id}")]
+        public async Task<ActionResult> GetStatus(int id)
+        {
+            // Verkrijg export object van DB
+            var export = await _context.Export
+                .Include(e => e.Task)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            if (export == null) return BadRequest();
+
+            // Status response opstellen
+            return Ok(export.Task);
+        }
+
         // DELETE: api/Export/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExport(int id)
         {
-            var export = await _context.Export.FindAsync(id);
+            var export = await _context.Export
+                .Include(e => e.Task)
+                .FirstOrDefaultAsync();
             if (export == null)
             {
                 return NotFound();
             }
 
+            // Taak naar verwijderd zetten
+            var task = export.Task;
+            task.Status = Status.Verwijderd;
+
+            // Wijzigingen opslaan naar database
             _context.Export.Remove(export);
+            _context.Entry(task).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
     }
 }
