@@ -15,11 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Voeg Context, singletons, controllers en services toe
 builder.Services.AddDbContext<Erfpacht058_APIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Erfpacht058_APIContext") ?? throw new InvalidOperationException("Connection string 'Erfpacht058_APIContext' not found.")));
-builder.Services.AddSingleton<IKadasterAPIService, KadasterAPIService>(provider =>
-{
-    var filepath = builder.Configuration["Kadaster:JsonFile"];
-    return new KadasterAPIService(filepath);
-});
 builder.Services.AddControllers();
 builder.Services.AddSingleton<TaskQueueHostedService>();
 builder.Services.AddHostedService(provider => provider.GetService<TaskQueueHostedService>());
