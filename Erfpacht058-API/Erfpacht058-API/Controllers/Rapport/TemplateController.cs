@@ -261,6 +261,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             var structure = entityTypes.Select(entityType =>
             {
                 var properties = entityType.GetProperties()
+                    .Where(property => !property.IsForeignKey()) // sluit Foreign Key velden uit
                     .Select(property => new
                     {
                         Name = property.Name,

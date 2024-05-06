@@ -22,10 +22,10 @@ export class AuthenticateInterceptor implements HttpInterceptor {
   // Interceptor die voor beveiligde routes automatisch de bearer token toevoegd aan de header van het request
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Alleen uitvoeren als het geen publieke route betreft
+    this.spinner.show(); // toon laad spinner
+    
     if (!this.publicRoutes.includes(req.url))
     {
-      this.spinner.show(); // toon laad spinner
-
       const token = localStorage.getItem('token');
 
       // Controleer of de token aanwezig is
