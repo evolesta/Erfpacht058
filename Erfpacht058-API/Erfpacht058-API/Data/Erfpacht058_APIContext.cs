@@ -7,6 +7,7 @@ using Erfpacht058_API.Models;
 using BCrypt.Net;
 using Erfpacht058_API.Models.Eigendom;
 using Erfpacht058_API.Models.OvereenkomstNS;
+using Erfpacht058_API.Models.Rapport;
 
 namespace Erfpacht058_API.Data
 {
@@ -39,6 +40,17 @@ namespace Erfpacht058_API.Data
                 .HasOne(e => e.Adres)
                 .WithOne(a => a.Eigendom)
                 .HasForeignKey<Adres>(a => a.EigendomId);
+
+            // Relaties defineren voor Template / RapportData en Filters
+            modelBuilder.Entity<Template>()
+                .HasMany(e => e.RapportData)
+                .WithOne(e => e.Template)
+                .HasForeignKey(e => e.TemplateId);
+
+            modelBuilder.Entity<Template>()
+                .HasMany(e => e.Filters)
+                .WithOne(e => e.Template)
+                .HasForeignKey(e => e.TemplateId);
 
         }
         public DbSet<Erfpacht058_API.Models.Eigendom.Eigendom> Eigendom { get; set; } = default!;

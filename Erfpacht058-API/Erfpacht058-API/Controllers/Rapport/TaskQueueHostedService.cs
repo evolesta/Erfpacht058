@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Erfpacht058_API.Models;
 using System.Reflection;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
@@ -78,6 +79,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Verkrijg Export details
             var template = await context.Template
                 .Include(e => e.RapportData)
+                .Include(e => e.Filters)
                 .FirstOrDefaultAsync(e => e.Id == export.Template.Id);
 
             // Verkrijg het betreffende model Type
@@ -88,7 +90,55 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Zet de entiteit van de DbContext dynamisch a.d.h.v. modelType
             var setMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set), 1, new Type[] { });
             setMethod = setMethod.MakeGenericMethod(modelType);
-            var dbSet = setMethod.Invoke(context, null);
+            var dbSet = (IQueryable) setMethod.Invoke(context, null);
+
+            // Pas eventuele filters toe aan de DbSet object
+            foreach (var filter in template.Filters)
+            {
+                var parameter = Expression.Parameter(modelType, "x");
+                var property = Expression.Property(parameter, filter.Key);
+                var convertedValue = Convert.ChangeType(filter.Value, property.Type);
+                var value = Expression.Constant(convertedValue, property.Type);
+                BinaryExpression binaryExpression = null;
+
+                // Op basis van de Enum operator een actie uitvoeren
+                switch (filter.Operation)
+                {
+                    case Operator.Equal:
+                        binaryExpression = Expression.Equal(property, value);
+                        break;
+                    case Operator.NotEqual:
+                        binaryExpression = Expression.NotEqual(property, value);
+                        break;
+                    case Operator.GreaterThen:
+                        binaryExpression = Expression.GreaterThan(property, value);
+                        break;
+                    case Operator.LessThen:
+                        binaryExpression = Expression.LessThan(property, value);
+                        break;
+                    case Operator.GreaterThanEqual:
+                        binaryExpression = Expression.GreaterThanOrEqual(property, value);
+                        break;
+                    case Operator.LessThanEqual:
+                        binaryExpression = Expression.LessThanOrEqual(property, value);
+                        break;
+                }
+
+                // Filter toepassen
+                if (binaryExpression != null)
+                {
+                    var lambda = Expression.Lambda(binaryExpression, parameter);
+                    // Apply the filter using the 'Where' method on the IQueryable
+                    dbSet = dbSet.Provider.CreateQuery(
+                        Expression.Call(
+                            typeof(Queryable),
+                            "Where",
+                            new Type[] { modelType },
+                            dbSet.Expression,
+                            Expression.Quote(lambda)
+                        ));
+                }
+            }
 
             /* Stel een Dictionary samen met als sleutel kolomnaam en waarde als rijen
              * Voorbeeld:
@@ -97,13 +147,15 @@ namespace Erfpacht058_API.Controllers.Rapport
              */
             Dictionary<string, List<object>> exportData = new Dictionary<string, List<object>>();
 
+            var dbData = await dbSet
+                .Cast<object>()
+                .ToListAsync(); // verkrijg de (gefilterde) resultaten van de database asynchroon
+
             foreach (var column in template.RapportData)
             {
-                var propertyInfo = modelType.GetProperty(column.Key);
-                var columnData = await ((IQueryable)dbSet)
-                    .Select($"{column.Key}") // selecteer de kolom
-                    .Cast<object>()
-                    .ToListAsync();
+                var columnData = dbData
+                    .Select(item => item.GetType().GetProperty(column.Key).GetValue(item, null))
+                    .ToList();
 
                 exportData.Add(column.Key, columnData); 
             }

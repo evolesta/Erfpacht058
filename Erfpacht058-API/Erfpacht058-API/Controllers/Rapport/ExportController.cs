@@ -33,14 +33,20 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Export>>> GetExport()
         {
-            return await _context.Export.ToListAsync();
+            return await _context.Export
+                .Include(e => e.Task)
+                .Include(e => e.Template)
+                .ToListAsync();
         }
 
         // GET: api/Export/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Export>> GetExport(int id)
         {
-            var export = await _context.Export.FindAsync(id);
+            var export = await _context.Export
+                .Include(e => e.Task)
+                .Include(e => e.Template)
+                .FirstOrDefaultAsync(e  => e.Id == id); 
 
             if (export == null)
             {
@@ -110,7 +116,7 @@ namespace Erfpacht058_API.Controllers.Rapport
 
             // Check of Taak succesvol is
             if (export.Task.Status != Status.Succesvol)
-                return BadRequest("Export nog niet gereed");
+                return BadRequest("Export nog niet gereed of mislukt");
 
             // Verkrijg bestandspad
             var filepath = export.ExportPad;

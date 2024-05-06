@@ -93,10 +93,12 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                     _context.Entry(existingRapportData).State = EntityState.Modified; // Wijzig de records in de database
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             // Vernieuw de Filter relationele objecten
-            foreach (var filter in template.Filters)
+            foreach (var filter in templateDto.Filters)
             {
                 var existingFilter = template.Filters.FirstOrDefault(f => f.Id == filter.Id);
 
@@ -122,6 +124,8 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                     _context.Entry(existingFilter).State = EntityState.Modified;
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             // Verwijder records die niet meer in de payload aanwezig zijn, maar nog wel in de database
@@ -219,6 +223,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Verkrijg object
             var template = await _context.Template
                 .Include(x => x.RapportData)
+                .Include(x => x.Filters)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (template == null) return BadRequest();
 
@@ -265,7 +270,7 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                 return new
                 {
-                    TableName = entityType.GetTableName(),
+                    TableName = entityType.ClrType.FullName,
                     Properties = properties,
                 };
             }).ToList();

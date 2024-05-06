@@ -34,7 +34,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasIndex("EigendomId");
 
-                    b.ToTable("EigenaarEigendom");
+                    b.ToTable("EigenaarEigendom", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Bestand", b =>
@@ -67,7 +67,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasIndex("EigendomId");
 
-                    b.ToTable("Bestand");
+                    b.ToTable("Bestand", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Adres", b =>
@@ -102,7 +102,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[EigendomId] IS NOT NULL");
 
-                    b.ToTable("Adres");
+                    b.ToTable("Adres", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Eigenaar", b =>
@@ -153,7 +153,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Eigenaar");
+                    b.ToTable("Eigenaar", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Eigendom", b =>
@@ -187,7 +187,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Eigendom");
+                    b.ToTable("Eigendom", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Herziening", b =>
@@ -213,7 +213,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[EigendomId] IS NOT NULL");
 
-                    b.ToTable("Herziening");
+                    b.ToTable("Herziening", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Kadaster", b =>
@@ -248,7 +248,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[EigendomId] IS NOT NULL");
 
-                    b.ToTable("Kadaster");
+                    b.ToTable("Kadaster", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Gebruiker", b =>
@@ -289,7 +289,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[ExportId] IS NOT NULL");
 
-                    b.ToTable("Gebruiker");
+                    b.ToTable("Gebruiker", (string)null);
 
                     b.HasData(
                         new
@@ -330,7 +330,7 @@ namespace Erfpacht058_API.Migrations
                     b.HasIndex("OvereenkomstId")
                         .IsUnique();
 
-                    b.ToTable("Financien");
+                    b.ToTable("Financien", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.OvereenkomstNS.Overeenkomst", b =>
@@ -366,7 +366,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasIndex("EigendomId");
 
-                    b.ToTable("Overeenkomst");
+                    b.ToTable("Overeenkomst", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Export", b =>
@@ -388,7 +388,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Export");
+                    b.ToTable("Export", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Filter", b =>
@@ -417,7 +417,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("Filter");
+                    b.ToTable("Filter", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.RapportData", b =>
@@ -443,7 +443,7 @@ namespace Erfpacht058_API.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("RapportData");
+                    b.ToTable("RapportData", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.TaskQueue", b =>
@@ -481,7 +481,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[ExportId] IS NOT NULL");
 
-                    b.ToTable("TaskQueue");
+                    b.ToTable("TaskQueue", (string)null);
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Template", b =>
@@ -519,7 +519,7 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[ExportId] IS NOT NULL");
 
-                    b.ToTable("Template");
+                    b.ToTable("Template", (string)null);
                 });
 
             modelBuilder.Entity("EigenaarEigendom", b =>

@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class DetailDialogComponent implements OnInit {
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {title: string, dataRows: string[], displayValues: string[], endpoint: string},
+  constructor(@Inject(MAT_DIALOG_DATA) public data: {title: string, dataRows: string[], displayValues: string[], endpoint: string, message: string},
     private http: HttpHelperService) {}
 
   showData: {};
@@ -24,11 +24,13 @@ export class DetailDialogComponent implements OnInit {
   }
 
   getData(): void {
-    this.http.get(this.data.endpoint).subscribe(resp => {
-      const response:any = resp.body;
-      this.showData = response;
-      this.loaded = true;
-    });
+    if (this.data.endpoint != null) {
+      this.http.get(this.data.endpoint).subscribe(resp => {
+        const response:any = resp.body;
+        this.showData = response;
+        this.loaded = true;
+      });
+    }
   }
 
 }

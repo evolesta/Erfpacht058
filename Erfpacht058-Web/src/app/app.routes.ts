@@ -20,6 +20,7 @@ import { ModUserComponent } from './app/usermanagement/mod-user/mod-user.compone
 import { RapportageComponent } from './app/rapportage/rapportage.component';
 import { SjablonenComponent } from './app/rapportage/sjablonen/sjablonen.component';
 import { ModSjablonenComponent } from './app/rapportage/sjablonen/mod-sjablonen/mod-sjablonen.component';
+import { AddRapportageComponent } from './app/rapportage/add-rapportage/add-rapportage.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -50,6 +51,7 @@ export const routes: Routes = [
             { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
             { path: 'overeenkomst/edit/:id', component: ModOvereenkomstComponent },
             { path: 'rapportage', component: RapportageComponent },
+            { path: 'rapportage/add', component: AddRapportageComponent },
             { path: 'rapportage/sjablonen', component: SjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/add', component: ModSjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/edit/:id', component: ModSjablonenComponent, canActivate: [adminGuard]},
