@@ -1,0 +1,19 @@
+version: '1.0'
+name: Erfpacht058
+
+services:
+    backend:
+        container_name: BackendAPI
+        build:
+            context: ./Erfpacht058-API
+            dockerfile: ./Erfpacht058-API/Dockerfile Prod
+        ports:
+            - "8000:80"
+            - "8001:443"  
+    frontend:
+        container_name: FrontendWeb
+        build:
+            context: ./Erfpacht058-Web
+            dockerfile: Dockerfile
+        ports:
+            - "8080:80"
