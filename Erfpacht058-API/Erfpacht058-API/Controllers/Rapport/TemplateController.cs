@@ -129,11 +129,19 @@ namespace Erfpacht058_API.Controllers.Rapport
             }
 
             // Verwijder records die niet meer in de payload aanwezig zijn, maar nog wel in de database
-            var rapportDataIdsInDto = templateDto.RapportData.Select(rd => rd.Id).ToList(); // verkrijg alle Ids uit de payload
-            var filterIdsInDto = templateDto.Filters.Select(f => f.Id).ToList();
+            var rapportDataIdsInDto = templateDto.RapportData
+                .Select(rd => rd.Id)
+                .ToList(); // verkrijg alle Ids uit de payload
+            var filterIdsInDto = templateDto.Filters
+                .Select(f => f.Id)
+                .ToList();
             // verkrijg alle Ids die nog wel in de database staan en niet meer in de payload (te verwijderen ids)
-            var rapportDataToRemove = template.RapportData.Where(rd => !rapportDataIdsInDto.Contains(rd.Id)).ToList();
-            var filterIdsToRemove = template.Filters.Where(f => !filterIdsInDto.Contains(f.Id)).ToList();
+            var rapportDataToRemove = template.RapportData
+                .Where(rd => !rapportDataIdsInDto.Contains(0) && !rapportDataIdsInDto.Contains(rd.Id))
+                .ToList();
+            var filterIdsToRemove = template.Filters
+                .Where(f => !filterIdsInDto.Contains(0) && !filterIdsInDto.Contains(f.Id))
+                .ToList();
             // Verwijder de IDS voor RapportData
             foreach (var idToRemove in rapportDataToRemove)
             {

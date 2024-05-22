@@ -14,6 +14,9 @@ namespace Erfpacht058_API.Models.Rapport
         public int? ExportId { get; set; } // Optionele one-to-one relatie
         [JsonIgnore]
         public Export? Export { get; set; }
+        public int? ImportId { get; set; } // optionele one-to-one relatie
+        [JsonIgnore]
+        public Import? Import { get; set; }
     }
 
     public enum SoortTaak

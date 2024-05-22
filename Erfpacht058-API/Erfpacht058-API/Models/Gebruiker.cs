@@ -15,7 +15,10 @@ namespace Erfpacht058_API.Models
         public int LogingPoging { get; set; }
         public int? ExportId { get; set; } // one-to-one relatie
         [JsonIgnore]
-        public Export? Export { get; set; }
+        public Export? Export { get; set; } // one-to-one relatie
+        public int? ImportId { get; set; }
+        [JsonIgnore]
+        public Import? Import { get; set; } // one-to-one relatie
     }
 
     public enum Rol

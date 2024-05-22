@@ -66,5 +66,8 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Rapport.Template> Template { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Rapport.RapportData> RapportData { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Rapport.Filter> Filter { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.Import> Import { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.TranslateModel> TranslateModel { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Rapport.Translation> Translation { get; set; } = default!;
     }
 }

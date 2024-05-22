@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ug4s4w0+1m2o7odGDtL7smqfB8FMKjMrkg98TTqstZJHyH1VASu5zGfJ5z/w4SWTQpSmbdfqldQzZktc7RKWbA==",
+  "dgSpecHash": "wNdg2V3FXDEjlD0Mq1hTe3xmXq+zcrZpiC2PNpxG0OiiihywmoTs2trmnKFZZXH8FXS3VNDtQF49roasOinsTQ==",
   "success": true,
   "projectFilePath": "C:\\repos\\Erfpacht058\\Erfpacht058-API\\Erfpacht058-API\\Erfpacht058-API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\e94\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
+    "C:\\Users\\e94\\.nuget\\packages\\csvhelper\\32.0.3\\csvhelper.32.0.3.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\documentformat.openxml\\3.0.2\\documentformat.openxml.3.0.2.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\documentformat.openxml.framework\\3.0.2\\documentformat.openxml.framework.3.0.2.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",

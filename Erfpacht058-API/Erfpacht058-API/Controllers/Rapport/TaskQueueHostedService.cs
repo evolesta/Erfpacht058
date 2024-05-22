@@ -2,12 +2,11 @@
 using Erfpacht058_API.Models.Rapport;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.DotNet.Scaffolding.Shared.Project;
-using Microsoft.AspNetCore.Http;
-using Erfpacht058_API.Models;
 using System.Reflection;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Globalization;
+using CsvHelper;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
@@ -50,8 +49,16 @@ namespace Erfpacht058_API.Controllers.Rapport
                     // Async Task uitvoeren
                     try
                     {
-                        // Task async uitvoeren
-                        await Export(task.Export, "", context, config);
+                        // Task async uitvoeren adhv het soort taak
+                        switch (task.SoortTaak)
+                        {
+                            case SoortTaak.Import:
+                                await Import(task.Import, context);
+                                break;
+                            case SoortTaak.Export:
+                                await Export(task.Export, "", context, config);
+                                break;
+                        }
 
                         // Zet status op succesvol ivm geen fouten
                         task.Status = Status.Succesvol;
@@ -74,6 +81,12 @@ namespace Erfpacht058_API.Controllers.Rapport
         }
 
         // Background Tasks
+
+        /// <summary>
+        /// Behandel een export verzoek naar gewenst formaat van een model gespecificeerd
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public async Task Export(Export export, string outputFormat, Erfpacht058_APIContext context, IConfiguration configuration)
         {
             // Verkrijg Export details
@@ -184,6 +197,49 @@ namespace Erfpacht058_API.Controllers.Rapport
             context.Entry(export).State = EntityState.Modified;
 
             await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Behandel een import verzoek
+        /// </summary>
+        /// <param name="import"></param>
+        /// <returns></returns>
+        public async Task Import(Import import, Erfpacht058_APIContext context)
+        {
+            // Verkrijg vertaaltabel
+            var translateModel = await context.TranslateModel
+                .Include(e => e.Translations)
+                .FirstOrDefaultAsync(e => e.Id == import.TranslateModel.Id);
+            if (translateModel == null) throw new Exception("Geen correcte vertaaltabel gevonden");
+
+            // Verkrijg het betreffende model Type
+            var modelType = Assembly.GetExecutingAssembly().GetType(translateModel.Model);
+            if (modelType == null)
+                throw new InvalidOperationException("Model niet gevonden");
+
+            // Zet de entiteit van de DbContext dynamisch a.d.h.v. modelType
+            var setMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set), 1, new Type[] { });
+            setMethod = setMethod.MakeGenericMethod(modelType);
+            var dbSet = (IQueryable)setMethod.Invoke(context, null);
+
+            // CSV uitlezen
+            using (var stream = new StreamReader(import.importPad))
+            {
+                // CSV Reader initialiseren
+                using (var csvReader = new CsvReader(stream, CultureInfo.InvariantCulture))
+                {
+                    // Alle CSV Records uitlezen
+                    var records = csvReader.GetRecords(modelType);
+
+                    // Doorloop ieder CSV record en voeg toe aan de context
+                    foreach (var record in records)
+                    {
+                        context.Entry(record).State = EntityState.Added; 
+                    }
+
+                    await context.SaveChangesAsync();
+                }
+            }
         }
     }
 }
