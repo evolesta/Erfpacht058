@@ -1,6 +1,6 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, EMPTY } from 'rxjs';
+import { Observable, EMPTY, finalize } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
@@ -44,16 +44,21 @@ export class AuthenticateInterceptor implements HttpInterceptor {
             'Authorization', 'Bearer ' + token
           )
         });
+
+        // Geef gewijzigde request terug
+        return next.handle(req).pipe(
+          finalize(() => this.spinner.hide())
+        );
       }
       else {
         // Token is verlopen - navigeer de gebruiker naar login
         this.router.navigateByUrl('');
         return EMPTY;
       }
+    } else {
+      // publieke routes - geeft request direct terug
+      this.spinner.hide();
+      return next.handle(req);
     }
-
-    // Forceer het (gewijzigde) HTTP request naar de endpoint
-    this.spinner.hide();
-    return next.handle(req);
   }
 }

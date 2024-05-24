@@ -9,6 +9,7 @@ namespace Erfpacht058_API.Models.Rapport
         public string Maker { get; set; }
         public string Model { get; set; }
         public int? ImportId { get; set; }
+        [JsonIgnore]
         public Import? Import { get; set; } // one-to-one relatie
         public ICollection<Translation>? Translations { get; } = new List<Translation>(); // optionele one-to-many relatie
         public DateTime AanmaakDatum { get; set; }

@@ -24,6 +24,7 @@ import { AddRapportageComponent } from './app/rapportage/add-rapportage/add-rapp
 import { ImportComponent } from './app/import/import.component';
 import { VertaaltabellenComponent } from './app/import/vertaaltabellen/vertaaltabellen.component';
 import { ModVertaaltabelComponent } from './app/import/vertaaltabellen/mod-vertaaltabel/mod-vertaaltabel.component';
+import { AddImportComponent } from './app/import/add-import/add-import.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -59,6 +60,7 @@ export const routes: Routes = [
             { path: 'rapportage/sjablonen/add', component: ModSjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/edit/:id', component: ModSjablonenComponent, canActivate: [adminGuard]},
             { path: 'import', component: ImportComponent, canActivate: [adminGuard]},
+            { path: 'import/add', component: AddImportComponent, canActivate: [adminGuard]},
             { path: 'import/vertaaltabellen', component: VertaaltabellenComponent, canActivate: [adminGuard]},
             { path: 'import/vertaaltabellen/add', component: ModVertaaltabelComponent, canActivate: [adminGuard]},
             { path: 'import/vertaaltabellen/edit/:id', component: ModVertaaltabelComponent, canActivate: [adminGuard]},

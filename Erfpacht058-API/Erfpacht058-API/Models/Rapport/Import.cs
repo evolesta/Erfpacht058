@@ -13,6 +13,6 @@
 
     public class ImportDto
     {
-        public TranslateModel TranslateModel { get; set; }
+        public int TranslateModelId { get; set; }
     }
 }

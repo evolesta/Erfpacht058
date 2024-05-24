@@ -1,47 +1,99 @@
-﻿using Erfpacht058_API.Data;
-using Erfpacht058_API.Models.Rapport;
-using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Erfpacht058_API.Data;
+using Erfpacht058_API.Models.Rapport;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "Beheerder")]
     [ApiController]
     public class ImportController : ControllerBase
     {
         private readonly Erfpacht058_APIContext _context;
-        private readonly TaskQueueHostedService _taskQueueHostedService;
         private readonly IConfiguration _configuration;
+        private readonly TaskQueueHostedService _taskQueueHostedService;
 
-        public ImportController(Erfpacht058_APIContext context, TaskQueueHostedService taskQueueHostedService, IConfiguration configuration)
+        public ImportController(Erfpacht058_APIContext context, IConfiguration configuration, TaskQueueHostedService taskQueueHostedService)
         {
             _context = context;
-            _taskQueueHostedService = taskQueueHostedService;
             _configuration = configuration;
+            _taskQueueHostedService = taskQueueHostedService;
         }
 
-        // POST: api/import
+        // GET: api/Import
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Import>>> GetImport()
+        {
+            return await _context.Import
+                .Include(e => e.Task)
+                .Include(e => e.TranslateModel)
+                .ToListAsync();
+        }
+
+        // GET: api/Import/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Import>> GetImport(int id)
+        {
+            var import = await _context.Import
+                .Include(x => x.Task)
+                .Include(x => x.TranslateModel)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (import == null) return BadRequest();
+
+            return Ok(import);
+        }
+
+        // PUT: api/Import/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutImport(int id, ImportDto importDto)
+        {
+            // Verkrijg import object   
+            var import = await _context.Import
+                .FindAsync(id);
+            if (import == null) return BadRequest();
+
+            // Verkrijg TranslateModel object
+            var translateModel = await _context.TranslateModel
+                .FirstOrDefaultAsync(x => x.Id == importDto.TranslateModelId);
+            if (translateModel == null) return BadRequest();
+
+            // Wijzig en sla op in context
+            import.TranslateModel = translateModel;
+            _context.Entry(import).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(import);
+        }
+
+        // POST: api/Import
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         /// <summary>
-        /// Importeer een CSV naar de applicatie
+        /// Voeg een nieuwe import taak toe (upload een CSV)
         /// </summary>
-        /// <param name="csv"></param>
+        /// <param name="csvFile"></param>
         /// <param name="importDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult> NewImport(IFormFile csvFile, ImportDto importDto)
+        [HttpPost("{translateModelId}")]
+        public async Task<ActionResult<Import>> PostImport(IFormFile csvFile, int translateModelId)
         {
             // Verkrijg huidige gebruiker en vertaaltabel
-            var username = User.Claims.FirstOrDefault(user => user.Type == "Username")?.Value;
-            var user = await _context.Gebruiker.FirstOrDefaultAsync(u => u.Emailadres == username);
+            var username = User.Claims
+                .FirstOrDefault(user => user.Type == "Username")?.Value;
+            var user = await _context.Gebruiker
+                .FirstOrDefaultAsync(u => u.Emailadres == username);
 
-            var translationTabel = await _context.TranslateModel.FindAsync(importDto.TranslateModel);
+            var translationTabel = await _context.TranslateModel
+                .FirstOrDefaultAsync(x => x.Id == translateModelId);
             if (translationTabel == null) return BadRequest();
 
             // CSV bestand verwerken naar lokale storage
-            var filepath = _configuration["Bestanden:ImportPad"] + "/Import-CSV-" + BCrypt.Net.BCrypt.HashString(new Random().Next(1, 999999999).ToString()) + ".csv";
+            var filepath = _configuration["Bestanden:ImportPad"] + "/Import-CSV-" + (new Random().Next(1, 999999999).ToString()) + ".csv";
             using (var stream = System.IO.File.Create(filepath))
             {
                 await csvFile.CopyToAsync(stream);
@@ -70,10 +122,29 @@ namespace Erfpacht058_API.Controllers.Rapport
             import.Task = task;
             _context.Import.Add(import);
             _context.TaskQueue.Add(task);
-            await _context.SaveChangesAsync();  
+            await _context.SaveChangesAsync();
 
             // Nieuwe taak toevoegen naar background worker
             _taskQueueHostedService.EnqueueTask(task);
+
+            return Ok(import);
+
+        }
+
+        // DELETE: api/Import/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteImport(int id)
+        {
+            // Verkrijg import object van context
+            var import = await _context.Import
+                .Include(x => x.Task)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (import == null) return BadRequest();
+
+            // Sla wijzigingen op in context
+            _context.TaskQueue.Remove(import.Task);
+            _context.Import.Remove(import);
+            await _context.SaveChangesAsync();
 
             return Ok(import);
         }

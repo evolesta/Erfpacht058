@@ -7,6 +7,8 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
+using System.Dynamic;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
@@ -221,24 +223,74 @@ namespace Erfpacht058_API.Controllers.Rapport
             var setMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set), 1, new Type[] { });
             setMethod = setMethod.MakeGenericMethod(modelType);
             var dbSet = (IQueryable)setMethod.Invoke(context, null);
+            var addMethod = dbSet.GetType().GetMethod(nameof(DbSet<object>.Add));
+
+            // CSV Reader configuratie samenstellen
+            var csvReaderConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HeaderValidated = null,
+                MissingFieldFound = null,
+            };
 
             // CSV uitlezen
             using (var stream = new StreamReader(import.importPad))
+            // CSV Reader initialiseren
+            using (var csvReader = new CsvReader(stream, csvReaderConfig))
             {
-                // CSV Reader initialiseren
-                using (var csvReader = new CsvReader(stream, CultureInfo.InvariantCulture))
-                {
-                    // Alle CSV Records uitlezen
-                    var records = csvReader.GetRecords(modelType);
+                // Lees de Headers van de CSV en initialiseer een vertaaltabel dict.
+                csvReader.Read();
+                csvReader.ReadHeader();
+                var csvHeaders = csvReader.Context.Reader.HeaderRecord;
+                var headerToProperyMap = new Dictionary<string, string>();
 
-                    // Doorloop ieder CSV record en voeg toe aan de context
-                    foreach (var record in records)
+                // Stel de vertaaltabel samen adhv de translations uit de database
+                foreach (var translation in translateModel.Translations)
+                {
+                    var csvHeader = translation.CSVColummnName;
+                    var modelPropertyName = translation.ModelColumnName;
+                    if (!string.IsNullOrEmpty(csvHeader) && !string.IsNullOrEmpty(modelPropertyName))
                     {
-                        context.Entry(record).State = EntityState.Added; 
+                        headerToProperyMap[csvHeader] = modelPropertyName;
+                    }
+                }
+
+                // Loop door de CSV Regels heen met een while loop
+                while (csvReader.Read())
+                {
+                    // Maak een nieuwe instantie aan van het toe te voegen object aan het model
+                    var entityToAdd = Activator.CreateInstance(modelType);
+
+                    // Doorloop iedere header en stel het toe te voegen object samen adhv de vertaaltabel
+                    foreach (var header in csvHeaders)
+                    {
+                        if (headerToProperyMap.TryGetValue(header, out var propertyName))
+                        {
+                            // Verkrijg model kolomnaam en waarde
+                            var value = csvReader.GetField(header);
+                            var property = modelType.GetProperty(propertyName);
+                            if (property != null)
+                            {
+                                // Controleer of Enum waarden en Parse deze indien nodig
+                                if (property.PropertyType.IsEnum)
+                                {
+                                    var enumValue = Enum.Parse(property.PropertyType, value);
+                                    property.SetValue(entityToAdd, enumValue);
+                                }
+                                else
+                                {
+                                    // Reguliere waarden worden direct direct aan het object toegekend
+                                    property.SetValue(entityToAdd, Convert.ChangeType(value, property.PropertyType));
+                                }
+                            }
+                        }    
                     }
 
-                    await context.SaveChangesAsync();
+                    // Voeg het object toe aan de context
+                    addMethod.Invoke(dbSet, new[] { entityToAdd }); 
                 }
+
+                // Sla de nieuwe objecten op in de database context
+                await context.SaveChangesAsync();
             }
         }
     }
