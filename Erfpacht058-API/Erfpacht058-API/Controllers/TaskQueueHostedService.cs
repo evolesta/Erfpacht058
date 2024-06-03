@@ -9,8 +9,16 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Dynamic;
+using Erfpacht058_API.Controllers.Rapport;
+using Erfpacht058_API.Models.Facturen;
+using System.Configuration;
+using System.Text;
+using System.Xml.Linq;
+using System.IO.Compression;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.InkML;
 
-namespace Erfpacht058_API.Controllers.Rapport
+namespace Erfpacht058_API.Controllers
 {
     public class TaskQueueHostedService : BackgroundService
     {
@@ -18,6 +26,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         private readonly ConcurrentQueue<TaskQueue> _taskQueue = new ConcurrentQueue<TaskQueue>();
         private readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
         private readonly IServiceScopeFactory _scopeFactory;
+        private int _invoiceNrCounter = 0;
 
         public TaskQueueHostedService(ILogger<TaskQueueHostedService> logger, IServiceScopeFactory scopeFactory)
         {
@@ -28,16 +37,16 @@ namespace Erfpacht058_API.Controllers.Rapport
         public void EnqueueTask(TaskQueue task)
         {
             _taskQueue.Enqueue(task);
-            _signal.Release(); 
+            _signal.Release();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {           
+        {
             while (!stoppingToken.IsCancellationRequested)
             {
                 await _signal.WaitAsync(stoppingToken); // Wacht tot nieuw signaal voor het uitvoeren van een taak
 
-                while(_taskQueue.TryDequeue(out var task))
+                while (_taskQueue.TryDequeue(out var task))
                 {
                     // Zet task in Progress
                     await using var scope = _scopeFactory.CreateAsyncScope();
@@ -59,6 +68,10 @@ namespace Erfpacht058_API.Controllers.Rapport
                                 break;
                             case SoortTaak.Export:
                                 await Export(task.Export, "", context, config);
+                                break;
+                            case SoortTaak.Facturen:
+                                getLatestInvNr(context);
+                                await GenerateInvoices(task.FactuurJob, context, config);
                                 break;
                         }
 
@@ -101,11 +114,11 @@ namespace Erfpacht058_API.Controllers.Rapport
             var modelType = Assembly.GetExecutingAssembly().GetType(template.Model);
             if (modelType == null)
                 throw new InvalidOperationException("Model niet gevonden");
-            
+
             // Zet de entiteit van de DbContext dynamisch a.d.h.v. modelType
             var setMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set), 1, new Type[] { });
             setMethod = setMethod.MakeGenericMethod(modelType);
-            var dbSet = (IQueryable) setMethod.Invoke(context, null);
+            var dbSet = (IQueryable)setMethod.Invoke(context, null);
 
             // Pas eventuele filters toe aan de DbSet object
             foreach (var filter in template.Filters)
@@ -172,7 +185,7 @@ namespace Erfpacht058_API.Controllers.Rapport
                     .Select(item => item.GetType().GetProperty(column.Key).GetValue(item, null))
                     .ToList();
 
-                exportData.Add(column.Key, columnData); 
+                exportData.Add(column.Key, columnData);
             }
 
             // Genereer een export bestand adhv de keuze van de gebruiker
@@ -282,16 +295,150 @@ namespace Erfpacht058_API.Controllers.Rapport
                                     property.SetValue(entityToAdd, Convert.ChangeType(value, property.PropertyType));
                                 }
                             }
-                        }    
+                        }
                     }
 
                     // Voeg het object toe aan de context
-                    addMethod.Invoke(dbSet, new[] { entityToAdd }); 
+                    addMethod.Invoke(dbSet, new[] { entityToAdd });
                 }
 
                 // Sla de nieuwe objecten op in de database context
                 await context.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// Achtergrond taak die facturen genereert
+        /// </summary>
+        /// <returns></returns>
+        public async Task GenerateInvoices(FactuurJob factuurJob, Erfpacht058_APIContext context, IConfiguration configuration)
+        {
+            // verkrijg alle overeenkomsten die in de facturatieperiode vallen
+            var overeenkomsten = await context.Overeenkomst
+                .Include(e => e.Financien)
+                .Include(e => e.Eigendom)
+                    .ThenInclude(rel => rel.Eigenaar)
+                .Include(e => e.Eigendom)
+                    .ThenInclude(rel => rel.Adres)
+                .Where(f => f.Financien.FactureringsPeriode == factuurJob.FactureringsPeriode)
+                .ToListAsync();
+
+            // Facturen storage output gereed maken
+            var outputDir = configuration["Bestanden:Facturen"] + "/" + factuurJob.Id.ToString() + "/";
+            var csvPad = outputDir + "/FacturenJob-" + factuurJob.Id.ToString() + ".csv";
+            Directory.CreateDirectory(outputDir); // map aanmaken
+            Directory.CreateDirectory(outputDir + "/XML"); // XMl output
+
+            // CSV genereren
+            StringBuilder csvContent = new StringBuilder();
+            string[] csvHeaders = { "Nummer", "Datum", "Bedrag" };
+            string headerLine = string.Join(",", csvHeaders); // CSV kopregel genereren en wegschrijven naar bestand
+            csvContent.AppendLine(headerLine);
+            File.WriteAllText(csvPad, csvContent.ToString());
+            csvContent.Clear();
+
+            // Genereer per overeenkomst een nieuwe factuur
+            foreach (var overeenkomst in overeenkomsten)
+            {
+                // Nieuwe factuur aanmaaken
+                var factuur = new Factuur
+                {
+                    Eigenaar = overeenkomst.Eigendom.Eigenaar[0], // altijd op naam van eerste eigenaar
+                    Datum = DateTime.Now,
+                    Nummer = generateFactuurnr(context),
+                    Financien = overeenkomst.Financien,
+                    Bedrag = 0,
+                };
+
+                // Factuurregel opgestellen
+                var factuurregels = new FactuurRegels
+                {
+                    Aantal = 1,
+                    Beschrijving = "Canon erfpacht: " + overeenkomst.Eigendom.Adres.Straatnaam + " " + overeenkomst.Eigendom.Adres.Huisnummer,
+                    Prijs = overeenkomst.Financien.Bedrag,
+                    Totaal = overeenkomst.Financien.Bedrag
+                };
+
+                // Factuurregels toevoegen aan context
+                context.FactuurRegels.Add(factuurregels);
+                factuur.Regels.Add(factuurregels);
+
+                // Factuurbedrag berekenen adhv de regels
+                foreach (var regel in factuur.Regels)
+                {
+                    factuur.Bedrag += regel.Totaal;
+                }
+
+                // Relaties leggen en toevoegen aan context
+                context.Factuur.Add(factuur);
+                factuurJob.Facturen.Add(factuur);
+                context.Entry(factuurJob).State = EntityState.Modified; 
+
+                await context.SaveChangesAsync();
+
+                // Stap 2: XML factuur maken en toevoegen aan CSV
+                var xmlPad = outputDir + "/XML/" + factuur.Nummer + ".xml";
+                XDocument xmldoc = new XDocument(
+                        new XElement("Factuur",
+                            new XElement("Nummer", factuur.Nummer),
+                            new XElement("Datum", factuur.Datum.ToString("dd-MM-yyyy")),
+                            new XElement("Bedrag", factuur.Bedrag.ToString()),
+                            new XElement("Regels",
+                                from regel in factuur.Regels
+                                select new XElement("Regel",
+                                    new XElement("Aantal", regel.Aantal),
+                                    new XElement("Beschrijving", regel.Beschrijving),
+                                    new XElement("Prijs", regel.Prijs),
+                                    new XElement("Totaal", regel.Totaal)
+                            )
+                        )
+                    ));
+
+                xmldoc.Save(xmlPad); // wegschrijven naar XML
+
+                // CSV regel wegschrijven
+                string[] csvData = { factuur.Nummer, factuur.Datum.ToString("dd-MM-yyyy"), factuur.Bedrag.ToString() };
+                string csvRegel = string.Join(",", csvData);
+                File.AppendAllText(csvPad, csvRegel + Environment.NewLine);
+            }
+
+            // ZIP file genereren
+            var zipFile = configuration["Bestanden:Facturen"] + "/Facturen-" + factuurJob.Id.ToString() + ".zip";
+            ZipFile.CreateFromDirectory(outputDir, zipFile);
+
+            // Factuur Job storage pad bijwerken
+            factuurJob.StoragePad = zipFile;
+            context.Entry(factuurJob).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+        }
+
+        private void getLatestInvNr(Erfpacht058_APIContext context)
+        {
+            // verkrijg laatste factuurnummer van dit jaar
+            var laatsteFactNr = context.Factuur
+                .Where(i => i.Nummer.StartsWith(DateTime.Now.Year.ToString()))
+                .OrderByDescending(i => i.Nummer)
+                .FirstOrDefault();
+
+            if (laatsteFactNr == null)
+            {
+                _invoiceNrCounter = 0;
+            }
+            else
+            {
+                _invoiceNrCounter = Convert.ToInt32(laatsteFactNr.Nummer.Split("-")[1]); // update glob int
+            }
+        }
+
+        // Functie om een nieuw factuurnummer te genereren
+        private string generateFactuurnr(Erfpacht058_APIContext context)
+        {
+            var year = DateTime.Now.Year.ToString(); // verkrijg huidige jaar
+
+            // Verhoog de teller mbv Interlocked
+            Interlocked.Increment(ref _invoiceNrCounter);
+
+            return year + "-" + _invoiceNrCounter.ToString("D9");
         }
     }
 }

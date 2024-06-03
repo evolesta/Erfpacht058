@@ -37,6 +37,7 @@
   <ItemGroup>
     <Folder Include="Storage\Exports\" />
     <Folder Include="Storage\Imports\" />
+    <Folder Include="Storage\Facturen\" />
   </ItemGroup>
 
 </Project>

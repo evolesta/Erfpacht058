@@ -163,29 +163,5 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Status response opstellen
             return Ok(export.Task);
         }
-
-        // DELETE: api/Export/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteExport(int id)
-        {
-            var export = await _context.Export
-                .Include(e => e.Task)
-                .FirstOrDefaultAsync();
-            if (export == null)
-            {
-                return NotFound();
-            }
-
-            // Taak naar verwijderd zetten
-            var task = export.Task;
-            task.Status = Status.Verwijderd;
-
-            // Wijzigingen opslaan naar database
-            _context.Export.Remove(export);
-            _context.Entry(task).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
     }
 }

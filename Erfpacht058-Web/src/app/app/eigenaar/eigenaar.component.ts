@@ -59,7 +59,12 @@ export class EigenaarComponent implements OnInit {
     }
     
     // Check of eigenaar vanuit eigendom gekoppeld wordt
-    this.vanuitEigendom = !this.router.url.includes('add/0');
+    if (this.router.url.includes('add/0')) {
+      this.vanuitEigendom = false;
+    }
+    else 
+      this.vanuitEigendom = true;
+      this.eigendomId = this.route.snapshot.paramMap.get('id');
   }
 
   modEigenaar(): void {

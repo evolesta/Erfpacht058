@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Erfpacht058_API.Models.Facturen;
+using System.Text.Json.Serialization;
 
 namespace Erfpacht058_API.Models.Eigendom
 {
@@ -17,6 +18,7 @@ namespace Erfpacht058_API.Models.Eigendom
         public string Postcode { get; set; }
         public string Woonplaats { get; set; }
         public string? Debiteurnummer { get; set; }
+        public ICollection<Factuur> Facturen { get; set; } // many-to-one relatie (een eigenaar heeft meerdere facturen)
         public DateTime Ingangsdatum { get; set; }
         public DateTime? Einddatum { get; set; }
     }

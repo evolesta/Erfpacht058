@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Erfpacht058_API.Models.Facturen;
+using System.Text.Json.Serialization;
 
 namespace Erfpacht058_API.Models.Rapport
 {
@@ -17,12 +18,16 @@ namespace Erfpacht058_API.Models.Rapport
         public int? ImportId { get; set; } // optionele one-to-one relatie
         [JsonIgnore]
         public Import? Import { get; set; }
+        public int? FactuurJobId { get; set; } // optionele one-to-one relatie
+        [JsonIgnore]
+        public FactuurJob FactuurJob { get; set; }
     }
 
     public enum SoortTaak
     {
         Import,
-        Export
+        Export,
+        Facturen,
     }
 
     public enum Status

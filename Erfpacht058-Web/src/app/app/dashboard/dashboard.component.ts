@@ -12,13 +12,11 @@ import {MatMenuModule} from '@angular/material/menu';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-dialog.component';
 import { UploadDialogComponent } from '../../base/generic/upload-dialog/upload-dialog.component';
-import { environment } from '../../../environments/environment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DetailDialogComponent } from '../../base/generic/detail-dialog/detail-dialog.component';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,9 +39,12 @@ export class DashboardComponent implements OnInit {
     0: "Algemeen", 1: "Notitie", 2: "Bewijsstuk", 3: "Overeenkomst", 4: "Overig"
   }
   overeenkomstenTable: MatTableDataSource<any>;
-  overeenkomstenColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'rentepercentage', 'bedrag', 'frequentie', 'options'];
+  overeenkomstenColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'rentepercentage', 'bedrag', 'frequentie', 'periode', 'options'];
   frequentieOvereenkomsten = {
     0: 'Maandelijks', 1: 'Halfjaarlijks', 2: 'Jaarlijks'
+  }
+  factPerioden = {
+    0: 'Juni', 1: 'December'
   }
   notities = new FormControl('');
   editNotities: boolean;

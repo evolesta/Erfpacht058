@@ -28,8 +28,9 @@ export class ModOvereenkomstComponent implements OnInit {
     financien: new FormGroup({
       bedrag: new FormControl(),
       factureringsWijze: new FormControl(),
-      frequentie: new FormControl()
-    })
+      frequentie: new FormControl(),
+      factureringsPeriode: new FormControl('', Validators.required)
+    }),
   });
 
   id: string;
@@ -56,6 +57,7 @@ export class ModOvereenkomstComponent implements OnInit {
         this.overeenkomstForm.patchValue(response);
         this.overeenkomstForm.controls.ingangsdatum.setValue(datepipe.transform(response.ingangsdatum, 'yyyy-MM-dd'));
         this.overeenkomstForm.controls.einddatum.setValue(datepipe.transform(response.einddatum, 'yyyy-MM-dd'));
+        this.overeenkomstForm.controls.datumAkte.setValue(datepipe.transform(response.datumAkte, 'yyyy-MM-dd'));
       });
     }
 

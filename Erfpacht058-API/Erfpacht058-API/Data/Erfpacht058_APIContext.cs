@@ -8,6 +8,7 @@ using BCrypt.Net;
 using Erfpacht058_API.Models.Eigendom;
 using Erfpacht058_API.Models.OvereenkomstNS;
 using Erfpacht058_API.Models.Rapport;
+using Erfpacht058_API.Models.Facturen;
 
 namespace Erfpacht058_API.Data
 {
@@ -52,6 +53,17 @@ namespace Erfpacht058_API.Data
                 .WithOne(e => e.Template)
                 .HasForeignKey(e => e.TemplateId);
 
+            // Relatie definieren tussen Factuur en Eigenaar
+            modelBuilder.Entity<Factuur>()
+                .HasOne(f => f.Eigenaar)
+                .WithMany(e => e.Facturen)
+                .HasForeignKey(f => f.EigenaarId);
+
+            // Relatie definieren tussen Factuur en FactuurJob
+            modelBuilder.Entity<Factuur>()
+                .HasOne(f => f.FactuurJob)
+                .WithMany(fj => fj.Facturen)
+                .HasForeignKey(f => f.FactuurJobId);
         }
         public DbSet<Erfpacht058_API.Models.Eigendom.Eigendom> Eigendom { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Eigendom.Adres> Adres { get; set; } = default!;
@@ -69,5 +81,8 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Rapport.Import> Import { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Rapport.TranslateModel> TranslateModel { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Rapport.Translation> Translation { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Facturen.FactuurJob> FactuurJob { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Facturen.Factuur> Factuur { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Facturen.FactuurRegels> FactuurRegels { get; set; } = default!;
     }
 }

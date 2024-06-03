@@ -25,6 +25,8 @@ import { ImportComponent } from './app/import/import.component';
 import { VertaaltabellenComponent } from './app/import/vertaaltabellen/vertaaltabellen.component';
 import { ModVertaaltabelComponent } from './app/import/vertaaltabellen/mod-vertaaltabel/mod-vertaaltabel.component';
 import { AddImportComponent } from './app/import/add-import/add-import.component';
+import { FacturatieComponent } from './app/facturatie/facturatie.component';
+import { AddFacturatieComponent } from './app/facturatie/add-facturatie/add-facturatie.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -55,6 +57,9 @@ export const routes: Routes = [
             { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
             { path: 'overeenkomst/edit/:id', component: ModOvereenkomstComponent },
             { path: 'rapportage', component: RapportageComponent },
+            { path: 'rapportage/add', component: AddRapportageComponent },
+            { path: 'facturatie', component: FacturatieComponent },
+            { path: 'facturatie/add', component: AddFacturatieComponent },
             { path: 'rapportage/add', component: AddRapportageComponent },
             { path: 'rapportage/sjablonen', component: SjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/add', component: ModSjablonenComponent, canActivate: [adminGuard]},

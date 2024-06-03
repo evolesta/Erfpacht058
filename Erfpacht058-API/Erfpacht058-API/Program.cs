@@ -7,8 +7,8 @@ using System.Text;
 using System.Reflection;
 using Erfpacht058_API.Controllers.Eigendom;
 using System.Configuration;
-using Erfpacht058_API.Controllers.Rapport;
 using Microsoft.AspNetCore.Http;
+using Erfpacht058_API.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 

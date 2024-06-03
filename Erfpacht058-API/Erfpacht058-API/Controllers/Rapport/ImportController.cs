@@ -48,29 +48,6 @@ namespace Erfpacht058_API.Controllers.Rapport
             return Ok(import);
         }
 
-        // PUT: api/Import/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutImport(int id, ImportDto importDto)
-        {
-            // Verkrijg import object   
-            var import = await _context.Import
-                .FindAsync(id);
-            if (import == null) return BadRequest();
-
-            // Verkrijg TranslateModel object
-            var translateModel = await _context.TranslateModel
-                .FirstOrDefaultAsync(x => x.Id == importDto.TranslateModelId);
-            if (translateModel == null) return BadRequest();
-
-            // Wijzig en sla op in context
-            import.TranslateModel = translateModel;
-            _context.Entry(import).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(import);
-        }
-
         // POST: api/Import
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         /// <summary>
@@ -129,24 +106,6 @@ namespace Erfpacht058_API.Controllers.Rapport
 
             return Ok(import);
 
-        }
-
-        // DELETE: api/Import/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteImport(int id)
-        {
-            // Verkrijg import object van context
-            var import = await _context.Import
-                .Include(x => x.Task)
-                .FirstOrDefaultAsync(x => x.Id == id);
-            if (import == null) return BadRequest();
-
-            // Sla wijzigingen op in context
-            _context.TaskQueue.Remove(import.Task);
-            _context.Import.Remove(import);
-            await _context.SaveChangesAsync();
-
-            return Ok(import);
         }
     }
 }
