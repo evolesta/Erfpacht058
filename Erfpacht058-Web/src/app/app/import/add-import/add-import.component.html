@@ -1,0 +1,25 @@
+<h1>Nieuwe import</h1>
+
+<form [formGroup]="addImportForm" (ngSubmit)="addImport()">
+<mat-form-field class="full-width">
+    <mat-label>Vertaaltabel</mat-label>
+    <mat-select formControlName="translateModelId">
+        @for (model of translateModels; track model) {
+            <mat-option [value]="model.id">{{model.naam}}</mat-option>
+        }
+    </mat-select>
+    <mat-hint>Kies een vertaaltabel die de CSV kolommen vertaalt naar de correcte kolomnamen in de database.</mat-hint>
+</mat-form-field>
+
+<h2>CSV Bestand</h2>
+<p>Kies een CSV bestand die geimporteerd moet worden. Zie de documentatie voor meer info over de opmaak van het import bestand.</p>
+<p>
+    <input type="file" formControlName="csvFile" (change)="onFileChange($event)">
+</p>
+<div *ngIf="addImportForm.controls.csvFile.errors">
+    <p style="color: red;">Kies een correcte CSV</p>
+</div>
+
+<br/>
+<button type="submit" mat-raised-button color="primary"><mat-icon>save</mat-icon> Importeer CSV</button>
+</form>

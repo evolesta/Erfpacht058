@@ -4,6 +4,7 @@
     <mat-menu #searchEigendomMenu="matMenu">
         <button mat-menu-item (click)="openZoekDialogEigendom()">Via eigendom</button>
         <button mat-menu-item (click)="openZoekDialogAdres()">Via adres</button>
+        <button mat-menu-item (click)="openZoekDialogKadaster()">Via Kadastraal nummer</button>
     </mat-menu>
 
     <button mat-raised-button color="primary" routerLink="eigendom/add"><mat-icon>add</mat-icon> Nieuw eigendom</button>
@@ -293,6 +294,10 @@
                         <ng-container matColumnDef="frequentie">
                             <th mat-header-cell *matHeaderCellDef>Frequentie</th>
                             <td mat-cell *matCellDef="let element">{{frequentieOvereenkomsten[element.financien.frequentie]}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="periode">
+                            <th mat-header-cell *matHeaderCellDef>Periode</th>
+                            <td mat-cell *matCellDef="let element">{{factPerioden[element.financien.factureringsPeriode]}}</td>
                         </ng-container>
                         <ng-container matColumnDef="options">
                             <th mat-header-cell *matHeaderCellDef></th>

@@ -33,9 +33,17 @@
     <h2>Financiën</h2>
 
     <div formGroupName="financien">
-        <mat-form-field class="full-width">
+        <mat-form-field class="half-width">
             <mat-label>Bedrag</mat-label>
             <input matInput type="number" formControlName="bedrag">
+        </mat-form-field>
+
+        <mat-form-field class="half-width">
+            <mat-label>Periode</mat-label>
+            <mat-select formControlName="factureringsPeriode">
+                <mat-option [value]="0">Juni</mat-option>
+                <mat-option [value]="1">December</mat-option>
+            </mat-select>
         </mat-form-field>
     
         <mat-form-field class="half-width">

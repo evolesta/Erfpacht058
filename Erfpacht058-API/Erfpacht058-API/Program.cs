@@ -4,26 +4,20 @@ using Erfpacht058_API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.VisualBasic;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Components.Web;
 using System.Reflection;
 using Erfpacht058_API.Controllers.Eigendom;
 using System.Configuration;
+using Microsoft.AspNetCore.Http;
+using Erfpacht058_API.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Voeg Database Context toe
+// Voeg Context, singletons, controllers en services toe
 builder.Services.AddDbContext<Erfpacht058_APIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Erfpacht058_APIContext") ?? throw new InvalidOperationException("Connection string 'Erfpacht058_APIContext' not found.")));
-// Add services to the container.
-builder.Services.AddSingleton<IKadasterAPIService, KadasterAPIService>(provider =>
-{
-    var filepath = builder.Configuration["Kadaster:JsonFile"];
-    return new KadasterAPIService(filepath);
-});
-
 builder.Services.AddControllers();
+builder.Services.AddSingleton<TaskQueueHostedService>();
+builder.Services.AddHostedService(provider => provider.GetService<TaskQueueHostedService>());
 
 // Swagger API Documentatie genereren
 builder.Services.AddEndpointsApiExplorer();
@@ -79,6 +73,8 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
+
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community; // Benodigd voor het genereren van PDFs met QuestPDF library
 
 var app = builder.Build();
 

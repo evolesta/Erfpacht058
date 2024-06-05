@@ -251,6 +251,101 @@ namespace Erfpacht058_API.Migrations
                     b.ToTable("Kadaster");
                 });
 
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.Factuur", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("Bedrag")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("Datum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EigenaarId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FactuurJobId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FinancienId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nummer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EigenaarId");
+
+                    b.HasIndex("FactuurJobId");
+
+                    b.HasIndex("FinancienId");
+
+                    b.ToTable("Factuur");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.FactuurJob", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AanmaakDatum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("AfrondDatum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FactureringsPeriode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StoragePad")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FactuurJob");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.FactuurRegels", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Aantal")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Beschrijving")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FactuurId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Prijs")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Totaal")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FactuurId");
+
+                    b.ToTable("FactuurRegels");
+                });
+
             modelBuilder.Entity("Erfpacht058_API.Models.Gebruiker", b =>
                 {
                     b.Property<int>("Id")
@@ -266,6 +361,12 @@ namespace Erfpacht058_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ExportId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FactuurJobId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ImportId")
                         .HasColumnType("int");
 
                     b.Property<int>("LogingPoging")
@@ -289,6 +390,14 @@ namespace Erfpacht058_API.Migrations
                         .IsUnique()
                         .HasFilter("[ExportId] IS NOT NULL");
 
+                    b.HasIndex("FactuurJobId")
+                        .IsUnique()
+                        .HasFilter("[FactuurJobId] IS NOT NULL");
+
+                    b.HasIndex("ImportId")
+                        .IsUnique()
+                        .HasFilter("[ImportId] IS NOT NULL");
+
                     b.ToTable("Gebruiker");
 
                     b.HasData(
@@ -301,7 +410,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$SOlz6ulWACMQo6xrytW6MuOcZ0bTE/XplzVKw2CPm14ZaG3IFaHAK"
+                            Wachtwoord = "$2a$11$DCJD93gvt7vjre.Xw8u6U.sNS9hrz40ksy8fhEI49jhaGCI.nTMP2"
                         });
                 });
 
@@ -315,6 +424,9 @@ namespace Erfpacht058_API.Migrations
 
                     b.Property<float>("Bedrag")
                         .HasColumnType("real");
+
+                    b.Property<int>("FactureringsPeriode")
+                        .HasColumnType("int");
 
                     b.Property<int>("FactureringsWijze")
                         .HasColumnType("int");
@@ -380,6 +492,9 @@ namespace Erfpacht058_API.Migrations
                     b.Property<DateTime>("AanmaakDatum")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ExportPad")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Formaat")
                         .HasColumnType("int");
 
@@ -415,6 +530,29 @@ namespace Erfpacht058_API.Migrations
                     b.HasIndex("TemplateId");
 
                     b.ToTable("Filter");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Import", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Aanmaakdatum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("WijzigingsDatum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("importPad")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Import");
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.RapportData", b =>
@@ -460,6 +598,15 @@ namespace Erfpacht058_API.Migrations
                     b.Property<int?>("ExportId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FactuurJobId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Fout")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ImportId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Prioriteit")
                         .HasColumnType("int");
 
@@ -474,6 +621,14 @@ namespace Erfpacht058_API.Migrations
                     b.HasIndex("ExportId")
                         .IsUnique()
                         .HasFilter("[ExportId] IS NOT NULL");
+
+                    b.HasIndex("FactuurJobId")
+                        .IsUnique()
+                        .HasFilter("[FactuurJobId] IS NOT NULL");
+
+                    b.HasIndex("ImportId")
+                        .IsUnique()
+                        .HasFilter("[ImportId] IS NOT NULL");
 
                     b.ToTable("TaskQueue");
                 });
@@ -514,6 +669,70 @@ namespace Erfpacht058_API.Migrations
                         .HasFilter("[ExportId] IS NOT NULL");
 
                     b.ToTable("Template");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.TranslateModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AanmaakDatum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ImportId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Maker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Naam")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("WijzigingsDatum")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImportId")
+                        .IsUnique()
+                        .HasFilter("[ImportId] IS NOT NULL");
+
+                    b.ToTable("TranslateModel");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Translation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CSVColummnName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModelColumnName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TranslateModelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TranslateModelId");
+
+                    b.ToTable("Translation");
                 });
 
             modelBuilder.Entity("EigenaarEigendom", b =>
@@ -567,13 +786,61 @@ namespace Erfpacht058_API.Migrations
                     b.Navigation("Eigendom");
                 });
 
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.Factuur", b =>
+                {
+                    b.HasOne("Erfpacht058_API.Models.Eigendom.Eigenaar", "Eigenaar")
+                        .WithMany("Facturen")
+                        .HasForeignKey("EigenaarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Erfpacht058_API.Models.Facturen.FactuurJob", "FactuurJob")
+                        .WithMany("Facturen")
+                        .HasForeignKey("FactuurJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Erfpacht058_API.Models.OvereenkomstNS.Financien", "Financien")
+                        .WithMany("Facturen")
+                        .HasForeignKey("FinancienId");
+
+                    b.Navigation("Eigenaar");
+
+                    b.Navigation("FactuurJob");
+
+                    b.Navigation("Financien");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.FactuurRegels", b =>
+                {
+                    b.HasOne("Erfpacht058_API.Models.Facturen.Factuur", "Factuur")
+                        .WithMany("Regels")
+                        .HasForeignKey("FactuurId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Factuur");
+                });
+
             modelBuilder.Entity("Erfpacht058_API.Models.Gebruiker", b =>
                 {
                     b.HasOne("Erfpacht058_API.Models.Rapport.Export", "Export")
                         .WithOne("Gebruiker")
                         .HasForeignKey("Erfpacht058_API.Models.Gebruiker", "ExportId");
 
+                    b.HasOne("Erfpacht058_API.Models.Facturen.FactuurJob", "FactuurJob")
+                        .WithOne("Gebruiker")
+                        .HasForeignKey("Erfpacht058_API.Models.Gebruiker", "FactuurJobId");
+
+                    b.HasOne("Erfpacht058_API.Models.Rapport.Import", "Import")
+                        .WithOne("Gebruiker")
+                        .HasForeignKey("Erfpacht058_API.Models.Gebruiker", "ImportId");
+
                     b.Navigation("Export");
+
+                    b.Navigation("FactuurJob");
+
+                    b.Navigation("Import");
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.OvereenkomstNS.Financien", b =>
@@ -624,7 +891,19 @@ namespace Erfpacht058_API.Migrations
                         .WithOne("Task")
                         .HasForeignKey("Erfpacht058_API.Models.Rapport.TaskQueue", "ExportId");
 
+                    b.HasOne("Erfpacht058_API.Models.Facturen.FactuurJob", "FactuurJob")
+                        .WithOne("Task")
+                        .HasForeignKey("Erfpacht058_API.Models.Rapport.TaskQueue", "FactuurJobId");
+
+                    b.HasOne("Erfpacht058_API.Models.Rapport.Import", "Import")
+                        .WithOne("Task")
+                        .HasForeignKey("Erfpacht058_API.Models.Rapport.TaskQueue", "ImportId");
+
                     b.Navigation("Export");
+
+                    b.Navigation("FactuurJob");
+
+                    b.Navigation("Import");
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Template", b =>
@@ -634,6 +913,29 @@ namespace Erfpacht058_API.Migrations
                         .HasForeignKey("Erfpacht058_API.Models.Rapport.Template", "ExportId");
 
                     b.Navigation("Export");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.TranslateModel", b =>
+                {
+                    b.HasOne("Erfpacht058_API.Models.Rapport.Import", "Import")
+                        .WithOne("TranslateModel")
+                        .HasForeignKey("Erfpacht058_API.Models.Rapport.TranslateModel", "ImportId");
+
+                    b.Navigation("Import");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Translation", b =>
+                {
+                    b.HasOne("Erfpacht058_API.Models.Rapport.TranslateModel", "TranslateModel")
+                        .WithMany("Translations")
+                        .HasForeignKey("TranslateModelId");
+
+                    b.Navigation("TranslateModel");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Eigenaar", b =>
+                {
+                    b.Navigation("Facturen");
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.Eigendom.Eigendom", b =>
@@ -647,6 +949,27 @@ namespace Erfpacht058_API.Migrations
                     b.Navigation("Kadaster");
 
                     b.Navigation("Overeenkomst");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.Factuur", b =>
+                {
+                    b.Navigation("Regels");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Facturen.FactuurJob", b =>
+                {
+                    b.Navigation("Facturen");
+
+                    b.Navigation("Gebruiker")
+                        .IsRequired();
+
+                    b.Navigation("Task")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.OvereenkomstNS.Financien", b =>
+                {
+                    b.Navigation("Facturen");
                 });
 
             modelBuilder.Entity("Erfpacht058_API.Models.OvereenkomstNS.Overeenkomst", b =>
@@ -666,11 +989,27 @@ namespace Erfpacht058_API.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Import", b =>
+                {
+                    b.Navigation("Gebruiker")
+                        .IsRequired();
+
+                    b.Navigation("Task");
+
+                    b.Navigation("TranslateModel")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Erfpacht058_API.Models.Rapport.Template", b =>
                 {
                     b.Navigation("Filters");
 
                     b.Navigation("RapportData");
+                });
+
+            modelBuilder.Entity("Erfpacht058_API.Models.Rapport.TranslateModel", b =>
+                {
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

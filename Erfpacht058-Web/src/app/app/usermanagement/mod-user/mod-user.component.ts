@@ -26,7 +26,7 @@ export class ModUserComponent implements OnInit {
     wachtwoord: new FormControl('', Validators.required),
     wachtwoord2: new FormControl('', Validators.required),
     role: new FormControl('', Validators.required),
-    actief: new FormControl('', Validators.required)
+    actief: new FormControl(false, Validators.required)
   });
 
   edit: boolean;

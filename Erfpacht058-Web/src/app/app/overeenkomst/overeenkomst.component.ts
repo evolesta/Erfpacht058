@@ -25,9 +25,12 @@ import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-d
 export class OvereenkomstComponent implements OnInit {
 
   overeenkomstTable = new MatTableDataSource<any>;
-  overeenkomstColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'grondwaarde', 'rentepercentage', 'bedrag', 'frequentie', 'options'];
+  overeenkomstColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'grondwaarde', 'rentepercentage', 'bedrag', 'frequentie', 'periode', 'options'];
   frequentieOvereenkomsten = {
     0: 'Maandelijks', 1: 'Halfjaarlijks', 2: 'Jaarlijks'
+  };
+  perioden = {
+    0: 'Juni', 1: 'December'
   }
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -74,7 +77,7 @@ export class OvereenkomstComponent implements OnInit {
   openVerwijderOvereenkomstDialog(id): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
-      if (result.delete) {
+      if (result && result.delete) {
         this.http.delete('/overeenkomst/' + id).subscribe(resp => {
           this.router.navigateByUrl('app');
         });

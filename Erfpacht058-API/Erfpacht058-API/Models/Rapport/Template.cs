@@ -8,9 +8,10 @@ namespace Erfpacht058_API.Models.Rapport
         public string Naam { get; set; }
         public string Maker { get; set; }
         public string Model { get; set; } // Naam van het hoofdmodel waar data uit vergaart moet worden
-        public List<RapportData>? RapportData { get; } = new List<RapportData>(); // One-to-many relatie
-        public List<Filter>? Filters { get; } = new List<Filter>(); // One-to-Many relatie
+        public ICollection<RapportData>? RapportData { get; } = new List<RapportData>(); // One-to-many relatie
+        public ICollection<Filter>? Filters { get; } = new List<Filter>(); // One-to-Many relatie
         public int? ExportId { get; set; } // one-to-one relatie
+        [JsonIgnore]
         public Export? Export { get; set; }
         public DateTime AanmaakDatum { get; set; }
         public DateTime WijzigingsDatum { get; set; }
@@ -62,7 +63,7 @@ namespace Erfpacht058_API.Models.Rapport
         public string Value { get; set; }
         public int TemplateId { set; get; } // one-to-many relatie
         [JsonIgnore]
-        public Template Template {  set; get; }
+        public Template Template {  get; set; }
     }
 
     public enum Operator
@@ -77,7 +78,7 @@ namespace Erfpacht058_API.Models.Rapport
 
     public class FilterDto
     {
-        public int Id {  set; get; }
+        public int Id { get; set; }
         public string Key { get; set; }
         public Operator Operation { get; set; }
         public string Value { get; set; }

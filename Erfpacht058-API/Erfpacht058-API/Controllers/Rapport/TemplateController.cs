@@ -93,10 +93,12 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                     _context.Entry(existingRapportData).State = EntityState.Modified; // Wijzig de records in de database
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             // Vernieuw de Filter relationele objecten
-            foreach (var filter in template.Filters)
+            foreach (var filter in templateDto.Filters)
             {
                 var existingFilter = template.Filters.FirstOrDefault(f => f.Id == filter.Id);
 
@@ -122,14 +124,24 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                     _context.Entry(existingFilter).State = EntityState.Modified;
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             // Verwijder records die niet meer in de payload aanwezig zijn, maar nog wel in de database
-            var rapportDataIdsInDto = templateDto.RapportData.Select(rd => rd.Id).ToList(); // verkrijg alle Ids uit de payload
-            var filterIdsInDto = templateDto.Filters.Select(f => f.Id).ToList();
+            var rapportDataIdsInDto = templateDto.RapportData
+                .Select(rd => rd.Id)
+                .ToList(); // verkrijg alle Ids uit de payload
+            var filterIdsInDto = templateDto.Filters
+                .Select(f => f.Id)
+                .ToList();
             // verkrijg alle Ids die nog wel in de database staan en niet meer in de payload (te verwijderen ids)
-            var rapportDataToRemove = template.RapportData.Where(rd => !rapportDataIdsInDto.Contains(rd.Id)).ToList();
-            var filterIdsToRemove = template.Filters.Where(f => !filterIdsInDto.Contains(f.Id)).ToList();
+            var rapportDataToRemove = template.RapportData
+                .Where(rd => !rapportDataIdsInDto.Contains(0) && !rapportDataIdsInDto.Contains(rd.Id))
+                .ToList();
+            var filterIdsToRemove = template.Filters
+                .Where(f => !filterIdsInDto.Contains(0) && !filterIdsInDto.Contains(f.Id))
+                .ToList();
             // Verwijder de IDS voor RapportData
             foreach (var idToRemove in rapportDataToRemove)
             {
@@ -219,6 +231,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Verkrijg object
             var template = await _context.Template
                 .Include(x => x.RapportData)
+                .Include(x => x.Filters)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (template == null) return BadRequest();
 
@@ -256,6 +269,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             var structure = entityTypes.Select(entityType =>
             {
                 var properties = entityType.GetProperties()
+                    .Where(property => !property.IsForeignKey()) // sluit Foreign Key velden uit
                     .Select(property => new
                     {
                         Name = property.Name,
@@ -265,7 +279,7 @@ namespace Erfpacht058_API.Controllers.Rapport
 
                 return new
                 {
-                    TableName = entityType.GetTableName(),
+                    TableName = entityType.ClrType.FullName,
                     Properties = properties,
                 };
             }).ToList();

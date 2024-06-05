@@ -1,0 +1,23 @@
+<h1>Nieuwe export</h1>
+
+<form [formGroup]="addRapportageForm" (ngSubmit)="newExport()">
+    <mat-form-field class="full-width">
+        <mat-label>Sjabloon</mat-label>
+        <mat-select formControlName="templateId">
+            @for (template of templates; track template) {
+                <mat-option [value]="template.id">{{template.naam}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Formaat</mat-label>
+        <mat-select formControlName="formaat">
+            <mat-option [value]="0">PDF</mat-option>
+            <mat-option [value]="1">Excel</mat-option>
+            <mat-option [value]="2">CSV</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit"><mat-icon>save</mat-icon> Aanmaken</button>
+</form>

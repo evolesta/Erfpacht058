@@ -1,7 +1,56 @@
 <h1>Rapportages</h1>
 
 <p style="text-align: right;">
-    <button mat-raised-button color="primary"><mat-icon>add</mat-icon>Nieuwe import</button>&nbsp;
-    <button mat-raised-button color="primary"><mat-icon>add</mat-icon>Nieuwe export</button>&nbsp;
+    <button mat-raised-button color="primary" routerLink="add"><mat-icon>add</mat-icon>Nieuwe export</button>&nbsp;
     <button mat-raised-button color="primary" routerLink="sjablonen" *ngIf="helper.isAdministrator()"><mat-icon>summarize</mat-icon>Sjablonen</button>
 </p>
+
+<p style="text-align: right;">
+    <button mat-icon-button (click)="getRapportages()"><mat-icon>refresh</mat-icon></button>
+</p>
+
+<table mat-table [dataSource]="rapportagesTable" class="mat-elevation-z8" matSort matSortActive="id" matSortDirection="desc">
+    <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr.</th>
+        <td mat-cell *matCellDef="let element">{{element.id}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="naam">
+        <th mat-header-cell *matHeaderCellDef>Naam</th>
+        <td mat-cell *matCellDef="let element">{{element.template?.naam}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="formaat">
+        <th mat-header-cell *matHeaderCellDef>Formaat</th>
+        <td mat-cell *matCellDef="let element">{{formaten[element.formaat]}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let element">{{statussen[element.task.status]}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="aanmaakDatum">
+        <th mat-header-cell *matHeaderCellDef>Aanmaakdatum</th>
+        <td mat-cell *matCellDef="let element">{{element.aanmaakDatum | date: 'dd-MM-yyyy'}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="download">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="downloadExport(element.id, element.exportPad)" [disabled]="element.task.status != 2"><mat-icon>download</mat-icon></button>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="opties">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="showErrorDialog(element.task.fout)" [disabled]="element.task.status != 3"><mat-icon>info_i</mat-icon></button>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[10, 25, 50]" aria-label="Select page of users"></mat-paginator>

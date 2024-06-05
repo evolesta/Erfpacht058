@@ -20,6 +20,13 @@ import { ModUserComponent } from './app/usermanagement/mod-user/mod-user.compone
 import { RapportageComponent } from './app/rapportage/rapportage.component';
 import { SjablonenComponent } from './app/rapportage/sjablonen/sjablonen.component';
 import { ModSjablonenComponent } from './app/rapportage/sjablonen/mod-sjablonen/mod-sjablonen.component';
+import { AddRapportageComponent } from './app/rapportage/add-rapportage/add-rapportage.component';
+import { ImportComponent } from './app/import/import.component';
+import { VertaaltabellenComponent } from './app/import/vertaaltabellen/vertaaltabellen.component';
+import { ModVertaaltabelComponent } from './app/import/vertaaltabellen/mod-vertaaltabel/mod-vertaaltabel.component';
+import { AddImportComponent } from './app/import/add-import/add-import.component';
+import { FacturatieComponent } from './app/facturatie/facturatie.component';
+import { AddFacturatieComponent } from './app/facturatie/add-facturatie/add-facturatie.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -50,9 +57,18 @@ export const routes: Routes = [
             { path: 'overeenkomst/add/:id', component: ModOvereenkomstComponent },
             { path: 'overeenkomst/edit/:id', component: ModOvereenkomstComponent },
             { path: 'rapportage', component: RapportageComponent },
+            { path: 'rapportage/add', component: AddRapportageComponent },
+            { path: 'facturatie', component: FacturatieComponent },
+            { path: 'facturatie/add', component: AddFacturatieComponent },
+            { path: 'rapportage/add', component: AddRapportageComponent },
             { path: 'rapportage/sjablonen', component: SjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/add', component: ModSjablonenComponent, canActivate: [adminGuard]},
             { path: 'rapportage/sjablonen/edit/:id', component: ModSjablonenComponent, canActivate: [adminGuard]},
+            { path: 'import', component: ImportComponent, canActivate: [adminGuard]},
+            { path: 'import/add', component: AddImportComponent, canActivate: [adminGuard]},
+            { path: 'import/vertaaltabellen', component: VertaaltabellenComponent, canActivate: [adminGuard]},
+            { path: 'import/vertaaltabellen/add', component: ModVertaaltabelComponent, canActivate: [adminGuard]},
+            { path: 'import/vertaaltabellen/edit/:id', component: ModVertaaltabelComponent, canActivate: [adminGuard]},
             { path: 'usermanagement', component: UsermanagementComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/add', component: ModUserComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/edit/:id', component: ModUserComponent, canActivate: [adminGuard] },

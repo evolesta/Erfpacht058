@@ -1,0 +1,13 @@
+<h1>Facturatietaak</h1>
+
+<form [formGroup]="addFacturatieForm" (ngSubmit)="addFacturatieJob()">
+<mat-form-field class="full-width">
+    <mat-label>Facturatieperiode</mat-label>
+    <mat-select formControlName="factureringsPeriode">
+        <mat-option [value]="0">Juni</mat-option>
+        <mat-option [value]="1">December</mat-option>
+    </mat-select>
+</mat-form-field>
+
+<button mat-raised-button color="primary"><mat-icon>play_arrow</mat-icon> Start</button>
+</form>

@@ -28,12 +28,15 @@ export class LoginComponent {
     private router: Router) {}
 
   login(): void {
-    this.http.post('/token', this.loginForm.value).subscribe(resp => {
-      const body:any = resp.body;
-      localStorage.setItem('token', body.token);
-      this.router.navigateByUrl('/app');
-    }, error => {
-      this.error = true;
+    this.http.post('/token', this.loginForm.value).subscribe({
+      next: (resp) => {
+        const body:any = resp.body;
+        localStorage.setItem('token', body.token);
+        this.router.navigateByUrl('/app');
+      },
+      error: (err) => {
+        this.error = true;
+      }
     });
   }
 }

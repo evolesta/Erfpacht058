@@ -12,13 +12,11 @@ import {MatMenuModule} from '@angular/material/menu';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DeleteDialogComponent } from '../../base/generic/delete-dialog/delete-dialog.component';
 import { UploadDialogComponent } from '../../base/generic/upload-dialog/upload-dialog.component';
-import { environment } from '../../../environments/environment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DetailDialogComponent } from '../../base/generic/detail-dialog/detail-dialog.component';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,9 +39,12 @@ export class DashboardComponent implements OnInit {
     0: "Algemeen", 1: "Notitie", 2: "Bewijsstuk", 3: "Overeenkomst", 4: "Overig"
   }
   overeenkomstenTable: MatTableDataSource<any>;
-  overeenkomstenColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'rentepercentage', 'bedrag', 'frequentie', 'options'];
+  overeenkomstenColumns: string[] = ['dossiernummer', 'ingangsdatum', 'einddatum', 'rentepercentage', 'bedrag', 'frequentie', 'periode', 'options'];
   frequentieOvereenkomsten = {
     0: 'Maandelijks', 1: 'Halfjaarlijks', 2: 'Jaarlijks'
+  }
+  factPerioden = {
+    0: 'Juni', 1: 'December'
   }
   notities = new FormControl('');
   editNotities: boolean;
@@ -93,11 +94,31 @@ export class DashboardComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.result) {
-        localStorage.setItem('eigendomId', result.row.id);
-        this.initEigendom();
+      if (result)
+        if (result.result) {
+          localStorage.setItem('eigendomId', result.row.id);
+          this.initEigendom();
+        }
+    });
+  }
+
+  // Openen van het zoekvenster voor een kadastraal nr
+  openZoekDialogKadaster(): void {
+    const dialogRef = this.dialog.open(SearchDialogComponent, {
+      data: {
+        endpoint: '/kadaster',
+        title: 'Kadastraal nummer',
+        displayedColumns: ['kadastraalNummer'],
+        columnNames: ['Kadastraal nummer']
       }
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.result) {
+        localStorage.setItem('eigendomId', result.row.eigendomId);
+        this.initEigendom();
+      }
+    })
   }
 
   // +++ ADRES FUNCTIES
@@ -116,10 +137,11 @@ export class DashboardComponent implements OnInit {
 
     // Update geselecteerde object alleen wanneer het venster is gesloten na het maken van een keuze
     dialogRef.afterClosed().subscribe(result => {
-      if (result.result) {
-        localStorage.setItem('eigendomId', result.row.eigendomId);
-        this.initEigendom();
-      }
+      if (result)
+        if (result.result) {
+          localStorage.setItem('eigendomId', result.row.eigendomId);
+          this.initEigendom();
+        }
     });
   }
 
@@ -139,13 +161,14 @@ export class DashboardComponent implements OnInit {
     // Koppel de eigenaar aan het eigendom
     dialogRef.afterClosed().subscribe(result => {
       // Alleen verwerken als er een rij is aangeklikt
-      if (result.result) {
-        // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
-        const eigenaarId = result.row.id;
-        this.http.put('/eigendom/eigenaar/' + this.eigendom.id + '/' + eigenaarId, null).subscribe(resp => {
-          this.initEigendom();
-        });
-      }
+      if (result)
+        if (result.result) {
+          // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
+          const eigenaarId = result.row.id;
+          this.http.put('/eigendom/eigenaar/' + this.eigendom.id + '/' + eigenaarId, null).subscribe(resp => {
+            this.initEigendom();
+          });
+        }
     });
   }
 
@@ -244,13 +267,14 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       // Alleen verwerken als er een rij is aangeklikt
-      if (result.result) {
-        // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
-        const overeenkomstId = result.row.id;
-        this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
-          this.initEigendom();
-        });
-      }
+      if (result)
+        if (result.result) {
+          // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
+          const overeenkomstId = result.row.id;
+          this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
+            this.initEigendom();
+          });
+        }
     });
   }
 

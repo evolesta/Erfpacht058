@@ -1,0 +1,45 @@
+<h1>Vertaaltabel</h1>
+
+<form [formGroup]="modTabelForm" (ngSubmit)="modTabel()">
+    <mat-form-field class="full-width">
+        <mat-label>Naam</mat-label>
+        <input matInput formControlName="naam">
+    </mat-form-field>
+    <mat-form-field class="full-width">
+        <mat-label>Maker</mat-label>
+        <input matInput formControlName="maker">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-select formControlName="model" placeholder="Kies model" (valueChange)="filterModellen($event)">
+        @for (model of modellen; track model) {
+            <mat-option [value]="model.tableName">{{model.tableName}}</mat-option>
+        }
+    </mat-select>
+    </mat-form-field>
+
+    <h2>Vertalingen</h2>
+    <p>Geef per kolom aan welke in de CSV vertaalt moet worden naar het betreffende model</p>
+    <p style="text-align: right;"><button mat-icon-button (click)="addEmptyTranslation()" type="button"><mat-icon>add</mat-icon></button></p>
+    <div formArrayName="translations">
+        <div *ngFor="let translation of translationDataCollection.controls; let i = index">
+            <div [formGroupName]="i">
+                <mat-form-field class="half-width">
+                    <mat-label>Model kolomnaam</mat-label>
+                   <mat-select formControlName="ModelColumnName">
+                    @for (key of gefilterdeModel.properties; track key) {
+                        <mat-option [value]="key.name">{{key.name}}</mat-option>
+                    }
+                   </mat-select>
+                </mat-form-field>
+                <mat-form-field class="half-width">
+                    <mat-label>CSV kolomnaam</mat-label>
+                    <input matInput formControlName="CSVColummnName">
+                </mat-form-field>
+                <button mat-icon-button (click)="deleteTranslation(i)"><mat-icon>remove</mat-icon></button>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" mat-raised-button color="primary"><mat-icon>add</mat-icon> Opslaan</button>
+</form>

@@ -8,7 +8,7 @@ export class HelperService {
 
   constructor() { 
     const token = localStorage.getItem('token');
-    this.decodedToken = jwtDecode(token);
+    if (token != null) this.decodedToken = jwtDecode(token);
   }
 
   decodedToken: JwtPayload;

@@ -1,6 +1,6 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, EMPTY } from 'rxjs';
+import { Observable, EMPTY, finalize } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
@@ -22,15 +22,16 @@ export class AuthenticateInterceptor implements HttpInterceptor {
   // Interceptor die voor beveiligde routes automatisch de bearer token toevoegd aan de header van het request
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Alleen uitvoeren als het geen publieke route betreft
+    this.spinner.show(); // toon laad spinner
+    
     if (!this.publicRoutes.includes(req.url))
     {
-      this.spinner.show(); // toon laad spinner
-
       const token = localStorage.getItem('token');
 
       // Controleer of de token aanwezig is
       if (token == null) {
         // Token is niet aanwezig, navigeer de gebruiker naar login
+        this.spinner.hide();
         this.router.navigateByUrl('');
         return EMPTY;
       }
@@ -44,16 +45,23 @@ export class AuthenticateInterceptor implements HttpInterceptor {
             'Authorization', 'Bearer ' + token
           )
         });
+
+        // Geef gewijzigde request terug
+        return next.handle(req).pipe(
+          finalize(() => this.spinner.hide())
+        );
       }
       else {
         // Token is verlopen - navigeer de gebruiker naar login
+        this.spinner.hide();
         this.router.navigateByUrl('');
         return EMPTY;
       }
+    } else {
+      // publieke routes - geeft request direct terug
+      return next.handle(req).pipe(
+        finalize(() => this.spinner.hide())
+      );
     }
-
-    // Forceer het (gewijzigde) HTTP request naar de endpoint
-    this.spinner.hide();
-    return next.handle(req);
   }
 }
