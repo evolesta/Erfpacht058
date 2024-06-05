@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LoadingSpinnerService } from './loading-spinner.service';
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,18 @@ import { CommonModule } from '@angular/common';
   templateUrl: './loading-spinner.component.html',
   styleUrl: './loading-spinner.component.css'
 })
-export class LoadingSpinnerComponent {
+export class LoadingSpinnerComponent implements OnInit {
 
-  constructor(public spinner: LoadingSpinnerService) {}
+  isLoading: boolean = false;
+
+  constructor(public spinner: LoadingSpinnerService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+      this.spinner.isLoading$.subscribe((loading: boolean) => {
+        this.isLoading = loading;
+        this.cdr.detectChanges();
+      });
+  }
 }

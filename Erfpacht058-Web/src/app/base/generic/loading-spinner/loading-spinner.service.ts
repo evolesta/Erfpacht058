@@ -1,20 +1,24 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoadingSpinnerService {
 
-  isLoading = new Subject<boolean>();
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
-  constructor() { }
+  constructor(private ngZone: NgZone) { }
+
+  get isLoading$(): Observable<boolean> {
+    return this.isLoadingSubject.asObservable();
+  }
 
   show(): void {
-    this.isLoading.next(true);
+    this.ngZone.run(() => this.isLoadingSubject.next(true));
   }
 
   hide(): void {
-    this.isLoading.next(false);
+    this.ngZone.run(() => this.isLoadingSubject.next(false));
   }
 }

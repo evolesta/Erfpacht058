@@ -77,7 +77,7 @@ export class OvereenkomstComponent implements OnInit {
   openVerwijderOvereenkomstDialog(id): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
-      if (result.delete) {
+      if (result && result.delete) {
         this.http.delete('/overeenkomst/' + id).subscribe(resp => {
           this.router.navigateByUrl('app');
         });

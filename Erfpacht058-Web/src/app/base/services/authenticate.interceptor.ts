@@ -31,6 +31,7 @@ export class AuthenticateInterceptor implements HttpInterceptor {
       // Controleer of de token aanwezig is
       if (token == null) {
         // Token is niet aanwezig, navigeer de gebruiker naar login
+        this.spinner.hide();
         this.router.navigateByUrl('');
         return EMPTY;
       }
@@ -52,13 +53,15 @@ export class AuthenticateInterceptor implements HttpInterceptor {
       }
       else {
         // Token is verlopen - navigeer de gebruiker naar login
+        this.spinner.hide();
         this.router.navigateByUrl('');
         return EMPTY;
       }
     } else {
       // publieke routes - geeft request direct terug
-      this.spinner.hide();
-      return next.handle(req);
+      return next.handle(req).pipe(
+        finalize(() => this.spinner.hide())
+      );
     }
   }
 }

@@ -94,10 +94,11 @@ export class DashboardComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.result) {
-        localStorage.setItem('eigendomId', result.row.id);
-        this.initEigendom();
-      }
+      if (result)
+        if (result.result) {
+          localStorage.setItem('eigendomId', result.row.id);
+          this.initEigendom();
+        }
     });
   }
 
@@ -117,10 +118,11 @@ export class DashboardComponent implements OnInit {
 
     // Update geselecteerde object alleen wanneer het venster is gesloten na het maken van een keuze
     dialogRef.afterClosed().subscribe(result => {
-      if (result.result) {
-        localStorage.setItem('eigendomId', result.row.eigendomId);
-        this.initEigendom();
-      }
+      if (result)
+        if (result.result) {
+          localStorage.setItem('eigendomId', result.row.eigendomId);
+          this.initEigendom();
+        }
     });
   }
 
@@ -140,13 +142,14 @@ export class DashboardComponent implements OnInit {
     // Koppel de eigenaar aan het eigendom
     dialogRef.afterClosed().subscribe(result => {
       // Alleen verwerken als er een rij is aangeklikt
-      if (result.result) {
-        // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
-        const eigenaarId = result.row.id;
-        this.http.put('/eigendom/eigenaar/' + this.eigendom.id + '/' + eigenaarId, null).subscribe(resp => {
-          this.initEigendom();
-        });
-      }
+      if (result)
+        if (result.result) {
+          // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
+          const eigenaarId = result.row.id;
+          this.http.put('/eigendom/eigenaar/' + this.eigendom.id + '/' + eigenaarId, null).subscribe(resp => {
+            this.initEigendom();
+          });
+        }
     });
   }
 
@@ -245,13 +248,14 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       // Alleen verwerken als er een rij is aangeklikt
-      if (result.result) {
-        // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
-        const overeenkomstId = result.row.id;
-        this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
-          this.initEigendom();
-        });
-      }
+      if (result)
+        if (result.result) {
+          // Aanroepen van koppel endpoint om eigenaar te koppelen aan eigendom
+          const overeenkomstId = result.row.id;
+          this.http.put('/eigendom/overeenkomst/' + this.eigendom.id + '/' + overeenkomstId, null).subscribe(resp => {
+            this.initEigendom();
+          });
+        }
     });
   }
 

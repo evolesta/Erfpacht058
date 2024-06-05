@@ -46,11 +46,12 @@ export class UsermanagementComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.delete) {
-        this.http.delete('/gebruikers/' + id).subscribe(resp => {
-          this.initUsers();
-        });
-      }
+      if (result)
+        if (result.delete) {
+          this.http.delete('/gebruikers/' + id).subscribe(resp => {
+            this.initUsers();
+          });
+        }
     });
   }
 
@@ -60,9 +61,10 @@ export class UsermanagementComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.success) {
-        this.snackbar.open('Wachtwoord succesvol gereset', '', {duration: 4000});
-      }
+      if (result)
+        if (result.success) {
+          this.snackbar.open('Wachtwoord succesvol gereset', '', {duration: 4000});
+        }
     });
   }
 }

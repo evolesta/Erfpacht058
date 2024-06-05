@@ -1,4 +1,4 @@
-import { Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { Component } from '@angular/core';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';

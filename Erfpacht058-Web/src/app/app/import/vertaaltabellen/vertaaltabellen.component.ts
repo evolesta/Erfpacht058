@@ -40,7 +40,7 @@ export class VertaaltabellenComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteDialogComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.delete) {
+      if (result && result.delete) {
         this.http.delete('/translatemodel/' + id).subscribe(resp => {
           this.getTables();
         });
