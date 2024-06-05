@@ -102,6 +102,25 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // Openen van het zoekvenster voor een kadastraal nr
+  openZoekDialogKadaster(): void {
+    const dialogRef = this.dialog.open(SearchDialogComponent, {
+      data: {
+        endpoint: '/kadaster',
+        title: 'Kadastraal nummer',
+        displayedColumns: ['kadastraalNummer'],
+        columnNames: ['Kadastraal nummer']
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.result) {
+        localStorage.setItem('eigendomId', result.row.eigendomId);
+        this.initEigendom();
+      }
+    })
+  }
+
   // +++ ADRES FUNCTIES
 
   // Open het zoekvenster

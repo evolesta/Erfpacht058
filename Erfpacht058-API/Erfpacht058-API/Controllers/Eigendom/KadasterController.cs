@@ -22,6 +22,13 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _configuration = configuration; 
         }
 
+        // GET: /kadaster
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Kadaster>>> GetKadaster()
+        {
+            return await _context.Kadaster.ToListAsync();
+        }
+
         // POST: /kadaster/sync/5
         /// <summary>
         /// Synchroniseert data met het Kadaster a.d.h.v. Kadastrale nummer
