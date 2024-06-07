@@ -1,19 +1,33 @@
-version: '1.0'
-name: Erfpacht058
+version: '0.1'
+name: erfpacht058
 
 services:
     backend:
-        container_name: BackendAPI
+        container_name: Erfpacht058-API
         build:
             context: ./Erfpacht058-API
-            dockerfile: ./Erfpacht058-API/Dockerfile Prod
+            dockerfile: ./Erfpacht058-API/Dockerfile
+        volumes:
+            - ./config/appsettings.json:/app/appsettings.json
+            - ${CERTIFICATE_PATH}:/app/certificates/certificate.pfx
         ports:
-            - "8000:80"
-            - "8001:443"  
+            - "8001:443"
+        environment:
+            - ASPNETCORE_Kestrel__Certificates__Default__Path=certificates/certificate.pfx
+            - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTIFICATE_PASSWORD}
+            - ASPNETCORE_URLS=https://+;http://+
+            - e ASPNETCORE_HTTPS_PORTS=443
+            
     frontend:
-        container_name: FrontendWeb
+        container_name: Erfpacht058-GUI
         build:
-            context: ./Erfpacht058-Web
-            dockerfile: Dockerfile
+            context: .
+            args:
+                - CERTFILE=${CERTIFICATE_PATH}
+                - CERTPASSWORD=${CERTIFICATE_PASSWORD}
+            dockerfile: Erfpacht058-Web/Dockerfile
+        volumes:
+            - ./config/environment.ts:/usr/local/apache2/htdocs/assets/environment.ts
+            - ./config/httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
         ports:
-            - "8080:80"
+            - "8080:443"
