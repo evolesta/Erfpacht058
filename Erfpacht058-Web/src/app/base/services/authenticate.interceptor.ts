@@ -37,7 +37,7 @@ export class AuthenticateInterceptor implements HttpInterceptor {
       }
 
       // Controleer of de token nog geldig is
-      if (this.helper.tokenValidator(token))
+      if (this.helper.tokenValidator())
       {
         // Token is nog geldig - headers aanpassen en token toevoegen
         req = req.clone({

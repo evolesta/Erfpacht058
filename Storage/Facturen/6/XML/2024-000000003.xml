@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Factuur>
+  <Nummer>2024-000000003</Nummer>
+  <Datum>03-06-2024</Datum>
+  <Bedrag>999</Bedrag>
+  <Regels>
+    <Regel>
+      <Aantal>1</Aantal>
+      <Beschrijving>Canon erfpacht: Testlaan 112</Beschrijving>
+      <Prijs>999</Prijs>
+      <Totaal>999</Totaal>
+    </Regel>
+  </Regels>
+</Factuur>

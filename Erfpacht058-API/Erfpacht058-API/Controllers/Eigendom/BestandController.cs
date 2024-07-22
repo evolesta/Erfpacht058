@@ -18,10 +18,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
     public class BestandController : ControllerBase
     {
         private readonly Erfpacht058_APIContext _context;
+        private readonly IConfiguration _configuration;
 
-        public BestandController(Erfpacht058_APIContext context)
+        public BestandController(Erfpacht058_APIContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/Bestand
@@ -57,25 +59,28 @@ namespace Erfpacht058_API.Controllers.Eigendom
         {
             // Verkrijg bestand object van database
             var bestand = await _context.Bestand.FindAsync(id);
-            if (bestand == null) return BadRequest();
+           if (bestand == null) return BadRequest();
 
             // Verkrijg bestandspad naar bestand
-            var filepath = bestand.Pad;
-            if (!System.IO.File.Exists(filepath)) return BadRequest();
+            var filepath = _configuration["Bestanden:OpslagPad"] + bestand.Pad;
+            if (!System.IO.Path.Exists(filepath.Replace("/", "\\"))) return BadRequest();
 
-            // Converteer het bestand naar bytes om als response mee te sturen (download)
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(filepath);
+            var memory = new MemoryStream();
+            await using(var stream = new FileStream(filepath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
 
             // Zet content-Disposition om een download te forceren in de response
             var contentDisposition = new System.Net.Mime.ContentDisposition
             {
-                FileName = bestand.Naam,
+                FileName = Path.GetFileName(filepath),
                 Inline = false
             };
-            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString()); // voeg toe aan headers
 
-            // Geef het bestand als byte array terug in de octet-stream (download)
-            return File(fileBytes, "application/octet-stream");
+            return File(memory, "application/octet-stream");
         }
 
         // PUT: api/Bestand/5

@@ -11,7 +11,7 @@ COPY Erfpacht058-Web/ /app/
 COPY config/environment.ts ./src/environments/environment.ts
 
 # Build the Angular application
-RUN npm run build
+RUN npm run build --production
 
 # Stage 2: Converteer certificaat naar een los cert en private key bestanden
 FROM alpine:latest AS cert-stage

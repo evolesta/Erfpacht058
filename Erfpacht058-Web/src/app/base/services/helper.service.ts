@@ -13,7 +13,11 @@ export class HelperService {
 
   decodedToken: JwtPayload;
 
-  tokenValidator(token: any): boolean {
+  tokenValidator(): boolean {
+    // Wanneer er geen token aanwezig - geef False terug
+    if (this.decodedToken == null)
+      return false;
+
     // Controleer of de token nog geldig is
     const currTimestamp = Math.floor(Date.now() / 1000); // converteer huidige tijd naar seconden
 
