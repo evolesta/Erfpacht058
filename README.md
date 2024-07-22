@@ -31,6 +31,7 @@ Globale config:
 - Configureer in .env (in de root van de repo) het pad naar het certicaat en het wachtwoord (zie hoofdstuk over certificaten)
 
 # Installatie / update
+Download deze repository via releases (ZIP) en plaats de map op de Docker omgeving.
 Het product kan met Docker compose worden geinstalleerd in het Docker (gerelateerde) platform. 
 Voer het Docker compose commando uit:
 ```
@@ -43,7 +44,8 @@ Na de compose worden de containers automatisch gestart. De applicatie is benader
 https://ipofurl:8080 => Voor de frontend
 https://ipofurl:8001/api => API endpoints (ga naar /swagger voor de API documentatie)
 
-Voor updates kan dezelfde procedure gevolgd worden. Er wordt aangeraden geen data in de containers op te slaan, waardoor deze stateless zijn. Hierdoor kunnen deze ten alle tijden gereset, verwijderd en opnieuw opgetuigd worden zonder verlies van data.
+Voor updates kan dezelfde procedure gevolgd worden. De containers zijn stateless, doordat er geen data in wordt opgeslagen. De containers kunnen daarom ten alle tijden verwijderd, gereset en opnieuw opgetuigd worden zonder verlies van data.
+Voor Kubernetes platformen dient het compose bestand te worden geconverteerd. Gebruiker hiervoor Kompose (raadpleeg de documentatie).
 
 # Database installeren
 In de Erfpacht058-API map staat een SQL script (InitialCreate.sql) die uitgevoerd dient te worden op de nieuwe (productie) database. 

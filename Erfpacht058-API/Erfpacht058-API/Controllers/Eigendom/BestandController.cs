@@ -62,8 +62,9 @@ namespace Erfpacht058_API.Controllers.Eigendom
            if (bestand == null) return BadRequest();
 
             // Verkrijg bestandspad naar bestand
-            var filepath = _configuration["Bestanden:OpslagPad"] + bestand.Pad;
-            if (!System.IO.Path.Exists(filepath.Replace("/", "\\"))) return BadRequest();
+            var basePath = _configuration["Bestanden:OpslagPad"];
+            var filepath = basePath + bestand.Pad;
+            if (!System.IO.File.Exists(filepath)) return BadRequest();
 
             var memory = new MemoryStream();
             await using(var stream = new FileStream(filepath, FileMode.Open))
@@ -123,7 +124,8 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var eigendom = bestand.Eigendom;
 
             // Verwijder bestand uit storage
-            var filepath = bestand.Pad;
+            var basePath = _configuration["Bestanden:OpslagPad"];
+            var filepath = basePath + bestand.Pad;
             System.IO.File.Delete(filepath);
 
             // Verwijder relaties en verwerk naar database
