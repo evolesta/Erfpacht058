@@ -26,11 +26,14 @@ RUN openssl pkcs12 -in /certs/certificate.pfx -passin pass:${CERTPASSWORD} -clce
 # Stage 3: Kopieer Angular files en certicaten naar Apache container, activeer SSL
 FROM httpd:latest
 COPY --from=build-stage /app/dist/erfpacht058-web/browser /usr/local/apache2/htdocs/
+COPY Erfpacht058-Web/.htaccess /usr/local/apache2/htdocs/.htaccess
 COPY --from=cert-stage /certs/certificate.crt /usr/local/apache2/conf/ssl/certificate.crt
 COPY --from=cert-stage /certs/private_key.key /usr/local/apache2/conf/ssl/private_key.key
 
+# Activeer de SSL en mod Rewrite modules
 RUN sed -i '/LoadModule ssl_module/s/^#//g' /usr/local/apache2/conf/httpd.conf && \
     sed -i '/Include conf\/extra\/httpd-ssl.conf/s/^#//g' /usr/local/apache2/conf/httpd.conf
+RUN sed -i '/LoadModule rewrite_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
 
 EXPOSE 80
 EXPOSE 443

@@ -529,16 +529,19 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 return BadRequest("Bestand niet aanwezig of geaccepteerd");
 
             // Genereer storage pad
-            var storageLoc = _configuration["Bestanden:OpslagPad"] + "/" + eigendomId.ToString();
-            if (!Directory.Exists(storageLoc))
-                Directory.CreateDirectory(storageLoc);
+            var basePath = _configuration["Bestanden:OpslagPad"];
+            var rootPath =  "/" + eigendomId.ToString();
+            var fullRoot = basePath + rootPath;
+            if (!Directory.Exists(fullRoot)) // Check of de directory bestaat, zo niet maak aan
+                Directory.CreateDirectory(fullRoot);
 
             // Doorloop de lijst met alle bestanden
             foreach (var file in bestandDto.Files)
             {
                 // Schrijf het geuploade bestand naar de storage
-                var filepath = Path.Combine(storageLoc, file.FileName);
-                using (var stream = new FileStream(filepath, FileMode.Create))
+                //var filepath = Path.Combine(storageLoc, file.FileName);
+                var filepath = rootPath + "/" + file.FileName;
+                using (var stream = new FileStream(fullRoot + "/" + file.FileName, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }

@@ -1,37 +1,40 @@
 import { Injectable, OnInit } from '@angular/core';
-import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+
+interface JwtPayload {
+  exp?: number;
+  Role?: string;
+  Naam?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
 
-  constructor() { 
-    const token = localStorage.getItem('token');
-    if (token != null) this.decodedToken = jwtDecode(token);
-  }
-
-  decodedToken: JwtPayload;
-
   tokenValidator(): boolean {
-    // Wanneer er geen token aanwezig - geef False terug
-    if (this.decodedToken == null)
-      return false;
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    const decodedToken = jwtDecode<JwtPayload>(token);
 
     // Controleer of de token nog geldig is
     const currTimestamp = Math.floor(Date.now() / 1000); // converteer huidige tijd naar seconden
 
     // Als de expiration timestamp op de token aanwezig is en in de toekomst is deze nog geldig
-    return (this.decodedToken.exp != null && this.decodedToken.exp > currTimestamp);
+    return (decodedToken.exp != null && decodedToken.exp > currTimestamp);
   }
 
   isAdministrator(): boolean {
-    const decodedToken:any = this.decodedToken;
+    const token = localStorage.getItem('token');
+    const decodedToken = jwtDecode<JwtPayload>(token);
+
     return decodedToken.Role == "Beheerder";
   }
 
   naamGebruiker(): string {
-    const decodedToken:any = this.decodedToken;
+    const token = localStorage.getItem('token');
+    const decodedToken = jwtDecode<JwtPayload>(token);
+
     return decodedToken.Naam;
   }
 }
