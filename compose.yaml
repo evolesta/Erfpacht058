@@ -4,12 +4,14 @@ name: erfpacht058
 services:
     backend:
         container_name: Erfpacht058-API
+        user: "1654:1654"
         build:
             context: ./Erfpacht058-API
             dockerfile: ./Erfpacht058-API/Dockerfile
         volumes:
             - ./config/appsettings.json:/app/appsettings.json
             - ${CERTIFICATE_PATH}:/app/certificates/certificate.pfx
+            - storage:/mnt/fileshare
         ports:
             - "8001:443"
         environment:
@@ -17,6 +19,7 @@ services:
             - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTIFICATE_PASSWORD}
             - ASPNETCORE_URLS=https://+;http://+
             - e ASPNETCORE_HTTPS_PORTS=443
+        privileged: true
             
     frontend:
         container_name: Erfpacht058-GUI
@@ -31,3 +34,11 @@ services:
             - ./config/httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
         ports:
             - "8080:443"
+            
+volumes:
+    storage:
+        driver: local
+        driver_opts:
+            type: cifs
+            device: ${FILESHARE_PATH}
+            o: username=${FILESHARE_USERNAME},password=${FILESHARE_PASSWORD}{% if FILESHARE_DOMAIN},domain=${FILESHARE_DOMAIN}{% endif %},uid=1654,gid=1654,file_mode=0777,dir_mode=0777,vers=3.0

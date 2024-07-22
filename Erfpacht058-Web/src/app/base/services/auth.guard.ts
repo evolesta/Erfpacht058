@@ -7,17 +7,11 @@ import { inject } from '@angular/core';
 
 export const authGuard: CanActivateFn = (route, state) => {
   // Controleer of de token bestaat in de local storage
-  const token = localStorage.getItem('token');
   const helper = new HelperService();
   const router: Router = inject(Router);
-
-  if (token == null) {
-    router.navigateByUrl('');
-    return false; // token is niet aanwezig in browser storage
-  }
   
   // Controleer of de token nog geldig is en niet verlopen
-  if (helper.tokenValidator(token)) 
+  if (helper.tokenValidator()) 
     return true;
   else {
     router.navigateByUrl('');

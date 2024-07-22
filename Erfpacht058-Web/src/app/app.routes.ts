@@ -13,7 +13,6 @@ import { KadasterComponent } from './app/kadaster/kadaster.component';
 import { BestandComponent } from './app/bestand/bestand.component';
 import { OvereenkomstComponent } from './app/overeenkomst/overeenkomst.component';
 import { ModOvereenkomstComponent } from './app/overeenkomst/mod-overeenkomst/mod-overeenkomst.component';
-import { LoadingSpinnerComponent } from './base/generic/loading-spinner/loading-spinner.component';
 import { UsermanagementComponent } from './app/usermanagement/usermanagement.component';
 import { adminGuard } from './base/services/admin.guard';
 import { ModUserComponent } from './app/usermanagement/mod-user/mod-user.component';
@@ -32,7 +31,6 @@ export const routes: Routes = [
     // Publieke routes
     { path: '', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
-    { path: 'test', component: LoadingSpinnerComponent },
 
     // Beveiligde routes
     { 
