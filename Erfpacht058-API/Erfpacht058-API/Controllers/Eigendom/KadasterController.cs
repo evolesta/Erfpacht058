@@ -39,12 +39,15 @@ namespace Erfpacht058_API.Controllers.Eigendom
         public async Task<ActionResult<Kadaster>> SyncMetKadaster(int kadasterId)
         {
             // Verkrijg het Kadaster object uit de database
-            var kadaster = await _context.Kadaster.FindAsync(kadasterId);
+            var kadaster = await _context.Kadaster
+                .Include(e => e.Eigendom)
+                .FirstOrDefaultAsync(e => e.Id == kadasterId);
             if (kadaster == null) return BadRequest();
             if (kadaster.KadastraalNummer == null) return BadRequest(); // Kadast. nr. mag niet null zijn
 
             // Verkrijg de informatie uit het Kadaster
-            var kadasterAPI = new KadasterAPIServiceContext(new KadasterDemoService(_configuration["Kadaster:JsonFile"])); // Selecteer demo strategy
+            var adres = kadaster.Eigendom.Adres;
+            var kadasterAPI = new KadasterAPIServiceContext(new BAGAPIService(adres.Postcode, adres.Huisnummer.ToString(), _context, adres.Toevoeging, adres.Huisletter)); // Selecteer demo strategy
             var kadasterData = await kadasterAPI.RetrieveSingleDataAsync(kadaster.KadastraalNummer);
             if (kadasterData == null) return BadRequest();  
 

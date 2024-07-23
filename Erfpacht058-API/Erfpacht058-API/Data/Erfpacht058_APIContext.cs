@@ -36,6 +36,14 @@ namespace Erfpacht058_API.Data
                     }
                 );
 
+            modelBuilder.Entity<Settings>().HasData(
+                    new Settings
+                    {
+                        Id = 1,
+                        BAGAPI = "",
+                    }
+                );
+
             // Relaties definieren voor Eigendom
             modelBuilder.Entity<Eigendom>()
                 .HasOne(e => e.Adres)
@@ -84,5 +92,6 @@ namespace Erfpacht058_API.Data
         public DbSet<Erfpacht058_API.Models.Facturen.FactuurJob> FactuurJob { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Facturen.Factuur> Factuur { get; set; } = default!;
         public DbSet<Erfpacht058_API.Models.Facturen.FactuurRegels> FactuurRegels { get; set; } = default!;
+        public DbSet<Erfpacht058_API.Models.Settings> Settings { get; set; } = default!;
     }
 }

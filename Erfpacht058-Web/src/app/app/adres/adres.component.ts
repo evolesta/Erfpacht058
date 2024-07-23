@@ -23,6 +23,7 @@ export class AdresComponent implements OnInit {
     straatnaam: new FormControl('', Validators.required),
     huisnummer: new FormControl('', Validators.required),
     toevoeging: new FormControl(),
+    huisletter: new FormControl(),
     postcode: new FormControl('', Validators.required),
     woonplaats: new FormControl('', Validators.required)
   }); 

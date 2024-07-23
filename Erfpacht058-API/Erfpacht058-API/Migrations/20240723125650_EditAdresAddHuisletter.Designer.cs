@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240723125650_EditAdresAddHuisletter")]
+    partial class EditAdresAddHuisletter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -413,7 +416,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$didHBqcx3BOvAVvl5izQHOwU37giXZ3yWHOVTJTlR5vAJp3Enb0fu"
+                            Wachtwoord = "$2a$11$SntTFq0Tb38YnUySOTtMpeCX.8FLxSnz/z4HuDi9//qNOw9RBKl3y"
                         });
                 });
 
@@ -736,29 +739,6 @@ namespace Erfpacht058_API.Migrations
                     b.HasIndex("TranslateModelId");
 
                     b.ToTable("Translation");
-                });
-
-            modelBuilder.Entity("Erfpacht058_API.Models.Settings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BAGAPI")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Settings");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BAGAPI = ""
-                        });
                 });
 
             modelBuilder.Entity("EigenaarEigendom", b =>
