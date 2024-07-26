@@ -460,7 +460,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var kadaster = new Kadaster
             {
                 // Koppel enkel het kadastraal nr. voor de Sync
-                KadastraalNummer = kadasterDto.KadastraalNummer,
+                //KadastraalNummer = kadasterDto.KadastraalNummer,
                 Eigendom = eigendom,
                 EigendomId = eigendomId
             };
@@ -494,7 +494,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             if (kadaster == null) return BadRequest();
 
             // Wijzig kadaster object
-            kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
+            //kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
 
             // Wijzig naar database
             _context.Entry(kadaster).State = EntityState.Modified;

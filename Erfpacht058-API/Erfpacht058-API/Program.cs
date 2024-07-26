@@ -18,6 +18,7 @@ builder.Services.AddDbContext<Erfpacht058_APIContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddSingleton<TaskQueueHostedService>();
 builder.Services.AddHostedService(provider => provider.GetService<TaskQueueHostedService>());
+builder.Services.AddHttpClient();
 
 // Swagger API Documentatie genereren
 builder.Services.AddEndpointsApiExplorer();
