@@ -166,11 +166,11 @@
                     <button mat-button routerLink="kadaster/edit/{{eigendom.id}}"><mat-icon>edit</mat-icon> Kadaster wijzigen</button>
                 </p>
                 <table>
-                    <tr><td>Kadstraal nummer</td><td>{{eigendom.kadaster.kadastraalNummer}}</td></tr>
-                    <tr><td>Deeloppervlakte</td><td>{{eigendom.kadaster.deeloppervlakte}} m2</td></tr>
-                    <tr><td>Kadastrale grootte</td><td>{{eigendom.kadaster.kadastraleGrootte}} m2</td></tr>
-                    <tr><td>Type object</td><td>{{eigendom.kadaster.objectType}}</td></tr>
-                    <tr *ngIf="eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>{{eigendom.kadaster.laatsteSynchronisatie | date: 'dd-MM-yyyy'}}</td></tr>
+                    <tr><td>BAG ID</td><td>{{eigendom.kadaster.bagid}}</td></tr>
+                    <tr><td>Oppervlakte</td><td>{{eigendom.kadaster.oppervlakte}} m2</td></tr>
+                    <tr><td>Bouwjaar</td><td>{{eigendom.kadaster.bouwjaar}}</td></tr>
+                    <tr><td>Doel</td><td>{{eigendom.kadaster.gebruiksdoel}}</td></tr>
+                    <tr *ngIf="eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>{{eigendom.kadaster.laatsteSynchronisatie | date: 'dd-MM-yyyy HH:mm'}}</td></tr>
                     <tr *ngIf="!eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>nooit</td></tr>
                 </table>
             </ng-template>

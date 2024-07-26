@@ -1,0 +1,14 @@
+<div mat-dialog-title class="dialog-title">
+    <h2>{{data.title}}</h2>
+    <button mat-icon-button aria-label="Sluiten" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content>
+    <p>{{data.message}}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button [mat-dialog-close]>Oke</button>
+</mat-dialog-actions>
