@@ -4,6 +4,7 @@ using Erfpacht058_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erfpacht058_API.Migrations
 {
     [DbContext(typeof(Erfpacht058_APIContext))]
-    partial class Erfpacht058_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20240723130616_AddSettings")]
+    partial class AddSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -227,23 +230,23 @@ namespace Erfpacht058_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BAGID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Bouwjaar")
+                    b.Property<float>("Deeloppervlakte")
                         .HasColumnType("real");
 
                     b.Property<int?>("EigendomId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Gebruiksdoel")
+                    b.Property<string>("KadastraalNummer")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("KadastraleGrootte")
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("LaatsteSynchronisatie")
                         .HasColumnType("datetime2");
 
-                    b.Property<float>("Oppervlakte")
-                        .HasColumnType("real");
+                    b.Property<string>("ObjectType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -413,7 +416,7 @@ namespace Erfpacht058_API.Migrations
                             Naam = "Gebruiker",
                             Role = 1,
                             Voornamen = "Eerste",
-                            Wachtwoord = "$2a$11$Uc5.4aivaWigaWNIFNC7ceQmgjlxu1kXf71Rf3CRiVBlgh.ZTKcaq"
+                            Wachtwoord = "$2a$11$didHBqcx3BOvAVvl5izQHOwU37giXZ3yWHOVTJTlR5vAJp3Enb0fu"
                         });
                 });
 

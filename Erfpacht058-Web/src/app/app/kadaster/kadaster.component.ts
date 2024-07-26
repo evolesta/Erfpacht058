@@ -17,10 +17,10 @@ import { MatIconModule } from '@angular/material/icon';
 export class KadasterComponent implements OnInit {
 
   kadasterForm = new FormGroup({
-    kadastraalNummer: new FormControl('', Validators.required),
-    deeloppervlakte: new FormControl({value: '', disabled: true}),
-    kadastraleGrootte: new FormControl({value: '', disabled: true}),
-    objectType: new FormControl({value: '', disabled: true})
+    bagid: new FormControl('', Validators.required),
+    oppervlakte: new FormControl({value: '', disabled: true}),
+    bouwjaar: new FormControl({value: '', disabled: true}),
+    gebruiksdoel: new FormControl({value: '', disabled: true})
   });
 
   edit: boolean;

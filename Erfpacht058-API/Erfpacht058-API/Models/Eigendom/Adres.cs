@@ -12,6 +12,7 @@ namespace Erfpacht058_API.Models.Eigendom
         public string? Straatnaam { get; set; }
         public int Huisnummer { get; set; }
         public string? Toevoeging { get; set; }
+        public string? Huisletter { get; set; }
         public string? Postcode { get; set; }
         public string? Woonplaats { get; set; }
     }
@@ -21,6 +22,7 @@ namespace Erfpacht058_API.Models.Eigendom
         public string? Straatnaam { get; set; }
         public int Huisnummer { get; set; }
         public string? Toevoeging { get; set; }
+        public string? Huisletter { get; set; }
         public string? Postcode { get; set; }
         public string? Woonplaats { get; set; }
     }

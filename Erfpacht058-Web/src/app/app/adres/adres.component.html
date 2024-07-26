@@ -3,17 +3,22 @@
 <p>Adres muteren voor eigendom: {{eigendomId}}</p>
 
 <form [formGroup]="adresForm" (ngSubmit)="modAdres()">
-    <mat-form-field class="thirth-width">
+    <mat-form-field class="half-width">
         <mat-label>Straatnaam</mat-label>
         <input matInput formControlName="straatnaam">
     </mat-form-field>
-    <mat-form-field class="thirth-width">
+    <mat-form-field class="half-width">
         <mat-label>Huisnummer</mat-label>
         <input type="number" matInput formControlName="huisnummer">
     </mat-form-field>
-    <mat-form-field class="thirth-width">
+
+    <mat-form-field class="half-width">
         <mat-label>Toevoeging</mat-label>
         <input matInput formControlName="toevoeging">
+    </mat-form-field>
+    <mat-form-field class="half-width">
+        <mat-label>Huisletter</mat-label>
+        <input matInput formControlName="huisletter">
     </mat-form-field>
 
     <mat-form-field class="full-width">

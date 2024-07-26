@@ -211,6 +211,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 Huisnummer = adresDto.Huisnummer,
                 Postcode = adresDto.Postcode,
                 Toevoeging = adresDto.Toevoeging,
+                Huisletter = adresDto.Huisletter,
                 Woonplaats = adresDto.Woonplaats,
             };
             _context.Adres.Add(adres);
@@ -248,6 +249,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             adres.Straatnaam = adresDto.Straatnaam;
             adres.Huisnummer = adresDto.Huisnummer;
             adres.Toevoeging = adresDto.Toevoeging;
+            adres.Huisletter = adresDto.Huisletter;
             adres.Postcode = adresDto.Postcode;
             adres.Woonplaats = adresDto.Woonplaats;
             
@@ -458,7 +460,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var kadaster = new Kadaster
             {
                 // Koppel enkel het kadastraal nr. voor de Sync
-                KadastraalNummer = kadasterDto.KadastraalNummer,
+                //KadastraalNummer = kadasterDto.KadastraalNummer,
                 Eigendom = eigendom,
                 EigendomId = eigendomId
             };
@@ -492,7 +494,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             if (kadaster == null) return BadRequest();
 
             // Wijzig kadaster object
-            kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
+            //kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
 
             // Wijzig naar database
             _context.Entry(kadaster).State = EntityState.Modified;

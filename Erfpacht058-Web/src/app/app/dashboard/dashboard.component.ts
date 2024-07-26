@@ -17,6 +17,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DetailDialogComponent } from '../../base/generic/detail-dialog/detail-dialog.component';
+import { ErrorDialogComponent } from '../../base/generic/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -199,8 +200,19 @@ export class DashboardComponent implements OnInit {
 
   // Aanroepen van de synchronisatie in de back-end met het Kadaster
   syncKadaster(): void {
-    this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe(resp => {
-      this.initEigendom();
+    this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe({
+      next: (resp) => {
+        this.initEigendom();
+      },
+      error: (err) => {
+        this.dialog.open(ErrorDialogComponent, {
+          data: {
+            title: 'Fout',
+            message: err.error
+          }
+        });
+        console.log(err)
+      }
     });
   }
 

@@ -1,37 +1,67 @@
-﻿using Newtonsoft.Json;
+﻿using Erfpacht058_API.Data;
+using Erfpacht058_API.Models.Eigendom;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
     // Strategy pattern toegepast zodat in een later stadium de Kadaster API eenvoudig geimplementeerd kan worden met weinig refactoring van code
     public interface IKadasterAPIService
     {
-        Task<Dictionary<string, object>> RetrieveSingleDataAsync(string id); // Functie die een single Kadaster object teruggeeft
+        Task<Dictionary<string, object>> RetrieveSingleDataAsync(); // Functie die een single Kadaster object teruggeeft
     }
 
-    // Demo strategy voor het simuleren van een API adhv een JSON bestand
-    public class KadasterDemoService : IKadasterAPIService
+    // Strategy voor het bevragen van de BAG API service als tijdelijke implementatie voor de Kadaster API
+    public class BAGAPIService : IKadasterAPIService
     {
-        private readonly string _filepath;
+        private readonly Adres _adres;
+        private readonly Erfpacht058_APIContext _context;
+        private readonly IHttpClientFactory _factory;
 
-        public KadasterDemoService(string filepath)
+        public BAGAPIService(Adres adres, Erfpacht058_APIContext context, IHttpClientFactory factory)
         {
-            _filepath = filepath;
+            _adres = adres;
+            _factory = factory;
+            _context = context;
         }
 
-        // Lees het JSON bestand met testdata uit om een API te simuleren
-        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync(string kadastNr)
+        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync()
         {
-            // Lees het JSON data bestand uit
-            var jsonContent = await File.ReadAllTextAsync(_filepath);
+            // Verkrijg API sleutel
+            var settings = await _context.Settings.FindAsync(1);
+            var BAGAPIKey = settings.BAGAPI;
+            if (string.IsNullOrEmpty(BAGAPIKey)) 
+                throw new Exception("Geen BAG API sleutel gevonden");
 
-            // Converteer de string naar een List van Dictionaries
-            var jsonCollection = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonContent);
+            // Stel zoek parameters samen met String builder
+            var sb = new StringBuilder("?");
+            sb.Append("postcode=" + _adres.Postcode); // verplicht
+            sb.Append("&huisnummer=" + _adres.Huisnummer); // verplicht
+            if (!string.IsNullOrEmpty(_adres.Toevoeging)) sb.Append("&huisnummertoevoeging=" + _adres.Toevoeging); // optioneel, alleen toevoegen wanneer deze niet null is
+            if (!string.IsNullOrEmpty(_adres.Huisletter)) sb.Append("&huisletter=" + _adres.Huisletter); // optioneel, alleen toevoegen wanneer deze niet null is
 
-            // Zoek het kadastrale nr. m.b.v. Linq
-            var foundObject = jsonCollection.FirstOrDefault(dict =>
-                dict["KadastraalNummer"].ToString() == kadastNr);
+            // Vraag informatie op bij de BAG API
+            var httpClient = _factory.CreateClient();
+            httpClient.DefaultRequestHeaders.Add("X-Api-Key", BAGAPIKey); // Voeg de API sleutel toe aan de headers
+            httpClient.DefaultRequestHeaders.Add("Accept-Crs", "epsg:28992");
+            var response = await httpClient.GetStringAsync("https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/adressenuitgebreid" + sb.ToString());
 
-            return foundObject;
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
+
+            // check of er adressen zijn teruggegeven
+            if (!dictionary.ContainsKey("_embedded"))
+                throw new Exception("Geen adressen gevonden");
+
+            // Verkrijg de collectie van adressen en check of er met de zoekopdracht slechts 1 resultaat is overgebleven
+            var embedded = dictionary["_embedded"] as JObject;
+            var BAGadres = embedded["adressen"].ToObject<List<Dictionary<string, object>>>();
+
+            if (BAGadres.Count > 1)
+                throw new Exception("Meerdere adressen gevonden, specificeer toevoeging en/of huisletter");
+
+            return BAGadres[0]; // Geef het adres terug als dictionary
         }
     }
 
@@ -43,7 +73,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                // empty constructor
         }
 
-        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync(string kadastNr)
+        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync()
         {
             // Todo -- later uitwerken
             throw new NotImplementedException();
@@ -65,9 +95,9 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _kadasterAPIService = kadasterAPIService;
         }
 
-        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync(string kadasterNr)
+        public async Task<Dictionary<string, object>> RetrieveSingleDataAsync()
         {
-            return await _kadasterAPIService.RetrieveSingleDataAsync(kadasterNr);
+            return await _kadasterAPIService.RetrieveSingleDataAsync();
         }
     }
 }
