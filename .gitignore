@@ -7,3 +7,7 @@ config/appsettings.json
 config/environment.ts
 Erfpacht058-API/Erfpacht058-API/obj/Container
 Storage
+Erfpacht058-API/UnitTesting/bin/Debug
+Erfpacht058-API/UnitTesting/obj/Debug
+Erfpacht058-API/UnitTests/bin/Debug
+Erfpacht058-API/UnitTests/obj/Debug

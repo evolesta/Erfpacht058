@@ -64,7 +64,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 return NotFound();
             }
 
-            return eigendom;
+            return Ok(eigendom);
         }
 
         // PUT: api/Eigendom/5
@@ -146,7 +146,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _context.Eigendom.Add(eigendom);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEigendom", new { id = eigendom.Id }, eigendom);
+            return Ok(eigendom);
         }
 
         // DELETE: api/Eigendom/5
