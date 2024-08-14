@@ -9,10 +9,12 @@ using Erfpacht058_API.Data;
 using Erfpacht058_API.Models.Facturen;
 using Erfpacht058_API.Models.Rapport;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers.Facturen
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class FactuurJobController : ControllerBase
     {

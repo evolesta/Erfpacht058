@@ -1,9 +1,13 @@
 ﻿using Erfpacht058_API.Controllers.Eigendom;
 using Erfpacht058_API.Data;
+using Erfpacht058_API.Models;
 using Erfpacht058_API.Models.Eigendom;
+using Erfpacht058_API.Models.OvereenkomstNS;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using NuGet.ContentModel;
 using System.Globalization;
 using Xunit;
@@ -21,7 +25,7 @@ namespace UnitTesting
     {
         private readonly EigendomController _controller;
         private readonly Erfpacht058_APIContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly Mock<IConfiguration> _configuration;
 
         // constructor
         public EigendomTests() 
@@ -32,15 +36,21 @@ namespace UnitTesting
                 .Options;
             _context = new Erfpacht058_APIContext(options);
 
+            // Mock de Configuratie
+            _configuration = new Mock<IConfiguration>();
+            _configuration.Setup(config => config["Bestanden:OpslagPad"]).Returns("C:/temp/");
+
             // Creeer controller object
-            _controller = new EigendomController(_context, _configuration);
+            _controller = new EigendomController(_context, _configuration.Object);
         }
 
         [Fact]
         // Test 1: Test of twee Eigendom objecten opgehaald kunnen worden
-        public async Task a_GetAlleEigendommen()
+        public async Task GetAlleEigendommen()
         {
             // Act
+            ClearDatabase(); // reset Database
+
             _context.Eigendom.AddRange(new List<Eigendom> // Seed Eigendom data
             {
                 new Eigendom { Id = 1, Relatienummer = "RL012335540", Ingangsdatum = DateTime.Parse("01-01-2025", new CultureInfo("nl-NL")), Complexnummer = "Xasss5s5s", EconomischeWaarde = 1002,
@@ -66,11 +76,198 @@ namespace UnitTesting
             );
         }
 
-        // Helper functie om een Parent Eigendom object op te voeren
-        private async Task<ActionResult<Eigendom>> AddTestEigendom()
+        [Fact]
+        // Test 2: Test of een Eigendom object opgevoerd kan worden
+        public async Task AddNewEigendom()
         {
+            // Act
+            ClearDatabase(); // Reset database
+
             var eigendom = new EigendomDto
             {
+                Complexnummer = "012566",
+                Relatienummer = "RL12346",
+                Ingangsdatum = DateTime.Parse("2024-01-01"),
+                Einddatum = DateTime.Parse("2030-01-01"),
+                EconomischeWaarde = 10500,
+                VerzekerdeWaarde = 115200,
+                Notities = "Dit is een test"
+            };
+
+            var result = await _controller.PostEigendom(eigendom);
+
+            // Assert
+            // Test of het relatienummer klopt met de ingevoegde data
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+            Assert.Equal("RL12346", returnValue.Relatienummer); // Test of het eigendom object het opgevoerde relatienummer bevat
+        }
+
+        [Fact]
+        // Test 3: Test of een Adres relatie opgevoerd kan worden
+        public async Task AddAdresToEigendom()
+        {
+            // Act
+            ClearDatabase(); // Reset database
+            AddTestEigendom(); // voer test eigedom object op
+
+            var adres = new AdresDto
+            {
+                Straatnaam = "Testlaan",
+                Huisnummer = 12,
+                Postcode = "1234AB",
+                Woonplaats = "Testonie",
+                Huisletter = "X",
+                Toevoeging = "1"
+            };
+
+            var result = await _controller.AddAdresToEigendom(1, adres);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+            Assert.Equal("Testlaan", returnValue.Adres.Straatnaam); // Test of het eigendom object een relatie bevat met het opgevoerde adres
+        }
+
+        [Fact]
+        // Test 4: Test of een eigenaar relatie opgevoerd kan worden
+        public async Task AddEigenaarToEigendom()
+        {
+            // Act
+            ClearDatabase(); // Reset database
+            AddTestEigendom(); // voer test eigendom object op
+
+            var eigenaar = new EigenaarDto
+            {
+                Ingangsdatum = DateTime.Parse("1900-01-01"),
+                Einddatum = DateTime.Parse("2025-01-01"),
+                Debiteurnummer = "66666662",
+                Naam = "Kerel",
+                Straatnaam = "Waalderlaan",
+                Huisnummer = 12,
+                Postcode = "1234AB",
+                Toevoeging = "1",
+                Voorletters = "X",
+                Voornamen = "Semafoor",
+                Woonplaats = "Drachten"
+            };
+
+            var result = await _controller.AddEigenaarToEigendom(1, eigenaar);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+            Assert.Equal("Kerel", returnValue.Eigenaar[0].Naam); // Test of het eigendom object een eigenaar in de collectie heeft staan met de naam
+        }
+
+        [Fact]
+        // Test 5: Test of een herziening opgevoerd kan worden
+        public async Task AddHerzieningToEigendom()
+        {
+            // Act
+            ClearDatabase(); // Reset database
+            AddTestEigendom();
+
+            var herziening = new HerzieningDto
+            {
+                Herzieningsdatum = DateTime.Parse("2020-01-01"),
+                VolgendeHerziening = 25
+            };
+
+            var result = await _controller.AddHerzieningToEigendom(1, herziening);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+            Assert.Equal(25, returnValue.Herziening.VolgendeHerziening); // Test of het relationele herzieningsobject 25 bevat voor de volgende herziening
+        }
+
+        [Fact]
+        // Test 6: Test of er een overeenkomst toegevoegd kan worden + Financien
+        public async Task AddOvereenkomstToEigendom()
+        {
+            // Act
+            ClearDatabase(); // Reset database
+            AddTestEigendom();
+
+            var financien = new FinancienDto
+            {
+                Bedrag = 1000,
+                Frequentie = Frequentie.Jaarlijks,
+                FactureringsPeriode = FactureringsPeriode.December,
+                FactureringsWijze = FactureringsWijze.Vooraf
+            };
+
+            var overeenkomst = new OvereenkomstDto
+            {
+                Dossiernummer = "XA12444",
+                Ingangsdatum = DateTime.Parse("1990-01-01"),
+                DatumAkte = DateTime.Parse("2020-01-01"),
+                Grondwaarde = 10000,
+                Rentepercentage = 8,
+                Financien = financien
+            };
+
+            var result = await _controller.AddOvereenkomst(1, overeenkomst);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+            Assert.Equal("XA12444", returnValue.Overeenkomst.First().Dossiernummer);
+        }
+
+        [Fact]
+        // Test 7: Test of er een bestand geupload kan worden onder een eigendom
+        public async Task UploadBestand()
+        {
+            ClearDatabase(); // Reset database
+            AddTestEigendom(); // Voeg een eigendom toe
+
+            // Stel een test bestand op
+            var filemock = new Mock<IFormFile>();
+            var content = "Dit is een testbestand";
+            var filename = "test.txt";
+            var ms = new MemoryStream();
+            var writer = new StreamWriter(ms);
+            writer.Write(content);
+            writer.Flush();
+            ms.Position = 0;
+
+            // Setup IFormFile die meegestuurd wordt
+            filemock.Setup(_ => _.OpenReadStream()).Returns(ms);
+            filemock.Setup(_ => _.FileName).Returns(filename);
+            filemock.Setup(_ => _.Length).Returns(ms.Length);
+            var formFile = filemock.Object;
+            
+            // Creeer een nieuwe DTO
+            var bestandDto = new BestandDtoUpload();
+            bestandDto.Files = new List<IFormFile> { formFile };
+
+            // Act
+            var result = await _controller.AddBestand(1, bestandDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
+
+            var config = _configuration.Object;
+            var filepath = config["Bestanden:OpslagPad"] + returnValue.Bestand.First().Pad;
+            Assert.Multiple(
+                () => Assert.Equal("test.txt", returnValue.Bestand.First().Naam), // controleer naam van het bestand
+                () => Assert.True(Path.Exists(filepath)) // controleer of het bestand bestaat
+            );
+
+            File.Delete(filepath); // verwijder test bestand
+        }
+
+        // ++ HELPER FUNCTIES ++
+        // Helper functie om een Parent Eigendom object op te voeren
+        private void AddTestEigendom()
+        {
+            // creer een object zonder relaties
+            var eigendom = new Eigendom
+            {
+                Id = 1,
                 Relatienummer = "RL123456789",
                 Ingangsdatum = DateTime.Parse("01-01-1980", new CultureInfo("nl-NL")),
                 Einddatum = null,
@@ -80,33 +277,15 @@ namespace UnitTesting
                 Notities = "Dit is een testnotitie",
             };
 
-            return await _controller.PostEigendom(eigendom);
+            _context.Eigendom.Add(eigendom);
+            _context.SaveChanges();
         }
 
-        [Fact]
-        // Test 2: Test of een Eigendom object opgevoerd kan worden
-        public async Task b_AddNewEigendom()
+        // Helper functie die de database reset voor iedere afzonderlijke test
+        private void ClearDatabase()
         {
-            // Act
-            var result = await AddTestEigendom();
-
-            // Assert
-            // Test of het relatienummer klopt met de ingevoegde data
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<Eigendom>(okResult.Value);
-            Assert.Equal("RL123456789", returnValue.Relatienummer);
-        }
-
-        [Fact]
-        // Test 3: Test of een Adres relatie opgevoerd kan worden
-        public async Task c_AddAdresToEigendom()
-        {
-            // Act
-            var eigendom = await AddTestEigendom(); // Voeg parent eigendom object toe
-            eigendom = eigendom.Value;
-
-            
-            
+            _context.RemoveRange(_context.Eigendom); // verwijder alle Eigendommen 
+            _context.SaveChanges();
         }
     }
 }
