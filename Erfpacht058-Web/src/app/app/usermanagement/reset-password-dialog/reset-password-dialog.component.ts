@@ -1,5 +1,5 @@
 import { DialogModule } from '@angular/cdk/dialog';
-import { HttpClientModule } from '@angular/common/http';
+import {} from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';

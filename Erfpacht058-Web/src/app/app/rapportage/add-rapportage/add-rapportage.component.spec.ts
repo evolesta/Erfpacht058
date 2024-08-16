@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddRapportageComponent } from './add-rapportage.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('AddRapportageComponent', () => {
   let component: AddRapportageComponent;
@@ -8,7 +12,8 @@ describe('AddRapportageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddRapportageComponent]
+      imports: [AddRapportageComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideAnimations()]
     })
     .compileComponents();
     

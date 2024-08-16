@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SjablonenComponent } from './sjablonen.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('SjablonenComponent', () => {
   let component: SjablonenComponent;
@@ -8,7 +12,8 @@ describe('SjablonenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SjablonenComponent]
+      imports: [SjablonenComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideAnimations()]
     })
     .compileComponents();
     

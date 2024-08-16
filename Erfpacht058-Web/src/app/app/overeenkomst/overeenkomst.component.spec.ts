@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OvereenkomstComponent } from './overeenkomst.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('OvereenkomstComponent', () => {
   let component: OvereenkomstComponent;
@@ -8,7 +12,8 @@ describe('OvereenkomstComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OvereenkomstComponent]
+      imports: [OvereenkomstComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideAnimations()]
     })
     .compileComponents();
     

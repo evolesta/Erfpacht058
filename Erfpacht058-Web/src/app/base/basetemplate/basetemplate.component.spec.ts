@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BasetemplateComponent } from './basetemplate.component';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('BasetemplateComponent', () => {
   let component: BasetemplateComponent;
@@ -8,7 +10,8 @@ describe('BasetemplateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BasetemplateComponent]
+      imports: [BasetemplateComponent],
+      providers: [provideRouter([]), provideAnimations()]
     })
     .compileComponents();
     

@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ModVertaaltabelComponent } from './mod-vertaaltabel.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('ModVertaaltabelComponent', () => {
   let component: ModVertaaltabelComponent;
@@ -8,7 +12,8 @@ describe('ModVertaaltabelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModVertaaltabelComponent]
+      imports: [ModVertaaltabelComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideAnimations()]
     })
     .compileComponents();
     
