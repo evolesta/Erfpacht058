@@ -27,6 +27,7 @@ namespace Erfpacht058_API.Controllers
         private readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
         private readonly IServiceScopeFactory _scopeFactory;
         private int _invoiceNrCounter = 0;
+        public TaskCompletionSource<bool> _taskCompletionSource { get; } = new TaskCompletionSource<bool>();
 
         public TaskQueueHostedService(ILogger<TaskQueueHostedService> logger, IServiceScopeFactory scopeFactory)
         {
@@ -40,8 +41,15 @@ namespace Erfpacht058_API.Controllers
             _signal.Release();
         }
 
+        public async Task ExecuteBackgroundTask(CancellationToken stoppingToken)
+        {
+            await ExecuteAsync(stoppingToken);
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await _signal.WaitAsync(stoppingToken); // Wacht tot nieuw signaal voor het uitvoeren van een taak
@@ -49,6 +57,7 @@ namespace Erfpacht058_API.Controllers
                 while (_taskQueue.TryDequeue(out var task))
                 {
                     // Zet task in Progress
+                    _logger.LogInformation("Achtergrondtaak in behandeling");
                     await using var scope = _scopeFactory.CreateAsyncScope();
                     var context = scope.ServiceProvider.GetRequiredService<Erfpacht058_APIContext>();
                     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -77,12 +86,17 @@ namespace Erfpacht058_API.Controllers
 
                         // Zet status op succesvol ivm geen fouten
                         task.Status = Status.Succesvol;
+                        _logger.LogInformation("Taak succesvol afgerond");
+
+                        _taskCompletionSource.SetResult(true); // Geef succes terug
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("Error executing Task: " + ex.Message);
+                        _logger.LogError("Fout bij uitvoeren taak: " + ex.Message);
                         task.Fout = ex.Message;
                         task.Status = Status.Mislukt;
+
+                        _taskCompletionSource.SetException(ex); // Geef exception terug
                     }
                     finally
                     {

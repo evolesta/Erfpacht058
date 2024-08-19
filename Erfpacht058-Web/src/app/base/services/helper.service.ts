@@ -25,16 +25,26 @@ export class HelperService {
   }
 
   isAdministrator(): boolean {
-    const token = localStorage.getItem('token');
-    const decodedToken = jwtDecode<JwtPayload>(token);
+    try {
+      const token = localStorage.getItem('token');
+      const decodedToken = jwtDecode<JwtPayload>(token);
 
-    return decodedToken.Role == "Beheerder";
+      return decodedToken.Role == "Beheerder";
+    } catch (error) {
+      console.error('Failed to decode token:', error);
+      return false;
+    }
   }
 
   naamGebruiker(): string {
-    const token = localStorage.getItem('token');
-    const decodedToken = jwtDecode<JwtPayload>(token);
+    try {
+      const token = localStorage.getItem('token');
+      const decodedToken = jwtDecode<JwtPayload>(token);
 
-    return decodedToken.Naam;
+      return decodedToken?.Naam;
+    } catch (error) {
+      console.error('Failed to decode token: ', error);
+      return null;
+    }
   }
 }

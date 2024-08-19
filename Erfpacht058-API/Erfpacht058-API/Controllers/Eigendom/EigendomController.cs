@@ -64,7 +64,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 return NotFound();
             }
 
-            return eigendom;
+            return Ok(eigendom);
         }
 
         // PUT: api/Eigendom/5
@@ -146,7 +146,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _context.Eigendom.Add(eigendom);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEigendom", new { id = eigendom.Id }, eigendom);
+            return Ok(eigendom);
         }
 
         // DELETE: api/Eigendom/5
@@ -270,7 +270,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="eigenaarDto"></param>
         /// <returns></returns>
         [HttpPost("eigenaar/{eigendomId}")]
-        public async Task<ActionResult<Eigenaar>> AddEigenaarToEigendom(int eigendomId, EigenaarDto eigenaarDto)
+        public async Task<ActionResult<Eigendom>> AddEigenaarToEigendom(int eigendomId, EigenaarDto eigenaarDto)
         {
             // Verkrijg Eigendom object
             var eigendom = await _context.Eigendom
@@ -302,7 +302,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _context.Entry(eigendom).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return Ok(eigenaar);
+            return Ok(eigendom);
         }
 
         // PUT: /eigendom/5/eigenaar/5 
@@ -439,70 +439,6 @@ namespace Erfpacht058_API.Controllers.Eigendom
             return Ok(herziening);
         }
 
-        // === Kadaster gerelateerde functies ===
-        // POST: /eigendom/kadaster/5
-        /// <summary>
-        /// Voeg een nieuw kadaster object toe aan een eigendom
-        /// </summary>
-        /// <param name="eigendomId"></param>
-        /// <param name="kadasterDto"></param>
-        /// <returns></returns>
-        [HttpPost("kadaster/{eigendomId}")]
-        public async Task<ActionResult<Kadaster>> AddKadasterToEigendom(int eigendomId, KadasterDto kadasterDto)
-        {
-            // verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-               .Include(e => e.Kadaster)
-               .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
-
-            // Maak een nieuw Kadaster object aan
-            var kadaster = new Kadaster
-            {
-                // Koppel enkel het kadastraal nr. voor de Sync
-                //KadastraalNummer = kadasterDto.KadastraalNummer,
-                Eigendom = eigendom,
-                EigendomId = eigendomId
-            };
-
-            // Maak nieuw Kadaster object, leg relaties en voeg toe aan database
-            _context.Kadaster.Add(kadaster);
-            eigendom.Kadaster = kadaster;
-            _context.Entry(eigendom).State = EntityState.Modified;
-            
-            await _context.SaveChangesAsync();
-
-            return Ok(kadaster);
-        }
-
-        // PUT: /eigendom/kadaster/5
-        /// <summary>
-        /// Wijzig een bestaand kadaster object bij een eigendom
-        /// </summary>
-        /// <param name="eigendomId"></param>
-        /// <param name="kadasterDto"></param>
-        /// <returns></returns>
-        [HttpPut("kadaster/{eigendomId}")]
-        public async Task<ActionResult<Kadaster>> EditKadaster(int eigendomId, KadasterDto kadasterDto)
-        {
-            // verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-               .Include(e => e.Kadaster)
-               .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
-            var kadaster = eigendom.Kadaster;
-            if (kadaster == null) return BadRequest();
-
-            // Wijzig kadaster object
-            //kadaster.KadastraalNummer = kadasterDto.KadastraalNummer;
-
-            // Wijzig naar database
-            _context.Entry(kadaster).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(kadaster);
-        }
-
         // POST: /eigendom/bestand/5
         /// <summary>
         /// Upload een nieuw bestand onder het eigendom
@@ -518,7 +454,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         ///     }
         /// </remarks>
         [HttpPost("bestand/{eigendomId}")]
-        public async Task<ActionResult<Bestand>> AddBestand(int eigendomId, BestandDtoUpload bestandDto)    
+        public async Task<ActionResult<Eigendom>> AddBestand(int eigendomId, BestandDtoUpload bestandDto)    
         {
             // Verkrijg eigendom object
             var eigendom = await _context.Eigendom
@@ -579,7 +515,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="overeenkomstDto"></param>
         /// <returns></returns>
         [HttpPost("overeenkomst/{eigendomId}")]
-        public async Task<ActionResult<Overeenkomst>> AddOvereenkomst(int eigendomId, OvereenkomstDto overeenkomstDto)
+        public async Task<ActionResult<Eigendom>> AddOvereenkomst(int eigendomId, OvereenkomstDto overeenkomstDto)
         {
             // Verkrijg eigendom object
             var eigendom = await _context.Eigendom
@@ -614,7 +550,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             _context.Entry(eigendom).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return Ok(overeenkomst);
+            return Ok(eigendom);
         }
 
         // PUT: /eigendom/overeenkomst/5/5

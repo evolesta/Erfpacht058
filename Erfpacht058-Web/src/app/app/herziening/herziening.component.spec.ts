@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HerzieningComponent } from './herziening.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 describe('HerzieningComponent', () => {
   let component: HerzieningComponent;
@@ -8,7 +12,9 @@ describe('HerzieningComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HerzieningComponent]
+      imports: [HerzieningComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter ([]), provideAnimations()]
+
     })
     .compileComponents();
     

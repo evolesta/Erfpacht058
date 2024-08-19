@@ -12,11 +12,11 @@
             <form [formGroup]="loginForm" (ngSubmit)="login()">
                 <mat-form-field class="full-width">
                     <mat-label>E-mailadres</mat-label>
-                    <input matInput formControlName="emailadres">
+                    <input matInput formControlName="emailadres" name="email">
                 </mat-form-field>
                 <mat-form-field class="full-width">
                     <mat-label>Wachtwoord</mat-label>
-                    <input matInput type="password" formControlName="wachtwoord">
+                    <input matInput type="password" formControlName="wachtwoord" name="password">
                 </mat-form-field>
                 <button mat-raised-button color="primary" type="submit">Inloggen</button>
             </form>
