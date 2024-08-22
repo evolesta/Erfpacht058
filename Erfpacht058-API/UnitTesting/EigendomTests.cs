@@ -38,7 +38,8 @@ namespace UnitTesting
 
             // Mock de Configuratie
             _configuration = new Mock<IConfiguration>();
-            _configuration.Setup(config => config["Bestanden:OpslagPad"]).Returns("C:/temp/");
+            var dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            _configuration.Setup(config => config["Bestanden:OpslagPad"]).Returns(dir + "/temp");
 
             // Creeer controller object
             _controller = new EigendomController(_context, _configuration.Object);
