@@ -21,6 +21,7 @@ namespace UnitTesting
     Test 3: Test of een Adres relatie opgevoerd kan worden
      */
 
+    [Collection("Tests")]
     public class EigendomTests
     {
         private readonly EigendomController _controller;

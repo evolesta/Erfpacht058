@@ -20,6 +20,7 @@ using System.Text;
 
 namespace UnitTesting
 {
+    [Collection("tests")]
     public class AchtergrondTakenTests
     {
         /*
