@@ -21,6 +21,7 @@ namespace UnitTesting
     Test 3: Test of een Adres relatie opgevoerd kan worden
      */
 
+    [Collection("Tests")]
     public class EigendomTests
     {
         private readonly EigendomController _controller;
@@ -38,7 +39,8 @@ namespace UnitTesting
 
             // Mock de Configuratie
             _configuration = new Mock<IConfiguration>();
-            _configuration.Setup(config => config["Bestanden:OpslagPad"]).Returns("C:/temp/");
+            var dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            _configuration.Setup(config => config["Bestanden:OpslagPad"]).Returns(dir + "/temp/");
 
             // Creeer controller object
             _controller = new EigendomController(_context, _configuration.Object);
@@ -284,8 +286,7 @@ namespace UnitTesting
         // Helper functie die de database reset voor iedere afzonderlijke test
         private void ClearDatabase()
         {
-            _context.RemoveRange(_context.Eigendom); // verwijder alle Eigendommen 
-            _context.SaveChanges();
+            _context.Database.EnsureDeleted();
         }
     }
 }

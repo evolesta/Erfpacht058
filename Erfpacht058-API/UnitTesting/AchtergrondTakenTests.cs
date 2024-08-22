@@ -20,6 +20,7 @@ using System.Text;
 
 namespace UnitTesting
 {
+    [Collection("Tests")]
     public class AchtergrondTakenTests
     {
         /*
@@ -46,9 +47,10 @@ namespace UnitTesting
             _context = new Erfpacht058_APIContext(options);
 
             _configuration = new Mock<IConfiguration>();
-            _configuration.Setup(config => config["Bestanden:ExportPad"]).Returns("C://temp/export");
-            _configuration.Setup(config => config["Bestanden:ImportPad"]).Returns("C://temp/import");
-            _configuration.Setup(config => config["Bestanden:Facturen"]).Returns("C://temp/facturen");
+            var dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            _configuration.Setup(config => config["Bestanden:ExportPad"]).Returns(dir + "/temp/export");
+            _configuration.Setup(config => config["Bestanden:ImportPad"]).Returns(dir + "/temp/import");
+            _configuration.Setup(config => config["Bestanden:Facturen"]).Returns(dir + "/temp/facturen");
 
             var serviceProvider = new Mock<IServiceProvider>();
             serviceProvider.Setup(x => x.GetService(typeof(Erfpacht058_APIContext))).Returns(_context);
@@ -374,16 +376,7 @@ namespace UnitTesting
         // Functie die de context database reset
         private void ClearDatabase()
         {
-            _context.RemoveRange(_context.TaskQueue);
-            _context.RemoveRange(_context.Eigendom);
-            _context.RemoveRange(_context.Adres);
-            _context.RemoveRange(_context.Overeenkomst);
-            _context.RemoveRange(_context.Financien);
-            _context.RemoveRange(_context.Export);
-            _context.RemoveRange(_context.Import);
-            _context.RemoveRange(_context.Factuur);
-            _context.RemoveRange(_context.FactuurJob);
-            _context.SaveChanges();
+            _context.Database.EnsureDeleted();
         }
     }
 }
