@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore Erfpacht058-API/Erfpacht058-API.csproj
+      run: dotnet restore Erfpacht058-API/Erfpacht058-API/Erfpacht058-API.csproj
     - name: Build
-      run: dotnet build Erfpacht058-API/Erfpacht058-API.csproj
+      run: dotnet build Erfpacht058-API/Erfpacht058-API/Erfpacht058-API.csproj
     - name: Test
       run: dotnet test Erfpacht058-API/UnitTesting/UnitTesting.csproj
