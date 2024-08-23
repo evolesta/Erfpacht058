@@ -1,4 +1,4 @@
 export const environment = {
     // URL naar API tijdens debuggen
-    apiURL: "https://localhost:32770/api"
+    apiURL: "https://erfpacht058.test:8001/api"
 };

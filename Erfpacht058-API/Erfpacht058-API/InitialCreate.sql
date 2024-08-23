@@ -32,7 +32,7 @@ IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Acti
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240216111823_AddGebruikersTable', N'8.0.4');
+VALUES (N'20240216111823_AddGebruikersTable', N'8.0.7');
 GO
 
 COMMIT;
@@ -219,7 +219,7 @@ CREATE INDEX [IX_Overeenkomst_EigendomId] ON [Overeenkomst] ([EigendomId]);
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240301105841_AddEigendomData', N'8.0.4');
+VALUES (N'20240301105841_AddEigendomData', N'8.0.7');
 GO
 
 COMMIT;
@@ -253,7 +253,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240301125132_EditEigendomNullvelden', N'8.0.4');
+VALUES (N'20240301125132_EditEigendomNullvelden', N'8.0.7');
 GO
 
 COMMIT;
@@ -333,7 +333,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240311101731_EditEigenaarNullableFields', N'8.0.4');
+VALUES (N'20240311101731_EditEigenaarNullableFields', N'8.0.7');
 GO
 
 COMMIT;
@@ -352,7 +352,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240318084444_EditKadasterAddLaatsteSync', N'8.0.4');
+VALUES (N'20240318084444_EditKadasterAddLaatsteSync', N'8.0.7');
 GO
 
 COMMIT;
@@ -377,7 +377,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240318112635_EditBestandModBestandgr', N'8.0.4');
+VALUES (N'20240318112635_EditBestandModBestandgr', N'8.0.7');
 GO
 
 COMMIT;
@@ -429,7 +429,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240322125646_EditOvereenkomstNullableFields', N'8.0.4');
+VALUES (N'20240322125646_EditOvereenkomstNullableFields', N'8.0.7');
 GO
 
 COMMIT;
@@ -463,7 +463,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240327192825_EditFinancienRemoveDatums', N'8.0.4');
+VALUES (N'20240327192825_EditFinancienRemoveDatums', N'8.0.7');
 GO
 
 COMMIT;
@@ -482,7 +482,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240412143002_EditGebruikerAddLoginPoging', N'8.0.4');
+VALUES (N'20240412143002_EditGebruikerAddLoginPoging', N'8.0.7');
 GO
 
 COMMIT;
@@ -561,7 +561,7 @@ ALTER TABLE [Gebruiker] ADD CONSTRAINT [FK_Gebruiker_Export_ExportId] FOREIGN KE
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240416113130_AddExportTemplateModels', N'8.0.4');
+VALUES (N'20240416113130_AddExportTemplateModels', N'8.0.7');
 GO
 
 COMMIT;
@@ -600,7 +600,7 @@ CREATE INDEX [IX_Filter_TemplateId] ON [Filter] ([TemplateId]);
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240422132758_EditTemplateAddFiltersRel', N'8.0.4');
+VALUES (N'20240422132758_EditTemplateAddFiltersRel', N'8.0.7');
 GO
 
 COMMIT;
@@ -619,7 +619,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240429141734_EditTaskQueueAddFoutmelding', N'8.0.4');
+VALUES (N'20240429141734_EditTaskQueueAddFoutmelding', N'8.0.7');
 GO
 
 COMMIT;
@@ -638,7 +638,7 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240503123808_EditExportAddExportPad', N'8.0.4');
+VALUES (N'20240503123808_EditExportAddExportPad', N'8.0.7');
 GO
 
 COMMIT;
@@ -710,7 +710,7 @@ ALTER TABLE [TaskQueue] ADD CONSTRAINT [FK_TaskQueue_Import_ImportId] FOREIGN KE
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240522110849_AddImportModels', N'8.0.4');
+VALUES (N'20240522110849_AddImportModels', N'8.0.7');
 GO
 
 COMMIT;
@@ -795,7 +795,7 @@ ALTER TABLE [TaskQueue] ADD CONSTRAINT [FK_TaskQueue_FactuurJob_FactuurJobId] FO
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240603091142_AddInvoicingModels', N'8.0.4');
+VALUES (N'20240603091142_AddInvoicingModels', N'8.0.7');
 GO
 
 COMMIT;
@@ -814,7 +814,85 @@ SELECT @@ROWCOUNT;
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240603135545_AddStoragePadFctJob', N'8.0.4');
+VALUES (N'20240603135545_AddStoragePadFctJob', N'8.0.7');
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+ALTER TABLE [Adres] ADD [Huisletter] nvarchar(max) NULL;
+GO
+
+UPDATE [Gebruiker] SET [Wachtwoord] = N'$2a$11$SntTFq0Tb38YnUySOTtMpeCX.8FLxSnz/z4HuDi9//qNOw9RBKl3y'
+WHERE [Id] = 1;
+SELECT @@ROWCOUNT;
+
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20240723125650_EditAdresAddHuisletter', N'8.0.7');
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+CREATE TABLE [Settings] (
+    [Id] int NOT NULL IDENTITY,
+    [BAGAPI] nvarchar(max) NULL,
+    CONSTRAINT [PK_Settings] PRIMARY KEY ([Id])
+);
+GO
+
+UPDATE [Gebruiker] SET [Wachtwoord] = N'$2a$11$didHBqcx3BOvAVvl5izQHOwU37giXZ3yWHOVTJTlR5vAJp3Enb0fu'
+WHERE [Id] = 1;
+SELECT @@ROWCOUNT;
+
+GO
+
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'BAGAPI') AND [object_id] = OBJECT_ID(N'[Settings]'))
+    SET IDENTITY_INSERT [Settings] ON;
+INSERT INTO [Settings] ([Id], [BAGAPI])
+VALUES (1, N'');
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'BAGAPI') AND [object_id] = OBJECT_ID(N'[Settings]'))
+    SET IDENTITY_INSERT [Settings] OFF;
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20240723130616_AddSettings', N'8.0.7');
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+EXEC sp_rename N'[Kadaster].[ObjectType]', N'Gebruiksdoel', N'COLUMN';
+GO
+
+EXEC sp_rename N'[Kadaster].[KadastraleGrootte]', N'Oppervlakte', N'COLUMN';
+GO
+
+EXEC sp_rename N'[Kadaster].[KadastraalNummer]', N'BAGID', N'COLUMN';
+GO
+
+EXEC sp_rename N'[Kadaster].[Deeloppervlakte]', N'Bouwjaar', N'COLUMN';
+GO
+
+UPDATE [Gebruiker] SET [Wachtwoord] = N'$2a$11$Uc5.4aivaWigaWNIFNC7ceQmgjlxu1kXf71Rf3CRiVBlgh.ZTKcaq'
+WHERE [Id] = 1;
+SELECT @@ROWCOUNT;
+
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20240726074320_EditKadasterStructure', N'8.0.7');
 GO
 
 COMMIT;
