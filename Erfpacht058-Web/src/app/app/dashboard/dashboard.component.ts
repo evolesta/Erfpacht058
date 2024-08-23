@@ -200,7 +200,7 @@ export class DashboardComponent implements OnInit {
 
   // Aanroepen van de synchronisatie in de back-end met het Kadaster
   syncKadaster(): void {
-    this.http.post('/kadaster/sync/' + this.eigendom.kadaster.id, '').subscribe({
+    this.http.get('/kadaster/sync/' + this.eigendom.id).subscribe({
       next: (resp) => {
         this.initEigendom();
       },

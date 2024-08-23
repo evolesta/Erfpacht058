@@ -3,21 +3,15 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient } from '@angular/common/http';
-import { AuthenticateInterceptor } from './base/services/authenticate.interceptor';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CommonModule, NgIf } from '@angular/common';
-import { provideClientHydration, provideProtractorTestingSupport } from '@angular/platform-browser';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { authInterceptor } from './base/services/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
-    provideRouter(routes),
-    provideProtractorTestingSupport(),
-    provideClientHydration(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     importProvidersFrom(CommonModule),
     provideAnimations(),
-    { provide: HTTP_INTERCEPTORS, useClass: AuthenticateInterceptor, multi: true },
   ]
 };

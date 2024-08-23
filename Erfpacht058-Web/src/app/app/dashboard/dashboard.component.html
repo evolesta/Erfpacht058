@@ -174,7 +174,7 @@
                     <tr *ngIf="!eigendom.kadaster.laatsteSynchronisatie"><td>Laatste synchronisatie</td><td>nooit</td></tr>
                 </table>
             </ng-template>
-            <ng-template #elseBlockKadast>Er zijn nog geen Kadastrale gegevens bekend - <a routerLink="kadaster/add/{{eigendom.id}}">Kadaster invullen</a></ng-template>
+            <ng-template #elseBlockKadast>Er zijn nog geen Kadastrale gegevens bekend - <a href="" *ngIf="eigendom.adres" (click)="syncKadaster()">Synchroniseren</a></ng-template>
         </mat-expansion-panel>
 
         <mat-expansion-panel>

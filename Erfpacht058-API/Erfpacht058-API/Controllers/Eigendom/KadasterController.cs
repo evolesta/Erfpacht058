@@ -35,22 +35,40 @@ namespace Erfpacht058_API.Controllers.Eigendom
 
         // POST: /kadaster/sync/5
         /// <summary>
-        /// Synchroniseert data met het Kadaster a.d.h.v. Kadastrale nummer
+        /// Synchroniseert data met het Kadaster a.d.h.v. eigendom
         /// </summary>
-        /// <param name="kadasterId"></param>
+        /// <param name="eigendomId"></param>
         /// <returns></returns>
-        [HttpPost("sync/{kadasterId}")]
-        public async Task<ActionResult<Kadaster>> SyncMetKadaster(int kadasterId)
+        [HttpGet("sync/{eigendomId}")]
+        public async Task<ActionResult<Kadaster>> SyncMetKadaster(int eigendomId)
         {
             // Verkrijg het Kadaster object uit de database
-            var kadaster = await _context.Kadaster
-                .Include(e => e.Eigendom)
-                .ThenInclude(e => e.Adres)
-                .FirstOrDefaultAsync(e => e.Id == kadasterId);
-            if (kadaster == null) return BadRequest();
+            var eigendom = await _context.Eigendom
+                .Include(e => e.Kadaster)
+                .Include(e => e.Adres)
+                .FirstOrDefaultAsync(e => e.Id == eigendomId);
+
+            Kadaster kadaster;
+
+            // check of er al een Kadaster object is
+            if (eigendom.Kadaster == null)
+            {
+                // Creeer nieuw Kadaster object
+                kadaster = new Kadaster
+                {
+                    Eigendom = eigendom,
+                    EigendomId = eigendom.Id
+                };
+
+                eigendom.Kadaster = kadaster;
+                _context.Kadaster.Add(kadaster);
+                await _context.SaveChangesAsync();
+            }
+            else
+                kadaster = eigendom.Kadaster;
 
             // Verkrijg de informatie uit het Kadaster
-            var adres = kadaster.Eigendom.Adres;
+            var adres = eigendom.Adres;
             var kadasterAPI = new KadasterAPIServiceContext(new BAGAPIService(adres, _context, _httpClientFactory)); // Selecteer demo strategy
 
             try
