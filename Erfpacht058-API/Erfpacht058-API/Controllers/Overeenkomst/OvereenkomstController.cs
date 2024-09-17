@@ -12,44 +12,38 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
     using Erfpacht058_API.Models.OvereenkomstNS;
     using Microsoft.AspNetCore.Authorization;
     using Erfpacht058_API.Models.Eigendom;
+    using Erfpacht058_API.Repositories.Interfaces;
+    using AutoMapper;
 
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
     public class OvereenkomstController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
+        private readonly IOvereenkomstRepository _overeenkomstRepo;
+        private readonly IMapper _mapper;
 
-        public OvereenkomstController(Erfpacht058_APIContext context)
+        public OvereenkomstController(IOvereenkomstRepository overeenkomstRepository, IMapper mapper)
         {
-            _context = context;
+            _overeenkomstRepo = overeenkomstRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Overeenkomst
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Overeenkomst>>> GetOvereenkomst()
         {
-            return await _context.Overeenkomst
-                .Include(e => e.Financien)
-                .Include(e => e.Eigendom)
-                .ToListAsync();
+            return Ok(await _overeenkomstRepo.GetOvereenkomsten());
         }
 
         // GET: api/Overeenkomst/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Overeenkomst>> GetOvereenkomst(int id)
         {
-            var overeenkomst = await _context.Overeenkomst
-                .Include(e => e.Financien)
-                .Include(e => e.Eigendom)
-                .FirstOrDefaultAsync(e => e.Id == id);
+            var result = await _overeenkomstRepo.GetOvereenkomst(id);
 
-            if (overeenkomst == null)
-            {
-                return NotFound();
-            }
-
-            return overeenkomst;
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: api/Overeenkomst/5
@@ -57,28 +51,10 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOvereenkomst(int id, OvereenkomstDto overeenkomstDto)
         {
-            // Verkrijg overenkomst object
-            var overeenkomst = await _context.Overeenkomst
-                .Include(e => e.Financien)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (overeenkomst == null) return BadRequest();
+            var result = await _overeenkomstRepo.EditOvereenkomst(id, overeenkomstDto);
 
-            // Wijzig overeenkomst adhv dto
-            overeenkomst.Dossiernummer = overeenkomstDto.Dossiernummer;
-            overeenkomst.Ingangsdatum = overeenkomstDto.Ingangsdatum;
-            overeenkomst.Einddatum = overeenkomstDto.Einddatum;
-            overeenkomst.Grondwaarde = overeenkomstDto.Grondwaarde;
-            overeenkomst.DatumAkte = overeenkomstDto.DatumAkte;
-            overeenkomst.Rentepercentage = overeenkomstDto.Rentepercentage;
-            overeenkomst.Financien.Bedrag = overeenkomstDto.Financien.Bedrag;
-            overeenkomst.Financien.FactureringsWijze = overeenkomstDto.Financien.FactureringsWijze;
-            overeenkomst.Financien.Frequentie = overeenkomstDto.Financien.Frequentie;
-
-            // Sla wijzigingen op in database
-            _context.Entry(overeenkomst).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(overeenkomst);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // DELETE: api/Overeenkomst/5
@@ -90,24 +66,10 @@ namespace Erfpacht058_API.Controllers.Overeenkomst
         [HttpDelete("{id}")]
         public async Task<ActionResult<Eigendom>> DeleteOvereenkomst(int id)
         {
-            // verkrijg benodigde objecten
-            var overeenkomst = await _context.Overeenkomst
-                .Include(e => e.Eigendom)
-                .Include(e => e.Financien)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (overeenkomst == null) return BadRequest();
-            var eigendom = overeenkomst.Eigendom;
-            if (eigendom == null) return BadRequest();
-            var financien = overeenkomst.Financien;
+            var result = await _overeenkomstRepo.DeleteOvereenkomst(id);
 
-            // Verwijder relaties en object en sla op
-            eigendom.Overeenkomst.Remove(overeenkomst);
-            _context.Overeenkomst.Remove(overeenkomst);
-            _context.Financien.Remove(financien);
-            _context.Entry(eigendom).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            if (result != null) return NoContent();
+            else return NotFound();
         }
     }
 }

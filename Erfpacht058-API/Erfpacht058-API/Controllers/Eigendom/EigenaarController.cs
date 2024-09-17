@@ -9,6 +9,8 @@ using Erfpacht058_API.Data;
 using Erfpacht058_API.Models.Eigendom;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.AspNetCore.Authorization;
+using Erfpacht058_API.Repositories.Interfaces;
+using AutoMapper;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
@@ -17,32 +19,32 @@ namespace Erfpacht058_API.Controllers.Eigendom
     [ApiController]
     public class EigenaarController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
+        private readonly IEigenaarRepository _eigenaarRepo;
+        private readonly IMapper _mapper;
 
-        public EigenaarController(Erfpacht058_APIContext context)
+        public EigenaarController(IEigenaarRepository eigenaarRepository, IMapper mapper)
         {
-            _context = context;
+            _eigenaarRepo = eigenaarRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Eigenaar
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Eigenaar>>> GetEigenaar()
         {
-            return await _context.Eigenaar.ToListAsync();
+            return Ok(await _eigenaarRepo.GetEigenaren());
         }
 
         // GET: api/Eigenaar/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Eigenaar>> GetEigenaar(int id)
         {
-            var eigenaar = await _context.Eigenaar.FindAsync(id);
+           var eigenaar = await _eigenaarRepo.GetEigenaar(id);
 
-            if (eigenaar == null)
-            {
-                return NotFound();
-            }
-
-            return eigenaar;
+            if (eigenaar != null) 
+                return Ok(eigenaar);
+            else
+                return BadRequest();
         }
 
         // POST: api/Eigenaar
@@ -55,23 +57,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPost]
         public async Task<ActionResult<Eigenaar>> PostEigenaar(EigenaarDto eigenaarDto)
         {
-            var eigenaar = new Eigenaar
-            {
-                Naam = eigenaarDto.Naam,
-                Voornamen = eigenaarDto.Voornamen,
-                Voorletters = eigenaarDto.Voorletters,
-                Straatnaam = eigenaarDto.Straatnaam,
-                Huisnummer = eigenaarDto.Huisnummer,
-                Toevoeging = eigenaarDto.Toevoeging,
-                Postcode = eigenaarDto.Postcode,
-                Woonplaats = eigenaarDto.Woonplaats,
-                Debiteurnummer = eigenaarDto.Debiteurnummer,
-                Ingangsdatum = eigenaarDto.Ingangsdatum,
-                Einddatum = eigenaarDto.Einddatum
-            };
+            // Map Dto naar object
+            var eigenaar = _mapper.Map<Eigenaar>(eigenaarDto);
 
-            _context.Eigenaar.Add(eigenaar);
-            await _context.SaveChangesAsync();
+            await _eigenaarRepo.AddEigenaar(eigenaar);
 
             return Ok(eigenaar);
         }
@@ -81,49 +70,22 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("{id}")]
         public async Task<ActionResult<Eigenaar>> PutEigenaar(int id, EigenaarDto eigenaarDto)
         {
-            // Verkrijg eigenaar object van context en wijzig de attributen uit de dto
-            var eigenaar = await _context.Eigenaar.FindAsync(id);
-            if (eigenaar == null)
+            var result = await _eigenaarRepo.EditEigenaar(id, eigenaarDto);
+
+            if (result != null)
+                return Ok(result);
+            else
                 return BadRequest();
-
-            eigenaar.Naam = eigenaarDto.Naam;
-            eigenaar.Voornamen = eigenaarDto.Voornamen;
-            eigenaar.Voorletters = eigenaarDto.Voorletters;
-            eigenaar.Straatnaam = eigenaarDto.Straatnaam;
-            eigenaar.Huisnummer = eigenaarDto.Huisnummer;
-            eigenaar.Toevoeging = eigenaarDto.Toevoeging;
-            eigenaar.Postcode = eigenaarDto.Postcode;
-            eigenaar.Woonplaats = eigenaarDto.Woonplaats;
-            eigenaar.Debiteurnummer = eigenaarDto.Debiteurnummer;
-            eigenaar.Ingangsdatum = eigenaarDto.Ingangsdatum;
-            eigenaar.Einddatum = eigenaarDto.Einddatum;
-
-            // Wijzigingen opslaan naar database
-            _context.Entry(eigenaar).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigenaar);
         }
 
         // DELETE: api/Eigenaar/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEigenaar(int id)
         {
-            var eigenaar = await _context.Eigenaar.FindAsync(id);
-            if (eigenaar == null)
-            {
-                return NotFound();
-            }
-
-            _context.Eigenaar.Remove(eigenaar);
-            await _context.SaveChangesAsync();
+            await _eigenaarRepo.DeleteEigenaar(id);
 
             return NoContent();
         }
-
-        private bool EigenaarExists(int id)
-        {
-            return _context.Eigenaar.Any(e => e.Id == id);
-        }
     }
 }
+ 

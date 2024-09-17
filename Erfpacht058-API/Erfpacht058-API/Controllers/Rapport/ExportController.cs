@@ -12,6 +12,7 @@ using Erfpacht058_API.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Reflection;
+using Erfpacht058_API.Services;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {

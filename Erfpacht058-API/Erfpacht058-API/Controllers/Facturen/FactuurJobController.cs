@@ -10,6 +10,7 @@ using Erfpacht058_API.Models.Facturen;
 using Erfpacht058_API.Models.Rapport;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Authorization;
+using Erfpacht058_API.Services;
 
 namespace Erfpacht058_API.Controllers.Facturen
 {

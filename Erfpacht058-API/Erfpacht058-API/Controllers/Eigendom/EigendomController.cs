@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Erfpacht058_API.Data;
-using Erfpacht058_API.Models.Eigendom;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Erfpacht058_API.Controllers.Eigendom
@@ -15,19 +13,36 @@ namespace Erfpacht058_API.Controllers.Eigendom
     using Erfpacht058_API.Models.Eigendom;
     using System.Configuration;
     using Erfpacht058_API.Models.OvereenkomstNS;
+    using AutoMapper;
+    using Erfpacht058_API.Repositories.Interfaces;
 
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
     public class EigendomController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public EigendomController(Erfpacht058_APIContext context, IConfiguration configuration)
+        private readonly IEigendomRepository _eigendomRepo;
+        private readonly IAdresRepository _adresRepo;
+        private readonly IEigenaarRepository _eigenaarRepo;
+        private readonly IHerzieningRepository _herzieningRepo;
+        private readonly IBestandRepository _bestandRepository;
+        private readonly IOvereenkomstRepository _overeenkomstRepository;
+
+        public EigendomController(IConfiguration configuration, IMapper mapper, IEigendomRepository eigendomRepo, IAdresRepository adresRepository,
+            IEigenaarRepository eigenaarRepo, IHerzieningRepository herzieningRepository, IBestandRepository bestandRepository, IOvereenkomstRepository overeenkomstRepository)
         {
-            _context = context;
             _configuration = configuration;
+            _mapper = mapper;
+
+            _eigendomRepo = eigendomRepo;
+            _adresRepo = adresRepository;
+            _eigenaarRepo = eigenaarRepo;
+            _herzieningRepo = herzieningRepository;
+            _bestandRepository = bestandRepository;
+            _overeenkomstRepository = overeenkomstRepository;
         }
 
         // GET: api/Eigendom
@@ -38,7 +53,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Eigendom>>> GetEigendom()
         {
-            return await _context.Eigendom.ToListAsync();
+            return Ok(await _eigendomRepo.GetEigendommen());
         }
 
         // GET: api/Eigendom/5
@@ -49,22 +64,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpGet("{id}")]
         public async Task<ActionResult<Eigendom>> GetEigendom(int id)
         {
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Adres)
-                .Include(e => e.Eigenaar)
-                .Include(e => e.Herziening)
-                .Include(e => e.Kadaster)
-                .Include(e => e.Bestand)
-                .Include(e => e.Overeenkomst)
-                    .ThenInclude(o => o.Financien)
-                .FirstOrDefaultAsync(e => e.Id == id);
+            var eigendom = await _eigendomRepo.GetEigendom(id);
 
-            if (eigendom == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(eigendom);
+            if (eigendom != null) return Ok(eigendom);
+            else return NotFound();
         }
 
         // PUT: api/Eigendom/5
@@ -78,43 +81,14 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEigendom(int id, EigendomDto eigendomDto)
         {
-            // Verkrijg het object uit de database
-            var eigendom = await _context.Eigendom.FindAsync(id);
-            
-            if (id != eigendom.Id)
-            {
-                return BadRequest();
-            }
+            // Map de Dto naar Eigendom
+            var eigendom = _mapper.Map<Eigendom>(eigendomDto);
 
-            // Wijzig het Eigendom object met de velden uit het Dto
-            eigendom.Relatienummer = eigendomDto.Relatienummer;
-            eigendom.Ingangsdatum = eigendomDto.Ingangsdatum;
-            eigendom.Einddatum = eigendomDto.Einddatum;
-            eigendom.Complexnummer = eigendomDto.Complexnummer;
-            eigendom.EconomischeWaarde = eigendomDto.EconomischeWaarde;
-            eigendom.VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde;
-            eigendom.Notities = eigendomDto.Notities;
+            // Werk object bij in Database
+            var result = await _eigendomRepo.EditEigendom(id, eigendom);
 
-            // wijzig gewijzigde object naar database
-            _context.Entry(eigendom).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EigendomExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            if (result != null) return Ok(eigendom);
+            else return NotFound();
         }
 
         // POST: api/Eigendom
@@ -127,26 +101,11 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPost]
         public async Task<ActionResult<Eigendom>> PostEigendom(EigendomDto eigendomDto)
         {
-            // Gebruik de Dto uit het model om een nieuw eigendom aan te maken
-            var eigendom = new Eigendom
-            {
-                Adres = null,
-                Relatienummer = eigendomDto.Relatienummer,
-                Ingangsdatum = eigendomDto.Ingangsdatum,
-                Einddatum = eigendomDto.Einddatum,
-                Complexnummer = eigendomDto.Complexnummer,
-                EconomischeWaarde = eigendomDto.EconomischeWaarde,
-                VerzekerdeWaarde = eigendomDto.VerzekerdeWaarde,
-                Kadaster = null,
-                Herziening = null,
-                Notities = eigendomDto.Notities,
-            };
+            // map Dto naar Eigendom
+            var eigendom = _mapper.Map<Eigendom>(eigendomDto);
 
-            // Nieuw object toevoegen aan database
-            _context.Eigendom.Add(eigendom);
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            // Voer object op in database
+            return Ok(await _eigendomRepo.AddEigendom(eigendom));
         }
 
         // DELETE: api/Eigendom/5
@@ -158,21 +117,11 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEigendom(int id)
         {
-            var eigendom = await _context.Eigendom.FindAsync(id);
-            if (eigendom == null)
-            {
-                return NotFound();
-            }
+            // Verwijder uit DB
+            var result = await _eigendomRepo.DeleteEigendom(id);
 
-            _context.Eigendom.Remove(eigendom);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool EigendomExists(int id)
-        {
-            return _context.Eigendom.Any(e => e.Id == id);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // === Adres gerelateerde routes ===
@@ -185,7 +134,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpGet("adres")]
         public async Task<ActionResult<IEnumerable<Adres>>> GetAdressen()
         {
-            return await _context.Adres.ToListAsync();
+            return Ok(await _adresRepo.GetAdressen());
         }
 
         // POST: api/Eigendom/adres/1
@@ -197,32 +146,13 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPost("adres/{eigendomId}")]
         public async Task<ActionResult<Eigendom>> AddAdresToEigendom(int eigendomId, AdresDto adresDto)
         {
-            // Verkrijg huidig Eigendom object
-            var eigendom = await _context.Eigendom.FindAsync(eigendomId);
-            if (eigendom == null)
-                return BadRequest();
+            // Map Dto naar object
+            var adres = _mapper.Map<Adres>(adresDto);
 
-            // Voeg referentie toe naar Eigendom object in nieuwe Adres object en voeg toe aan database
-            var adres = new Adres
-            {
-                Eigendom = eigendom,
-                EigendomId = eigendomId,
-                Straatnaam = adresDto.Straatnaam,
-                Huisnummer = adresDto.Huisnummer,
-                Postcode = adresDto.Postcode,
-                Toevoeging = adresDto.Toevoeging,
-                Huisletter = adresDto.Huisletter,
-                Woonplaats = adresDto.Woonplaats,
-            };
-            _context.Adres.Add(adres);
+            var result = await _adresRepo.AddAdres(eigendomId, adres);
 
-            // Pas nieuwe relatie toe in eigendom object
-            eigendom.Adres = adres;
-            _context.Entry(eigendom).State = EntityState.Modified;
-
-            // Pas toe naar database
-            await _context.SaveChangesAsync();
-            return Ok(eigendom);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: /eigendom/adres/1
@@ -235,29 +165,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("adres/{eigendomId}")]
         public async Task<ActionResult<Adres>> EditAdres(int eigendomId, AdresDto adresDto)
         {
-            // verkrijg huidig eigendom en adres object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Adres)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) // null check
-                return BadRequest();
-            var adres = eigendom.Adres;
-            if (adres == null)
-                return BadRequest("Geen adres aanwezig in eigendom object");
+            var result = await _adresRepo.EditAdres(eigendomId, adresDto);
 
-            // Muteer het Adres object
-            adres.Straatnaam = adresDto.Straatnaam;
-            adres.Huisnummer = adresDto.Huisnummer;
-            adres.Toevoeging = adresDto.Toevoeging;
-            adres.Huisletter = adresDto.Huisletter;
-            adres.Postcode = adresDto.Postcode;
-            adres.Woonplaats = adresDto.Woonplaats;
-            
-            // Adres object opslaan
-            _context.Entry(adres).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(adres);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // === Eigenaar gerelateerde endpoints
@@ -270,39 +181,15 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="eigenaarDto"></param>
         /// <returns></returns>
         [HttpPost("eigenaar/{eigendomId}")]
-        public async Task<ActionResult<Eigendom>> AddEigenaarToEigendom(int eigendomId, EigenaarDto eigenaarDto)
+        public async Task<ActionResult<Eigendom>> AddNewEigenaarToEigendom(int eigendomId, EigenaarDto eigenaarDto)
         {
-            // Verkrijg Eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Eigenaar)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) // Null check
-                return BadRequest();
+            // Map Dto naar Eigenaar
+            var eigenaar = _mapper.Map<Eigenaar>(eigenaarDto);
 
-            // Nieuw relatie object aanmaken en relaties leggen
-            var eigenaar = new Eigenaar
-            {
-                Naam = eigenaarDto.Naam,
-                Voornamen = eigenaarDto.Voornamen,
-                Voorletters = eigenaarDto.Voorletters,
-                Straatnaam = eigenaarDto.Straatnaam,
-                Huisnummer = eigenaarDto.Huisnummer,
-                Toevoeging = eigenaarDto.Toevoeging,
-                Postcode = eigenaarDto.Postcode,
-                Woonplaats = eigenaarDto.Woonplaats,
-                Debiteurnummer = eigenaarDto.Debiteurnummer,
-                Ingangsdatum = eigenaarDto.Ingangsdatum,
-                Einddatum = eigenaarDto.Einddatum,
-            };
-            eigenaar.Eigendom.Add(eigendom);
-            eigendom.Eigenaar.Add(eigenaar);
-
-            // Nieuwe eigenaar opslaan in database
-            _context.Eigenaar.Add(eigenaar);
-            _context.Entry(eigendom).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-            return Ok(eigendom);
+            var result = await _eigenaarRepo.AddNewEigenaarToEigendom(eigendomId, eigenaar);
+            
+            if (result != null) return Ok(eigenaar);
+            else return NotFound();
         }
 
         // PUT: /eigendom/5/eigenaar/5 
@@ -313,30 +200,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="eigenaarId"></param>
         /// <returns></returns>
         [HttpPut("eigenaar/{eigendomId}/{eigenaarId}")]
-        public async Task<ActionResult<Eigendom>> addEigenaarToEigendom(int eigendomId, int eigenaarId)
+        public async Task<ActionResult<Eigenaar>> addExistingEigenaarToEigendom(int eigendomId, int eigenaarId)
         {
-            // Verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Eigenaar)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null)
-                return BadRequest();
+            var result = await _eigenaarRepo.AddExistingEigenaarToEigendom(eigendomId, eigenaarId);
 
-            // Verkrijg eigenaar object
-            var eigenaar = await _context.Eigenaar
-                .Include(e => e.Eigendom)
-                .FirstOrDefaultAsync(e => e.Id == eigenaarId);
-            if (eigenaar == null)
-                return BadRequest();
-
-            // Leg relaties vast in database
-            eigendom.Eigenaar.Add(eigenaar);
-            eigenaar.Eigendom.Add(eigendom);
-            _context.Entry(eigendom).State = EntityState.Modified;
-            _context.Entry(eigenaar).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigenaar);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: /eigendom/eigenaar/5/5
@@ -347,28 +216,12 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="eigenaarId"></param>
         /// <returns></returns>
         [HttpDelete("eigenaar/{eigendomId}/{eigenaarId}")]
-        public async Task<ActionResult<Eigendom>> DeleteEigenaarFromEigendom(int eigendomId, int eigenaarId)
+        public async Task<ActionResult<Eigenaar>> DeleteEigenaarFromEigendom(int eigendomId, int eigenaarId)
         {
-            // Verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Eigenaar)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
+            var result = await _eigenaarRepo.DeleteEigenaarFromEigendom(eigendomId, eigenaarId);
 
-            // Verkrijg eigenaar object
-            var eigenaar = await _context.Eigenaar
-                .Include(e => e.Eigendom)
-                .FirstOrDefaultAsync(e => e.Id == eigenaarId);
-            if (eigenaar == null) return BadRequest();
-
-            // Verwijder relatie uit eigendom en verwijder eigenaar object
-            eigendom.Eigenaar.Remove(eigenaar);
-            eigenaar.Eigendom.Remove(eigendom);
-            _context.Entry(eigendom).State = EntityState.Modified;
-            _context.Entry(eigenaar).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-            return Ok(eigendom);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // === HERZIENING gerelateerde velden ===
@@ -381,30 +234,15 @@ namespace Erfpacht058_API.Controllers.Eigendom
         /// <param name="herzieningDto"></param>
         /// <returns></returns>
         [HttpPost("herziening/{eigendomId}")]
-        public async Task<ActionResult<Eigendom>> AddHerzieningToEigendom(int eigendomId, HerzieningDto herzieningDto)
+        public async Task<ActionResult<Herziening>> AddHerzieningToEigendom(int eigendomId, HerzieningDto herzieningDto)
         {
-            // Verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Herziening)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if(eigendom == null) return BadRequest();
+            // map Dto naar Herziening
+            var herziening = _mapper.Map<Herziening>(herzieningDto);
 
-            // Creeer een nieuw herziening object
-            var herziening = new Herziening
-            {
-                Herzieningsdatum = herzieningDto.Herzieningsdatum,
-                VolgendeHerziening = herzieningDto.VolgendeHerziening,
-                Eigendom = eigendom,
-                EigendomId = eigendomId
-            };
+            var result = await _herzieningRepo.AddHerzieningToEigendom(eigendomId, herziening);
 
-            // Voeg toe aan database en leg relaties
-            _context.Herziening.Add(herziening);
-            eigendom.Herziening = herziening;
-            _context.Entry(eigendom).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: /eigendom/herziening/5
@@ -417,26 +255,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("herziening/{eigendomId}")]
         public async Task<ActionResult<Herziening>> UpdateHerziening(int eigendomId, HerzieningDto herzieningDto)
         {
-            // verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-               .Include(e => e.Herziening)
-               .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
+            var result = await _herzieningRepo.UpdateHerziening(eigendomId, herzieningDto);
 
-            // Verkrijg herziening van eigendom object
-            var herziening = eigendom.Herziening;
-            if (herziening == null)
-                return BadRequest();
-
-            // Wijzig object
-            herziening.Herzieningsdatum = herzieningDto.Herzieningsdatum;
-            herziening.VolgendeHerziening = herzieningDto.VolgendeHerziening;
-
-            // Sla wijzigingen op naar database
-            _context.Entry(herziening).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(herziening);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // POST: /eigendom/bestand/5
@@ -456,12 +278,6 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPost("bestand/{eigendomId}")]
         public async Task<ActionResult<Eigendom>> AddBestand(int eigendomId, BestandDtoUpload bestandDto)    
         {
-            // Verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Bestand)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
-
             // Behandel bestand
             if (bestandDto.Files == null || bestandDto.Files.Count == 0)
                 return BadRequest("Bestand niet aanwezig of geaccepteerd");
@@ -487,7 +303,6 @@ namespace Erfpacht058_API.Controllers.Eigendom
                 // Maak een nieuw database object
                 var bestand = new Bestand
                 {
-                    Eigendom = eigendom,
                     Naam = file.FileName,
                     Beschrijving = "",
                     GrootteInKb = file.Length / 1024,
@@ -495,16 +310,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
                     Pad = filepath
                 };
 
-                // Leg relaties vast en voeg toe aan context
-                eigendom.Bestand.Add(bestand);
-                _context.Bestand.Add(bestand);
+                await _bestandRepository.AddBestand(eigendomId, bestand);
             }
 
-            // Opslaan in database
-            _context.Entry(eigendom).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            return Ok();
         }
 
         // POST: api/overeenkomst/{eigendomId}
@@ -517,40 +326,13 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPost("overeenkomst/{eigendomId}")]
         public async Task<ActionResult<Eigendom>> AddOvereenkomst(int eigendomId, OvereenkomstDto overeenkomstDto)
         {
-            // Verkrijg eigendom object
-            var eigendom = await _context.Eigendom
-                .Include(e => e.Overeenkomst)
-                .FirstOrDefaultAsync(e => e.Id == eigendomId);
-            if (eigendom == null) return BadRequest();
+            // Map Dto naar overeenkomst
+            var overeenkomst = _mapper.Map<Overeenkomst>(overeenkomstDto);
 
-            // Creeer een nieuw Financien child object
-            var financien = new Financien
-            {
-                Bedrag = overeenkomstDto.Financien.Bedrag,
-                FactureringsWijze = overeenkomstDto.Financien.FactureringsWijze,
-                Frequentie = overeenkomstDto.Financien.Frequentie
-            };
-            // Creeer een nieuw overeenkomst object
-            var overeenkomst = new Overeenkomst
-            {
-                Dossiernummer = overeenkomstDto.Dossiernummer,
-                Ingangsdatum = overeenkomstDto.Ingangsdatum,
-                Einddatum = overeenkomstDto.Einddatum,
-                Grondwaarde = overeenkomstDto.Grondwaarde,
-                DatumAkte = overeenkomstDto.DatumAkte,
-                Rentepercentage = overeenkomstDto.Rentepercentage,
-                Eigendom = eigendom,
-                Financien = financien
-            };
+            var result = await _overeenkomstRepository.AddOvereenkomst(eigendomId, overeenkomst);
 
-            // Leg relaties vast en sla object op in database
-            _context.Financien.Add(financien);
-            _context.Overeenkomst.Add(overeenkomst);
-            eigendom.Overeenkomst.Add(overeenkomst);
-            _context.Entry(eigendom).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: /eigendom/overeenkomst/5/5
@@ -563,20 +345,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("overeenkomst/{eigendomId}/{overeenkomstId}")]
         public async Task<ActionResult<Eigendom>> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId)
         {
-            // Verkrijg eigendom en overeenkomst objecten
-            var eigendom = await _context.Eigendom.FindAsync(eigendomId);
-            if (eigendom == null) return BadRequest();
-            var overeenkomst = await _context.Overeenkomst.FindAsync(overeenkomstId);
-            if (overeenkomst == null) return BadRequest();
+            var result = _overeenkomstRepository.KoppelOvereenkomstAanEigendom(eigendomId, overeenkomstId);
 
-            // Relaties leggen en opslaan
-            eigendom.Overeenkomst.Add(overeenkomst);
-            overeenkomst.Eigendom = eigendom;
-            _context.Entry(eigendom).State = EntityState.Modified;
-            _context.Entry(overeenkomst).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(eigendom);
+            if (result != null) return Ok(result); 
+            else return NotFound();
         }
     }
 }

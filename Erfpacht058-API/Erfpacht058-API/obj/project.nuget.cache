@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "FzTC5gJw8csWkPNpoPxl/yzRqZxA41NLSvwpBLoBE9s4X/x9YIMWVekj/ThAFFdPmMmtdzWwsmpaYFoQ58FixQ==",
+  "dgSpecHash": "jaC7wXtoAGBEJ0N6QppHy0hbDULm56mS185RlHjlrqMBkDeAHMZiet8O0fypFMn0BPzU2WkRHM5apFVTRJPuxQ==",
   "success": true,
   "projectFilePath": "C:\\repos\\Erfpacht058\\Erfpacht058-API\\Erfpacht058-API\\Erfpacht058-API.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\e94\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\e94\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",

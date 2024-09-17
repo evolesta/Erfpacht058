@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Data;
 using Erfpacht058_API.Models;
 using Microsoft.AspNetCore.Authorization;
+using Erfpacht058_API.Repositories.Interfaces;
+using AutoMapper;
 
 namespace Erfpacht058_API.Controllers.Eigendom
 {
@@ -17,34 +19,25 @@ namespace Erfpacht058_API.Controllers.Eigendom
     [ApiController]
     public class BestandController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
+        private readonly IBestandRepository _bestandRepo;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public BestandController(Erfpacht058_APIContext context, IConfiguration configuration)
+        public BestandController(IBestandRepository bestandRepository, IConfiguration configuration, IMapper mapper)
         {
-            _context = context;
+            _bestandRepo = bestandRepository;
             _configuration = configuration;
-        }
-
-        // GET: api/Bestand
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Bestand>>> GetBestand()
-        {
-            return await _context.Bestand.ToListAsync();
+            _mapper = mapper;
         }
 
         // GET: api/Bestand/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Bestand>> GetBestand(int id)
         {
-            var bestand = await _context.Bestand.FindAsync(id);
+            var bestand = await _bestandRepo.GetBestand(id);
 
-            if (bestand == null)
-            {
-                return NotFound();
-            }
-
-            return bestand;
+            if (bestand != null) return Ok(bestand);
+            else return NotFound();
         }
 
         // GET: /api/bestand/download/5
@@ -57,15 +50,18 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpGet("download/{id}")]
         public async Task<ActionResult> DownloadBestand(int id)
         {
-            // Verkrijg bestand object van database
-            var bestand = await _context.Bestand.FindAsync(id);
-           if (bestand == null) return BadRequest();
+            // Verkrijg bestand van repo
+            var bestand = await _bestandRepo.GetBestand(id);
+
+            if (bestand == null)
+                return NotFound();
 
             // Verkrijg bestandspad naar bestand
             var basePath = _configuration["Bestanden:OpslagPad"];
             var filepath = basePath + bestand.Pad;
             if (!System.IO.File.Exists(filepath)) return BadRequest();
 
+            // Creeer een memoryStream om het bestand als download aan te bieden
             var memory = new MemoryStream();
             await using(var stream = new FileStream(filepath, FileMode.Open))
             {
@@ -95,17 +91,10 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBestand(int id, BestandDto bestandDto)
         {
-            var bestand = await _context.Bestand.FindAsync(id);
-            if (bestand == null) return BadRequest();
+            var result = await _bestandRepo.UpdateBestand(id, bestandDto);
 
-            bestand.Naam = bestandDto.Naam;
-            bestand.Beschrijving = bestandDto.Beschrijving;
-            bestand.SoortBestand = (SoortBestand)bestandDto.SoortBestand;
-            
-            _context.Entry(bestand).State = EntityState.Modified; 
-            await _context.SaveChangesAsync(); 
-
-            return Ok(bestand);
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // DELETE: api/Bestand/5
@@ -117,24 +106,19 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBestand(int id)
         {
-            var bestand = await _context.Bestand
-                .Include(e => e.Eigendom)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (bestand == null) return NotFound();
-            var eigendom = bestand.Eigendom;
+            var result = await _bestandRepo.DeleteBestand(id);
 
-            // Verwijder bestand uit storage
-            var basePath = _configuration["Bestanden:OpslagPad"];
-            var filepath = basePath + bestand.Pad;
-            System.IO.File.Delete(filepath);
+            if (result != null)
+            {
+                // Verwijder bestand uit storage
+                var basePath = _configuration["Bestanden:OpslagPad"];
+                var filepath = basePath + result.Pad;
+                System.IO.File.Delete(filepath);
 
-            // Verwijder relaties en verwerk naar database
-            eigendom.Bestand.Remove(bestand);
-            _context.Bestand.Remove(bestand);
-            _context.Entry(bestand).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return NoContent();
+            }
+            else
+                return NotFound();
         }
     }
 }

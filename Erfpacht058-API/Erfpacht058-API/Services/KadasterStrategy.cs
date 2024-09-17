@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
-namespace Erfpacht058_API.Controllers.Eigendom
+namespace Erfpacht058_API.Services
 {
     // Strategy pattern toegepast zodat in een later stadium de Kadaster API eenvoudig geimplementeerd kan worden met weinig refactoring van code
     public interface IKadasterAPIService
@@ -32,7 +32,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
             // Verkrijg API sleutel
             var settings = await _context.Settings.FindAsync(1);
             var BAGAPIKey = settings.BAGAPI;
-            if (string.IsNullOrEmpty(BAGAPIKey)) 
+            if (string.IsNullOrEmpty(BAGAPIKey))
                 throw new Exception("Geen BAG API sleutel gevonden");
 
             // Stel zoek parameters samen met String builder
@@ -70,7 +70,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
     {
         public KadasterAPIService()
         {
-               // empty constructor
+            // empty constructor
         }
 
         public async Task<Dictionary<string, object>> RetrieveSingleDataAsync()

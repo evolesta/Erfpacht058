@@ -8,7 +8,9 @@ using System.Reflection;
 using Erfpacht058_API.Controllers.Eigendom;
 using System.Configuration;
 using Microsoft.AspNetCore.Http;
-using Erfpacht058_API.Controllers;
+using Erfpacht058_API.Services;
+using Erfpacht058_API.Repositories.Interfaces;
+using Erfpacht058_API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,17 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<TaskQueueHostedService>();
 builder.Services.AddHostedService(provider => provider.GetService<TaskQueueHostedService>());
 builder.Services.AddHttpClient();
+
+// Voeg Automapper toe
+builder.Services.AddAutoMapper(typeof(Program));
+
+// Voeg repositories toe voor Dependency injection
+builder.Services.AddScoped<IEigendomRepository, EigendomRepository>();
+builder.Services.AddScoped<IBestandRepository, BestandRepository>();
+builder.Services.AddScoped<IAdresRepository, AdresRepository>();
+builder.Services.AddScoped<IEigenaarRepository, EigenaarRepository>();
+builder.Services.AddScoped<IHerzieningRepository, HerzieningRepository>();
+builder.Services.AddScoped<IOvereenkomstRepository, OvereenkomstRepository>();
 
 // Swagger API Documentatie genereren
 builder.Services.AddEndpointsApiExplorer();

@@ -18,7 +18,7 @@ using System.IO.Compression;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.InkML;
 
-namespace Erfpacht058_API.Controllers
+namespace Erfpacht058_API.Services
 {
     public class TaskQueueHostedService : BackgroundService
     {
@@ -386,7 +386,7 @@ namespace Erfpacht058_API.Controllers
                 // Relaties leggen en toevoegen aan context
                 context.Factuur.Add(factuur);
                 factuurJob.Facturen.Add(factuur);
-                context.Entry(factuurJob).State = EntityState.Modified; 
+                context.Entry(factuurJob).State = EntityState.Modified;
 
                 await context.SaveChangesAsync();
 

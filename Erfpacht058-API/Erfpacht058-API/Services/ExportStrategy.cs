@@ -7,7 +7,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Erfpacht058_API.Controllers.Rapport
+namespace Erfpacht058_API.Services
 {
     // Interface voor de strategieen om te implementeren
     public interface IExportStrategy
@@ -81,7 +81,7 @@ namespace Erfpacht058_API.Controllers.Rapport
                             });
 
                             // Loop door de rijen heen en stel een collectie cellen op
-                            for (var i = 0; i < amountRows; i++) 
+                            for (var i = 0; i < amountRows; i++)
                             {
                                 foreach (var column in data)
                                 {
@@ -149,7 +149,7 @@ namespace Erfpacht058_API.Controllers.Rapport
                 worksheetPart.Worksheet = new Worksheet(new SheetData());
 
                 // Sheet toevoegen aan workbook
-                Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
+                Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild(new Sheets());
                 Sheet sheet = new Sheet()
                 {
                     Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
@@ -209,7 +209,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             _exportStrategy = exportStrategy;
         }
 
-        public string GenerateFile(Dictionary<string, List<object>> data, IConfiguration config, Export export) 
+        public string GenerateFile(Dictionary<string, List<object>> data, IConfiguration config, Export export)
         {
             return _exportStrategy.GenerateFile(data, config, export);
         }

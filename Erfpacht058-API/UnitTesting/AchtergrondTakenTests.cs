@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
-using Erfpacht058_API.Controllers;
 using Erfpacht058_API.Controllers.Facturen;
 using Erfpacht058_API.Controllers.Rapport;
 using Erfpacht058_API.Data;
@@ -8,6 +7,7 @@ using Erfpacht058_API.Models.Eigendom;
 using Erfpacht058_API.Models.Facturen;
 using Erfpacht058_API.Models.OvereenkomstNS;
 using Erfpacht058_API.Models.Rapport;
+using Erfpacht058_API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
