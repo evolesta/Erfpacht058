@@ -1,4 +1,6 @@
 ﻿using Erfpacht058_API.Data;
+using Erfpacht058_API.Models;
+using Erfpacht058_API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +17,11 @@ namespace Erfpacht058_API.Controllers
     public class AuthenticatieController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly Erfpacht058_APIContext _context;
+        private readonly IGebruikerRepository _gebruikerRepository;
 
-        public AuthenticatieController(Erfpacht058_APIContext context, IConfiguration configuration)
+        public AuthenticatieController(IGebruikerRepository gebruikerRepository, IConfiguration configuration)
         {
-            _context = context;
+            _gebruikerRepository = gebruikerRepository;
             _configuration = configuration;
         }
 
@@ -44,7 +46,7 @@ namespace Erfpacht058_API.Controllers
                 return BadRequest("Geen valide credentials opgegeven.");
 
             // Verkrijg gebruiker uit Database
-            var gebruiker = await _context.Gebruiker.FirstOrDefaultAsync(u => u.Emailadres == credentials.Emailadres);
+            var gebruiker = await _gebruikerRepository.ZoekGebruiker(credentials.Emailadres);
 
             // Controleer of de gebruiker is gevonden
             if (gebruiker == null)
@@ -53,11 +55,7 @@ namespace Erfpacht058_API.Controllers
             // Controleer max. loging Pogingen
             if (gebruiker.LogingPoging >= 3)
             {
-                // Zet gebruiker inactief
-                gebruiker.Actief = false;
-                _context.Entry(gebruiker).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-
+                _gebruikerRepository.LockGebruiker(gebruiker);
                 return BadRequest();
             }
 
@@ -70,9 +68,7 @@ namespace Erfpacht058_API.Controllers
             {
                 // Wachtwoord is correct
                 // Reset login pogingen
-                gebruiker.LogingPoging = 0;
-                _context.Entry(gebruiker).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
+                _gebruikerRepository.ResetLogin(gebruiker);
                 
                 // Genereer token en geef terug
                 var naam = gebruiker.Voornamen + " " + gebruiker.Naam;
@@ -82,11 +78,7 @@ namespace Erfpacht058_API.Controllers
             }
             else
             {
-                // Wachtwoord is incorrect
-                gebruiker.LogingPoging++; // Verhoog verk. loging pogingen
-                _context.Entry(gebruiker).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-
+                _gebruikerRepository.FouteLogin(gebruiker);
                 return BadRequest("Geen valide credentials opgegeven."); // Geen correct wachtwoord
             }
             
@@ -116,12 +108,5 @@ namespace Erfpacht058_API.Controllers
         }
     }
 
-    // Dto voor het authenticeren op de API
-    public class Credentials
-    {
-        [Required]
-        public string Emailadres { get; set; }
-        [Required]
-        public string Wachtwoord { get; set; }
-    }
+
 }

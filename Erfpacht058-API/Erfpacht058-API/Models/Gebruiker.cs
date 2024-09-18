@@ -1,5 +1,6 @@
 ﻿using Erfpacht058_API.Models.Facturen;
 using Erfpacht058_API.Models.Rapport;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Erfpacht058_API.Models
@@ -44,5 +45,13 @@ namespace Erfpacht058_API.Models
     public class WachtwoordDto
     {
         public string Wachtwoord { set; get; }
+    }
+
+    public class Credentials
+    {
+        [Required]
+        public string Emailadres { get; set; }
+        [Required]
+        public string Wachtwoord { get; set; }
     }
 }

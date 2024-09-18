@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Data;
 using Erfpacht058_API.Models;
 using Microsoft.AspNetCore.Authorization;
+using Erfpacht058_API.Repositories.Interfaces;
 
 namespace Erfpacht058_API.Controllers
 {
@@ -18,10 +19,12 @@ namespace Erfpacht058_API.Controllers
     public class GebruikersController : ControllerBase
     {
         private readonly Erfpacht058_APIContext _context;
+        private readonly IGebruikerRepository _gebruikerRepository;
 
-        public GebruikersController(Erfpacht058_APIContext context)
+        public GebruikersController(Erfpacht058_APIContext context, IGebruikerRepository gebruikerRepository)
         {
             _context = context;
+            _gebruikerRepository = gebruikerRepository;
         }
 
         // GET: api/Gebruikers
@@ -32,30 +35,14 @@ namespace Erfpacht058_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GebruikerDto>>> GetGebruiker()
         {
-            // Dto (data transfer object) toepassen om het wachtwoord veld te excluden van de response
-            var Gebruikers = from u in _context.Gebruiker
-                             select new GebruikerDto()
-                             { Id = u.Id, Voornamen = u.Voornamen, Naam = u.Naam, Actief = u.Actief, Emailadres = u.Emailadres, Role = u.Role };
-            
-            return await Gebruikers.ToListAsync();
+            return Ok(await _gebruikerRepository.GetGebruikers());
         }
 
         // GET: api/Gebruikers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<GebruikerDto>> GetGebruiker(int id)
         {
-            // Dto toepassen om het wachtwoord veld te excluden van de response
-            var gebruiker = await _context.Gebruiker.Select(u =>
-                new GebruikerDto()
-                { Id = u.Id, Voornamen = u.Voornamen, Naam = u.Naam, Actief = u.Actief, Emailadres = u.Emailadres, Role = u.Role })
-                .SingleOrDefaultAsync(u => u.Id == id);
-
-            if (gebruiker == null)
-            {
-                return NotFound();
-            }
-
-            return gebruiker;
+            return Ok(await _gebruikerRepository.GetGebruiker(id));
         }
 
         // PUT: api/Gebruikers/5
@@ -69,39 +56,10 @@ namespace Erfpacht058_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGebruiker(int id, GebruikerDto gebruikerDto)
         {
-            // Verkrijg gebruiker object en wijzig
-            var gebruiker = await _context.Gebruiker.FindAsync(id);
-            if (gebruiker == null) return BadRequest();
+            var result = _gebruikerRepository.EditGebruiker(id, gebruikerDto);
 
-            gebruiker.Naam = gebruikerDto.Naam;
-            gebruiker.Voornamen = gebruikerDto.Voornamen;
-            gebruiker.Emailadres = gebruikerDto.Emailadres;
-            gebruiker.Role = gebruikerDto.Role;
-            gebruiker.Actief = gebruikerDto.Actief;
-
-            // Als gebruiker op actief wordt gezet, reset dan de inlogpogingen
-            if (gebruiker.Actief)
-                gebruiker.LogingPoging = 0;
-
-            _context.Entry(gebruiker).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GebruikerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // PUT: api/Gebruikers/wachtwoord/5
@@ -114,53 +72,28 @@ namespace Erfpacht058_API.Controllers
         [HttpPut("wachtwoord/{id}")]
         public async Task<ActionResult> UpdateWachtwoord(int id, WachtwoordDto wachtwoord)
         {
-            // Verkrijg gebruiker
-            var gebruiker = await _context.Gebruiker.FindAsync(id);
-            if (gebruiker == null) return BadRequest();
+            var result = _gebruikerRepository.EditWachtwoord(id, wachtwoord);
 
-            // Hash en update het nieuwe wachtwoord
-            gebruiker.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(wachtwoord.Wachtwoord);
-
-            // Opslaan naar database
-            _context.Entry(gebruiker).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // POST: api/Gebruikers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Gebruiker>> PostGebruiker(Gebruiker gebruiker)
+        public async Task<ActionResult<Gebruiker>> PostGebruiker(GebruikerDto gebruikerDto)
         {
-            // Hash wachtwoord
-            gebruiker.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(gebruiker.Wachtwoord);
-            
-            _context.Gebruiker.Add(gebruiker);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetGebruiker", new { id = gebruiker.Id }, gebruiker);
+            return Ok(await _gebruikerRepository.AddGebruiker(gebruikerDto));
         }
 
         // DELETE: api/Gebruikers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGebruiker(int id)
         {
-            var gebruiker = await _context.Gebruiker.FindAsync(id);
-            if (gebruiker == null)
-            {
-                return NotFound();
-            }
+            var result = _gebruikerRepository.DeleteGebruiker(id);
 
-            _context.Gebruiker.Remove(gebruiker);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool GebruikerExists(int id)
-        {
-            return _context.Gebruiker.Any(e => e.Id == id);
+            if (result != null) return Ok();
+            else return NotFound(); 
         }
     }
 }

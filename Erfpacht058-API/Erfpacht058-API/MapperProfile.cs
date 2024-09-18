@@ -22,6 +22,8 @@ namespace Erfpacht058_API
             CreateMap<OvereenkomstDto, Overeenkomst>()
                 .ForMember(dest => dest.Financien, opt => opt.MapFrom(src => src.Financien));
             CreateMap<FinancienDto, Financien>();
+            CreateMap<GebruikerDto, Gebruiker>();
+            CreateMap<Gebruiker, GebruikerDto>();
         }
     }
 }
