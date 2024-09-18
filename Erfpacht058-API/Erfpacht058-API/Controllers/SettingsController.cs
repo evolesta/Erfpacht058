@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Erfpacht058_API.Data;
 using Erfpacht058_API.Models;
 using Microsoft.AspNetCore.Authorization;
+using Erfpacht058_API.Repositories.Interfaces;
 
 namespace Erfpacht058_API.Controllers
 {
@@ -20,11 +21,11 @@ namespace Erfpacht058_API.Controllers
         // De settings staan in een enkele rij met PK = 1
         // Daarom is er enkel een GET en PUT endpoint aanwezig
 
-        private readonly Erfpacht058_APIContext _context;
+        private readonly ISettingsRepository _settingsRepo;
 
-        public SettingsController(Erfpacht058_APIContext context)
+        public SettingsController(ISettingsRepository settingsRepo)
         {
-            _context = context;
+            _settingsRepo = settingsRepo;
         }
 
         // GET: api/Settings
@@ -32,7 +33,7 @@ namespace Erfpacht058_API.Controllers
         public async Task<ActionResult<Settings>> GetSettings()
         {
             // Geef altijd de eerste rij terug
-            return await _context.Settings.FindAsync(1);
+            return await _settingsRepo.GetSettings();
         }
 
         // PUT: api/Settings/5
@@ -40,17 +41,9 @@ namespace Erfpacht058_API.Controllers
         [HttpPut]
         public async Task<IActionResult> PutSettings(SettingsDto settingsDto)
         {
-            // Verkrijg de rij met settings, altijd met PK 1
-            var settings = await _context.Settings.FindAsync(1);
+            var result = await _settingsRepo.EditSettings(settingsDto);
 
-            // werk object bij
-            settings.BAGAPI = settingsDto.BAGAPIkey;
-
-            // Werk bij in context
-            _context.Entry(settings).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(settings);
+            return Ok(result);
         }
     }
 }

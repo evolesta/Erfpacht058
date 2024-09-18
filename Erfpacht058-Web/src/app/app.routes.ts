@@ -26,6 +26,7 @@ import { ModVertaaltabelComponent } from './app/import/vertaaltabellen/mod-verta
 import { AddImportComponent } from './app/import/add-import/add-import.component';
 import { FacturatieComponent } from './app/facturatie/facturatie.component';
 import { AddFacturatieComponent } from './app/facturatie/add-facturatie/add-facturatie.component';
+import { SettingsComponent } from './app/settings/settings.component';
 
 export const routes: Routes = [
     // Publieke routes
@@ -70,6 +71,7 @@ export const routes: Routes = [
             { path: 'usermanagement', component: UsermanagementComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/add', component: ModUserComponent, canActivate: [adminGuard] },
             { path: 'usermanagement/edit/:id', component: ModUserComponent, canActivate: [adminGuard] },
+            { path: 'settings', component: SettingsComponent, canActivate: [adminGuard] },
         ]
     },
 ];

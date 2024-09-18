@@ -1,0 +1,12 @@
+<h1>Instellingen</h1>
+
+<form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+    <mat-form-field class="full-width">
+        <mat-label>BAG API sleutel</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="bagapi">
+        <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        <mat-hint>De geheime sleutel voor toegang tot de BAG API van het Kadaster.</mat-hint>
+    </mat-form-field>
+
+    <p><button mat-raised-button color="primary"><mat-icon>save</mat-icon> Opslaan</button></p>
+</form>

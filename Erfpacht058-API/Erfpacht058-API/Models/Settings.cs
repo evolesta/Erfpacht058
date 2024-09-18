@@ -8,6 +8,6 @@
 
     public class SettingsDto
     {
-        public string? BAGAPIkey { get; set; }
+        public string? BAGAPI { get; set; }
     }
 }

@@ -24,6 +24,7 @@ namespace Erfpacht058_API
             CreateMap<FinancienDto, Financien>();
             CreateMap<GebruikerDto, Gebruiker>();
             CreateMap<Gebruiker, GebruikerDto>();
+            CreateMap<SettingsDto, Settings>();
         }
     }
 }

@@ -14,6 +14,7 @@
             <a mat-list-item routerLink="/app/import" matTooltip="Imports"><mat-icon>publish</mat-icon></a>
             <a mat-list-item routerLink="/app/facturatie" matTooltip="Facturen"><mat-icon>payments</mat-icon></a>
             <a mat-list-item *ngIf="helper.isAdministrator()" routerLink="/app/usermanagement" matTooltip="Gebruikersbeheer"><mat-icon>account_circle</mat-icon></a>
+            <a mat-list-item *ngIf="helper.isAdministrator()" routerLink="/app/settings" matTooltip="Instellingen"><mat-icon>settings</mat-icon></a>
         </mat-nav-list>
     </mat-drawer>
 
