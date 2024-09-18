@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Reflection;
 using Erfpacht058_API.Services;
+using Erfpacht058_API.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
+using System.Composition;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
@@ -21,40 +24,32 @@ namespace Erfpacht058_API.Controllers.Rapport
     [ApiController]
     public class ExportController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
         private readonly TaskQueueHostedService _taskQueueHostedService;
+        private readonly IExportRepository _exportRepo;
+        private readonly IGebruikerRepository _gebruikerRepo;
 
-        public ExportController(Erfpacht058_APIContext context, TaskQueueHostedService taskQueueHostedService)
+        public ExportController(TaskQueueHostedService taskQueueHostedService, IExportRepository exportRepository, IGebruikerRepository gebruikerRepo)
         {
-            _context = context;
             _taskQueueHostedService = taskQueueHostedService;
+            _exportRepo = exportRepository;
+            _gebruikerRepo = gebruikerRepo;
         }
 
         // GET: api/Export
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Export>>> GetExport()
         {
-            return await _context.Export
-                .Include(e => e.Task)
-                .Include(e => e.Template)
-                .ToListAsync();
+            return Ok(await _exportRepo.GetExports());
         }
 
         // GET: api/Export/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Export>> GetExport(int id)
         {
-            var export = await _context.Export
-                .Include(e => e.Task)
-                .Include(e => e.Template)
-                .FirstOrDefaultAsync(e  => e.Id == id); 
+            var result = await _exportRepo.GetExport(id);
 
-            if (export == null)
-            {
-                return NotFound();
-            }
-
-            return export;
+            if(result != null) return Ok(result);
+            else return NotFound();
         }
 
         // POST: api/Export
@@ -64,40 +59,20 @@ namespace Erfpacht058_API.Controllers.Rapport
         {
             // Verkrijg huidige gebruiker
             var username = User.Claims.FirstOrDefault(user => user.Type == "Username")?.Value;
-            var user = await _context.Gebruiker.FirstOrDefaultAsync(u => u.Emailadres == username);
-            var template = await _context.Template.FindAsync(exportDto.TemplateId);
-            if (template == null) return BadRequest();
+            var user = await _gebruikerRepo.ZoekGebruiker(username);
             
-            // Maak een nieuwe Export Taak aan
-            var export = new Export
+            // Voer export op
+            var result = _exportRepo.AddExport(exportDto, user);
+
+            if (result != null)
             {
-                Formaat = exportDto.Formaat,
-                Template = template,
-                AanmaakDatum = DateTime.Now,
-                Gebruiker = user
-            };
+                // Voeg Task toe aan queue en voer taak uit
+                _taskQueueHostedService.EnqueueTask(result.Result.Task);
 
-            // Maak een nieuwe Taak aan
-            var task = new TaskQueue
-            {
-                SoortTaak = SoortTaak.Export,
-                Status = Status.Nieuw,
-                Prioriteit = Prioriteit.Midden,
-                AanmaakDatum = DateTime.Now,
-                Export = export
-            };
-
-            export.Task = task; // Update Export relatie Taak
-
-            _context.Export.Add(export);
-            _context.TaskQueue.Add(task);
-
-            await _context.SaveChangesAsync();
-
-            // Voeg Task toe aan queue en voer taak uit
-            _taskQueueHostedService.EnqueueTask(task);
-
-            return Ok(export);
+                return Ok(result);
+            }
+            else
+                return NotFound();
         }
 
         // GET: /api/Export/download/5
@@ -110,10 +85,10 @@ namespace Erfpacht058_API.Controllers.Rapport
         public async Task<ActionResult> DownloadExport(int id)
         {
             // Verkrijg export object van DB
-            var export = await _context.Export
-                .Include(e => e.Task)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (export == null) return BadRequest();
+            var export = await _exportRepo.GetExport(id);
+
+            if (export == null) 
+                return NotFound();
 
             // Check of Taak succesvol is
             if (export.Task.Status != Status.Succesvol)
@@ -156,10 +131,10 @@ namespace Erfpacht058_API.Controllers.Rapport
         public async Task<ActionResult> GetStatus(int id)
         {
             // Verkrijg export object van DB
-            var export = await _context.Export
-                .Include(e => e.Task)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (export == null) return BadRequest();
+            var export = await _exportRepo.GetExport(id);
+
+            if (export == null) 
+                return NotFound();
 
             // Status response opstellen
             return Ok(export.Task);

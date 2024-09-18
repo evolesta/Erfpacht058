@@ -9,6 +9,7 @@ using Erfpacht058_API.Data;
 using Erfpacht058_API.Models.Rapport;
 using Microsoft.AspNetCore.Authorization;
 using Erfpacht058_API.Services;
+using Erfpacht058_API.Repositories.Interfaces;
 
 namespace Erfpacht058_API.Controllers.Rapport
 {
@@ -17,38 +18,34 @@ namespace Erfpacht058_API.Controllers.Rapport
     [ApiController]
     public class ImportController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
         private readonly IConfiguration _configuration;
         private readonly TaskQueueHostedService _taskQueueHostedService;
+        private readonly IImportRepository _importRepo;
+        private readonly IGebruikerRepository _gebruikerRepo;
 
-        public ImportController(Erfpacht058_APIContext context, IConfiguration configuration, TaskQueueHostedService taskQueueHostedService)
+        public ImportController(IConfiguration configuration, TaskQueueHostedService taskQueueHostedService, IImportRepository importRepository, IGebruikerRepository gebruikerRepo)
         {
-            _context = context;
             _configuration = configuration;
             _taskQueueHostedService = taskQueueHostedService;
+            _importRepo = importRepository;
+            _gebruikerRepo = gebruikerRepo;
         }
 
         // GET: api/Import
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Import>>> GetImport()
         {
-            return await _context.Import
-                .Include(e => e.Task)
-                .Include(e => e.TranslateModel)
-                .ToListAsync();
+            return Ok(await _importRepo.GetImports());
         }
 
         // GET: api/Import/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Import>> GetImport(int id)
         {
-            var import = await _context.Import
-                .Include(x => x.Task)
-                .Include(x => x.TranslateModel)
-                .FirstOrDefaultAsync(x => x.Id == id);
-            if (import == null) return BadRequest();
+            var result = _importRepo.GetImport(id);
 
-            return Ok(import);
+            if (result == null) return Ok(result);
+            else return NotFound();
         }
 
         // POST: api/Import
@@ -65,12 +62,7 @@ namespace Erfpacht058_API.Controllers.Rapport
             // Verkrijg huidige gebruiker en vertaaltabel
             var username = User.Claims
                 .FirstOrDefault(user => user.Type == "Username")?.Value;
-            var user = await _context.Gebruiker
-                .FirstOrDefaultAsync(u => u.Emailadres == username);
-
-            var translationTabel = await _context.TranslateModel
-                .FirstOrDefaultAsync(x => x.Id == translateModelId);
-            if (translationTabel == null) return BadRequest();
+            var user = await _gebruikerRepo.ZoekGebruiker(username);            
 
             // CSV bestand verwerken naar lokale storage
             var filepath = _configuration["Bestanden:ImportPad"] + "/Import-CSV-" + (new Random().Next(1, 999999999).ToString()) + ".csv";
@@ -79,36 +71,17 @@ namespace Erfpacht058_API.Controllers.Rapport
                 await csvFile.CopyToAsync(stream);
             }
 
-            // Nieuw import entry maken
-            var import = new Import
+            var result = _importRepo.AddImport(translateModelId, user, filepath);
+
+            if (result != null)
             {
-                Aanmaakdatum = DateTime.Now,
-                Gebruiker = user,
-                TranslateModel = translationTabel,
-                importPad = filepath
-            };
+                // Nieuwe taak toevoegen naar background worker
+                _taskQueueHostedService.EnqueueTask(result.Result.Task);
 
-            // Nieuwe taak aanmaken
-            var task = new TaskQueue
-            {
-                SoortTaak = SoortTaak.Import,
-                AanmaakDatum = DateTime.Now,
-                Status = Status.Nieuw,
-                Prioriteit = Prioriteit.Midden,
-                Import = import
-            };
-
-            // Relaties leggen en entrys toevoegen aan context
-            import.Task = task;
-            _context.Import.Add(import);
-            _context.TaskQueue.Add(task);
-            await _context.SaveChangesAsync();
-
-            // Nieuwe taak toevoegen naar background worker
-            _taskQueueHostedService.EnqueueTask(task);
-
-            return Ok(import);
-
+                return Ok(result);
+            }
+            else
+                return NotFound();
         }
     }
 }

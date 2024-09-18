@@ -34,6 +34,7 @@ builder.Services.AddScoped<IHerzieningRepository, HerzieningRepository>();
 builder.Services.AddScoped<IOvereenkomstRepository, OvereenkomstRepository>();
 builder.Services.AddScoped<IGebruikerRepository, GebruikerRepository>();
 builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+builder.Services.AddScoped<IExportRepository, ExportRepository>();
 
 // Swagger API Documentatie genereren
 builder.Services.AddEndpointsApiExplorer();
