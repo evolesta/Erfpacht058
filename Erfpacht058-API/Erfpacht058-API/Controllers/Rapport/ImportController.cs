@@ -23,7 +23,8 @@ namespace Erfpacht058_API.Controllers.Rapport
         private readonly IImportRepository _importRepo;
         private readonly IGebruikerRepository _gebruikerRepo;
 
-        public ImportController(IConfiguration configuration, TaskQueueHostedService taskQueueHostedService, IImportRepository importRepository, IGebruikerRepository gebruikerRepo)
+        public ImportController(IConfiguration configuration, TaskQueueHostedService taskQueueHostedService, 
+            IImportRepository importRepository, IGebruikerRepository gebruikerRepo)
         {
             _configuration = configuration;
             _taskQueueHostedService = taskQueueHostedService;

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using System.Text.Json.Serialization;
 
 namespace Erfpacht058_API.Models.Rapport
 {
@@ -82,5 +83,17 @@ namespace Erfpacht058_API.Models.Rapport
         public string Key { get; set; }
         public Operator Operation { get; set; }
         public string Value { get; set; }
+    }
+
+    public class EntityModelStructure
+    {
+        public string TableName { get; set; }
+        public List<PropertyModel> Properties { get; set; }
+    }
+
+    public class PropertyModel
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
     }
 }

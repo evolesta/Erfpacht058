@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Erfpacht058_API.Models;
 using Erfpacht058_API.Models.Eigendom;
+using Erfpacht058_API.Models.Facturen;
 using Erfpacht058_API.Models.OvereenkomstNS;
 using Erfpacht058_API.Models.Rapport;
 
@@ -27,6 +28,9 @@ namespace Erfpacht058_API
             CreateMap<Gebruiker, GebruikerDto>();
             CreateMap<SettingsDto, Settings>();
             CreateMap<ExportDto, Export>();
+            CreateMap<TemplateDto, Template>(); 
+            CreateMap<TranslateModelDto, TranslateModel>();
+            CreateMap<FactuurJobDto, FactuurJob>();
         }
     }
 }

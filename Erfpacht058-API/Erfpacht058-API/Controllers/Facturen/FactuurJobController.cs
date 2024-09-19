@@ -11,6 +11,7 @@ using Erfpacht058_API.Models.Rapport;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Authorization;
 using Erfpacht058_API.Services;
+using Erfpacht058_API.Repositories.Interfaces;
 
 namespace Erfpacht058_API.Controllers.Facturen
 {
@@ -19,35 +20,33 @@ namespace Erfpacht058_API.Controllers.Facturen
     [ApiController]
     public class FactuurJobController : ControllerBase
     {
-        private readonly Erfpacht058_APIContext _context;
         private readonly TaskQueueHostedService _taskQueueHostedService;
+        private readonly IFactuurJobRepository _factuurJobRepo;
+        private readonly IGebruikerRepository _gebruikerRepo;
 
-        public FactuurJobController(Erfpacht058_APIContext context, TaskQueueHostedService taskQueueHostedService)
+        public FactuurJobController(TaskQueueHostedService taskQueueHostedService, IFactuurJobRepository factuurJobRepository, 
+            IGebruikerRepository gebruikerRepo)
         {
-            _context = context;
             _taskQueueHostedService = taskQueueHostedService;
+            _factuurJobRepo = factuurJobRepository;
+            _gebruikerRepo = gebruikerRepo;
         }
 
         // GET: api/FactuurJob
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FactuurJob>>> GetFactuurJob()
         {
-            return await _context.FactuurJob
-                .Include(e=> e.Task)
-                .ToListAsync();
+            return Ok(await _factuurJobRepo.GetFactuurJobs());
         }
 
         // GET: api/FactuurJob/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FactuurJob>> GetFactuurJob(int id)
         {
-            var factuurJob = await _context.FactuurJob
-                .Include(e=> e.Task)
-                .Include(e=> e.Facturen)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (factuurJob == null) return BadRequest();
+            var result = await _factuurJobRepo.GetFactuurJob(id);
 
-           return factuurJob;
+            if (result != null) return Ok(result);
+            else return NotFound();
         }
 
         // POST: api/FactuurJob
@@ -60,43 +59,17 @@ namespace Erfpacht058_API.Controllers.Facturen
         [HttpPost]
         public async Task<ActionResult<FactuurJob>> PostFactuurJob(FactuurJobDto factuurJobDto)
         {
-            // Nieuwe facturatie taak aanmaken
-            var factuurJob = new FactuurJob
-            {
-                AanmaakDatum = DateTime.Now,
-                FactureringsPeriode = factuurJobDto.FactureringsPeriode,
-                StoragePad = "",
-            };
-
-            // Nieuwe taak aanmaken
-            var task = new TaskQueue
-            {
-                AanmaakDatum = DateTime.Now,
-                FactuurJob = factuurJob,
-                Prioriteit = Prioriteit.Midden,
-                SoortTaak = SoortTaak.Facturen,
-                Status = Status.Nieuw,
-            };
-
             // Verkrijg huidige gebruiker
             var username = User.Claims
                 .FirstOrDefault(user => user.Type == "Username")?.Value;
-            var user = await _context.Gebruiker
-                .FirstOrDefaultAsync(u => u.Emailadres == username);
+            var gebruiker = await _gebruikerRepo.ZoekGebruiker(username);
 
-            // Relaties leggen en entities toevoegen aan context
-            factuurJob.Gebruiker = user;
-            factuurJob.Task = task;
-
-            _context.TaskQueue.Add(task);
-            _context.FactuurJob.Add(factuurJob);
-
-            await _context.SaveChangesAsync();
+            var result = await _factuurJobRepo.AddFactuurJob(factuurJobDto, gebruiker);
 
             // Start taak in background service
-            _taskQueueHostedService.EnqueueTask(task);
+            _taskQueueHostedService.EnqueueTask(result.Task);
 
-            return Ok(factuurJob);
+            return Ok(result);
         }
 
         // GET: /factuurJob/export/5
@@ -109,10 +82,10 @@ namespace Erfpacht058_API.Controllers.Facturen
         public async Task<ActionResult> ExportInvoices(int id)
         {
             // Verkrijg FactuurJob
-            var factuurJob = await _context.FactuurJob
-                .Include(e => e.Task)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (factuurJob == null) return BadRequest();
+            var factuurJob = await _factuurJobRepo.GetFactuurJob(id);
+
+            if (factuurJob == null) 
+                return NotFound();
 
             // Check of taak succesvol is
             if (factuurJob.Task.Status != Status.Succesvol) return BadRequest("Export nog niet gereed of mislukt");
