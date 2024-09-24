@@ -108,9 +108,9 @@ export class DashboardComponent implements OnInit {
     const dialogRef = this.dialog.open(SearchDialogComponent, {
       data: {
         endpoint: '/kadaster',
-        title: 'Kadastraal nummer',
-        displayedColumns: ['kadastraalNummer'],
-        columnNames: ['Kadastraal nummer']
+        title: 'BAG ID',
+        displayedColumns: ['bagid'],
+        columnNames: ['BAG ID']
       }
     });
 

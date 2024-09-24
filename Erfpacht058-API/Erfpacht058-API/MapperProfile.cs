@@ -28,8 +28,11 @@ namespace Erfpacht058_API
             CreateMap<Gebruiker, GebruikerDto>();
             CreateMap<SettingsDto, Settings>();
             CreateMap<ExportDto, Export>();
-            CreateMap<TemplateDto, Template>(); 
-            CreateMap<TranslateModelDto, TranslateModel>();
+            CreateMap<TemplateDto, Template>()
+                .ForMember(dest => dest.RapportData, opt => opt.MapFrom(src => src.RapportData))
+                .ForMember(dest => dest.Filters, opt => opt.MapFrom(src => src.Filters));
+            CreateMap<TranslateModelDto, TranslateModel>()
+                .ForMember(dest => dest.Translations, opt => opt.MapFrom(src => src.Translations));
             CreateMap<FactuurJobDto, FactuurJob>();
         }
     }

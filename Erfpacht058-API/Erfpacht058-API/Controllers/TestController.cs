@@ -18,6 +18,26 @@ namespace Erfpacht058_API.Controllers
             return Ok("Succesvolle response");
         }
 
+        [HttpGet("data")]
+        public async Task<ActionResult<TestObject>> TestWithData()
+        {
+            var test = new TestObject
+            {
+                Name = "de Vries",
+                FirstName = "Jan",
+                Age = 30,
+                Gender = "Man"
+            };
 
+            return Ok(test);
+        }
+    }
+
+    public class TestObject
+    {
+        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public int Age { get; set; }
+        public string Gender { get; set; }
     }
 }

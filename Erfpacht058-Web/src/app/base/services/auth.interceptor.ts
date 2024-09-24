@@ -32,7 +32,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       router.navigateByUrl('');
       return EMPTY;
     }
-
     // Controleer of token nog geldig is
     if (helper.tokenValidator())
     {
