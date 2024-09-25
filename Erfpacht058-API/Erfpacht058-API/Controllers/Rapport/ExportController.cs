@@ -62,12 +62,12 @@ namespace Erfpacht058_API.Controllers.Rapport
             var user = await _gebruikerRepo.ZoekGebruiker(username);
             
             // Voer export op
-            var result = _exportRepo.AddExport(exportDto, user);
+            var result = await _exportRepo.AddExport(exportDto, user);
 
             if (result != null)
             {
                 // Voeg Task toe aan queue en voer taak uit
-                _taskQueueHostedService.EnqueueTask(result.Result.Task);
+                _taskQueueHostedService.EnqueueTask(result.Task);
 
                 return Ok(result);
             }

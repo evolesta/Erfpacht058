@@ -345,7 +345,7 @@ namespace Erfpacht058_API.Controllers.Eigendom
         [HttpPut("overeenkomst/{eigendomId}/{overeenkomstId}")]
         public async Task<ActionResult<Eigendom>> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId)
         {
-            var result = _overeenkomstRepository.KoppelOvereenkomstAanEigendom(eigendomId, overeenkomstId);
+            var result = await _overeenkomstRepository.KoppelOvereenkomstAanEigendom(eigendomId, overeenkomstId);
 
             if (result != null) return Ok(result); 
             else return NotFound();

@@ -13,6 +13,12 @@ namespace Erfpacht058_API.Repositories
         private readonly Erfpacht058_APIContext _context;
         private readonly IMapper _mapper;
 
+        public ImportRepository(Erfpacht058_APIContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
         async Task<Import> IImportRepository.AddImport(int translateModelId, Gebruiker gebruiker, string filepath)
         {
             var translationTabel = await _context.TranslateModel

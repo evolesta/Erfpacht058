@@ -52,7 +52,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTemplate(int id, TemplateDto templateDto)
         {
-            var result = _templateRepo.EditTemplate(id, templateDto);
+            var result = await _templateRepo.EditTemplate(id, templateDto);
 
             if (result != null) return Ok(result);
             else return NotFound();
@@ -80,7 +80,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTemplate(int id)
         {
-            var result = _templateRepo.DeleteTemplate(id);
+            var result = await _templateRepo.DeleteTemplate(id);
 
             if (result != null) return NoContent();
             else return NotFound();

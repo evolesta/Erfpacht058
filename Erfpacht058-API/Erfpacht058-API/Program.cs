@@ -35,6 +35,7 @@ builder.Services.AddScoped<IOvereenkomstRepository, OvereenkomstRepository>();
 builder.Services.AddScoped<IGebruikerRepository, GebruikerRepository>();
 builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
 builder.Services.AddScoped<IExportRepository, ExportRepository>();
+builder.Services.AddScoped<IImportRepository, ImportRepository>();
 builder.Services.AddScoped<ITemplateRepository, TemplateRepository>();
 builder.Services.AddScoped<ITranslateModelRepository, TranslateModelRepository>();
 builder.Services.AddScoped<IFactuurJobRepository, FactuurJobRepository>();

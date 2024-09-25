@@ -5,6 +5,8 @@
     <button mat-raised-button color="primary" routerLink="vertaaltabellen"><mat-icon>table</mat-icon> Vertaaltabellen</button>
 </p>
 
+<p style="text-align: right;"><button mat-icon-button (click)="getImports()"><mat-icon>refresh</mat-icon></button></p>
+
 <table mat-table [dataSource]="importsTable" class="mat-elevation-z8" matSort matSortActive="id" matSortDirection="desc">
     <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr.</th>

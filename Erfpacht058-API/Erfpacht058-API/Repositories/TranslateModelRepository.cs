@@ -21,20 +21,7 @@ namespace Erfpacht058_API.Repositories
         {
             // Maak een nieuwe vertaaltabel
             var translateModel = _mapper.Map<TranslateModel>(translateModelDto);
-
-            // Doorloop iedere vertaling en maak een nieuw object
-            foreach (var translation in translateModelDto.Translations)
-            {
-                var newTranslation = new Translation
-                {
-                    CSVColummnName = translation.CSVColummnName,
-                    ModelColumnName = translation.ModelColumnName,
-                    TranslateModel = translateModel
-                };
-
-                _context.Translation.Add(newTranslation);
-                translateModel.Translations.Add(newTranslation);
-            }
+            translateModel.AanmaakDatum = DateTime.Now;
 
             // Voeg toe aan context
             _context.TranslateModel.Add(translateModel);
@@ -76,41 +63,19 @@ namespace Erfpacht058_API.Repositories
             if (translateModel == null)
                 return null;
 
+            // Detach Translation ivm mapping
+            foreach (var translation in translateModel.Translations)
+            {
+                var local = _context.Set<Translation>()
+                    .Local
+                    .FirstOrDefault(entry => entry.Id == translation.Id);
+                if (local != null)
+                    _context.Entry(local).State = EntityState.Detached;
+            }
+
+            // Map Dto naar TranslateModel model
             _mapper.Map(translateModelDto, translateModel);
             translateModel.WijzigingsDatum = DateTime.Now;
-
-            // Vernieuw eventueel de vertalingen
-            foreach (var translation in translateModelDto.Translations)
-            {
-                // Verkrijg het bestaande record
-                var existingTranslation = translateModel.Translations
-                    .FirstOrDefault(ts => ts.Id == translation.Id);
-
-                if (existingTranslation == null)
-                {
-                    // Record niet gevonden, nieuwe aanmaken
-                    var newTranslation = new Translation
-                    {
-                        CSVColummnName = translation.CSVColummnName,
-                        ModelColumnName = translation.ModelColumnName,
-                        TranslateModel = translateModel
-                    };
-
-                    _context.Translation.Add(newTranslation);
-                    translateModel.Translations.Add(newTranslation);
-                }
-                else
-                {
-                    // bestaand record bijwerken
-                    existingTranslation.CSVColummnName = translation.CSVColummnName;
-                    existingTranslation.ModelColumnName = translation.ModelColumnName;
-
-                    _context.Entry(existingTranslation).State = EntityState.Modified;
-                }
-
-                // Opslaan in context
-                await _context.SaveChangesAsync();
-            }
 
             // Verwijder records die niet meer in de json body payload aanwezig zijn, maar nog wel in de database
             var translationsIdsInDto = translateModelDto.Translations

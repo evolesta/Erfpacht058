@@ -96,7 +96,8 @@ namespace Erfpacht058_API.Services
             });
 
             // Genereer een PDF bestand en geef het pad terug
-            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + ".pdf";
+            var rnd = new Random();
+            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + "_" + rnd.Next(11111, 99999).ToString() + ".pdf";
             document.GeneratePdf(filename);
 
             return filename;
@@ -123,7 +124,8 @@ namespace Erfpacht058_API.Services
             }
 
             // Bestand wegschrijven
-            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + ".csv";
+            var rnd = new Random(); 
+            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + "_" + rnd.Next(11111, 99999).ToString() + ".csv";
             File.WriteAllText(filename, csvContent.ToString());
 
             return filename;
@@ -135,7 +137,8 @@ namespace Erfpacht058_API.Services
     {
         public string GenerateFile(Dictionary<string, List<object>> data, IConfiguration config, Export export)
         {
-            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + ".xlsx";
+            var rnd = new Random();
+            var filename = config["Bestanden:ExportPad"] + "/Export-" + export.Id.ToString() + " - " + export.Template.Naam + "_" + rnd.Next(11111, 99999).ToString() + ".xlsx";
 
             // Gebruik OpenXML om een Excel bestand te genereren
             using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(filename, SpreadsheetDocumentType.Workbook))

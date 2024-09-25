@@ -50,13 +50,15 @@ namespace Erfpacht058_API.Repositories
         async Task<GebruikerDto> IGebruikerRepository.EditGebruiker(int id, GebruikerDto gebruikerDto)
         {
             // Verkrijg gebruiker
-            var gebruiker = await _context.Gebruiker.FindAsync(id);
+            var gebruiker = await _context.Gebruiker
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (gebruiker == null)
                 return null;
 
             // Map Dto met gewijzigde data
-            _mapper.Map(gebruiker, gebruikerDto);
+            _mapper.Map(gebruikerDto, gebruiker);
+            gebruiker.Id = id; // overschrijf ID uit DTO ivm UPDATE
 
             // Als gebruiker op actief wordt gezet, reset dan de inlogpogingen
             if (gebruiker.Actief)
@@ -78,6 +80,7 @@ namespace Erfpacht058_API.Repositories
                 return null;
 
             // Hash en update het nieuwe wachtwoord
+            gebruiker.Id = id;
             gebruiker.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(wachtwoordDto.Wachtwoord);
 
             // Opslaan naar database

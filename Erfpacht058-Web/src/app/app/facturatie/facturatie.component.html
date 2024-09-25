@@ -2,6 +2,8 @@
 
 <p style="text-align: right;"><button mat-raised-button color="primary" routerLink="add"><mat-icon>add</mat-icon> Nieuwe taak</button></p>
 
+<p style="text-align: right;"><button mat-icon-button (click)="getFacturaties()"><mat-icon>refresh</mat-icon></button></p>
+
 <table mat-table [dataSource]="facturaties" class="mat-elevation-z8" matSort matSortActive="id" matSortDirection="desc">
 <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr.</th>

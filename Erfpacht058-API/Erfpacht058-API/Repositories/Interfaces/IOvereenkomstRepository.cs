@@ -1,4 +1,5 @@
-﻿using Erfpacht058_API.Models.OvereenkomstNS;
+﻿using Erfpacht058_API.Models.Eigendom;
+using Erfpacht058_API.Models.OvereenkomstNS;
 
 namespace Erfpacht058_API.Repositories.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Erfpacht058_API.Repositories.Interfaces
         Task<Overeenkomst> AddOvereenkomst(int eigendomId, Overeenkomst overeenkomst);
         Task<Overeenkomst> EditOvereenkomst(int id, OvereenkomstDto overeenkomstDto);
         Task<Overeenkomst> DeleteOvereenkomst(int id);
-        Task<Overeenkomst> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId);
+        Task<Eigendom> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId);
     }
 }

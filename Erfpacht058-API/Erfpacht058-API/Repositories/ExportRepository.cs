@@ -31,6 +31,8 @@ namespace Erfpacht058_API.Repositories
             // Map Dto naar Export
             var export = _mapper.Map<Export>(exportDto);
             export.Gebruiker = gebruiker;
+            export.Template = template;
+            export.AanmaakDatum = DateTime.Now;
 
             // Maak een nieuwe Taak aan
             var task = new TaskQueue
@@ -57,6 +59,7 @@ namespace Erfpacht058_API.Repositories
             return await _context.Export
                 .Include(e => e.Task)
                 .Include(e => e.Template)
+                .Include(e => e.Gebruiker)
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
@@ -65,6 +68,7 @@ namespace Erfpacht058_API.Repositories
             return await _context.Export
                 .Include(e => e.Task)
                 .Include(e => e.Template)
+                .Include(e => e.Gebruiker)
                 .ToListAsync();
         }
     }

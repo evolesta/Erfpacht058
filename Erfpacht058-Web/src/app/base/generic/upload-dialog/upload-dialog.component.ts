@@ -55,8 +55,6 @@ export class UploadDialogComponent {
         formData.append('Files', (files[i] as FormControl).value);
       }
 
-      console.log(formData)
-
       // POST request met file upload
       this.http.post('/eigendom/bestand/' + this.data.id, formData).subscribe(resp => {
         this.dialogRef.close();

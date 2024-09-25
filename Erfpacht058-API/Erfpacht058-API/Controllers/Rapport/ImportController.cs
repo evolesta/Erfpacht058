@@ -43,7 +43,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpGet("{id}")]
         public async Task<ActionResult<Import>> GetImport(int id)
         {
-            var result = _importRepo.GetImport(id);
+            var result = await _importRepo.GetImport(id);
 
             if (result == null) return Ok(result);
             else return NotFound();
@@ -72,12 +72,12 @@ namespace Erfpacht058_API.Controllers.Rapport
                 await csvFile.CopyToAsync(stream);
             }
 
-            var result = _importRepo.AddImport(translateModelId, user, filepath);
+            var result = await _importRepo.AddImport(translateModelId, user, filepath);
 
             if (result != null)
             {
                 // Nieuwe taak toevoegen naar background worker
-                _taskQueueHostedService.EnqueueTask(result.Result.Task);
+                _taskQueueHostedService.EnqueueTask(result.Task);
 
                 return Ok(result);
             }

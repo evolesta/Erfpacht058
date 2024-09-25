@@ -38,6 +38,8 @@ namespace Erfpacht058_API.Repositories
             // Relaties leggen en entities toevoegen aan context
             factuurJob.Gebruiker = gebruiker;
             factuurJob.Task = task;
+            factuurJob.StoragePad = "";
+            factuurJob.AanmaakDatum = DateTime.Now;
 
             _context.TaskQueue.Add(task);
             _context.FactuurJob.Add(factuurJob);

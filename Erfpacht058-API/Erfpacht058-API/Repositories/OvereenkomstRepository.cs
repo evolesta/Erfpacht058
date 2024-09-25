@@ -106,7 +106,7 @@ namespace Erfpacht058_API.Repositories
                 .ToListAsync();
         }
 
-        async Task<Overeenkomst> IOvereenkomstRepository.KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId)
+        async Task<Eigendom> IOvereenkomstRepository.KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId)
         {
             // Verkrijg eigendom en overeenkomst objecten
             var eigendom = await _context.Eigendom.FindAsync(eigendomId);
@@ -126,7 +126,7 @@ namespace Erfpacht058_API.Repositories
             _context.Entry(overeenkomst).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return overeenkomst;
+            return eigendom;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpGet("{id}")]
         public async Task<ActionResult<TranslateModel>> GetTranslateModel(int id)
         {
-            var result = _translationsRepo.GetTranslateModel(id);
+            var result = await _translationsRepo.GetTranslateModel(id);
 
             if (result != null)
                 return Ok(result);
@@ -53,7 +53,7 @@ namespace Erfpacht058_API.Controllers.Rapport
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTranslateModel(int id, TranslateModelDto translateModelDto)
         {
-            var result = _translationsRepo.EditTranslateModel(id, translateModelDto);
+            var result = await _translationsRepo.EditTranslateModel(id, translateModelDto);
 
             if (result != null) return Ok(result);
             else return NotFound();

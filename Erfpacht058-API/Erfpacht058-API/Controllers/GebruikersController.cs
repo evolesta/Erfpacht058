@@ -56,7 +56,7 @@ namespace Erfpacht058_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGebruiker(int id, GebruikerDto gebruikerDto)
         {
-            var result = _gebruikerRepository.EditGebruiker(id, gebruikerDto);
+            var result = await _gebruikerRepository.EditGebruiker(id, gebruikerDto);
 
             if (result != null) return Ok(result);
             else return NotFound();
@@ -72,7 +72,7 @@ namespace Erfpacht058_API.Controllers
         [HttpPut("wachtwoord/{id}")]
         public async Task<ActionResult> UpdateWachtwoord(int id, WachtwoordDto wachtwoord)
         {
-            var result = _gebruikerRepository.EditWachtwoord(id, wachtwoord);
+            var result = await _gebruikerRepository.EditWachtwoord(id, wachtwoord);
 
             if (result != null) return Ok(result);
             else return NotFound();
@@ -90,7 +90,7 @@ namespace Erfpacht058_API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGebruiker(int id)
         {
-            var result = _gebruikerRepository.DeleteGebruiker(id);
+            var result = await _gebruikerRepository.DeleteGebruiker(id);
 
             if (result != null) return Ok();
             else return NotFound(); 
