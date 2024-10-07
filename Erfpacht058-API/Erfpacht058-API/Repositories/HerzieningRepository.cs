@@ -37,6 +37,11 @@ namespace Erfpacht058_API.Repositories
             return herziening;
         }
 
+        async Task<Eigendom> IHerzieningRepository.GetEigendomById(int eigendomId)
+        {
+            return await _context.Eigendom.FindAsync(eigendomId);
+        }
+
         async Task<Herziening> IHerzieningRepository.UpdateHerziening(int eigendomId, HerzieningDto herzieningDto)
         {
             // verkrijg eigendom object

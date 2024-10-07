@@ -34,6 +34,7 @@ namespace Erfpacht058_API
             CreateMap<TranslateModelDto, TranslateModel>();
             CreateMap<TranslationDto, Translation>();
             CreateMap<FactuurJobDto, FactuurJob>();
+            CreateMap<BestandDtoUpload, Bestand>();
         }
     }
 }

@@ -142,5 +142,10 @@ namespace Erfpacht058_API.Repositories
         {
             return await _context.Eigenaar.ToListAsync();
         }
+
+        async Task<Eigendom> IEigenaarRepository.GetEigendomById(int eigendomId)
+        {
+            return await _context.Eigendom.FindAsync(eigendomId);
+        }
     }
 }

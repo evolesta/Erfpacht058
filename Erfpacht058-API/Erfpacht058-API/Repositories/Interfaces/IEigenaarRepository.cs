@@ -12,5 +12,6 @@ namespace Erfpacht058_API.Repositories.Interfaces
         Task<Eigenaar> EditEigenaar(int id, EigenaarDto eigenaarDto);
         Task<Eigenaar> DeleteEigenaar(int id);
         Task<Eigenaar> DeleteEigenaarFromEigendom(int eigendomId, int eigenaarId);
+        Task<Eigendom> GetEigendomById(int eigendomId); 
     }
 }

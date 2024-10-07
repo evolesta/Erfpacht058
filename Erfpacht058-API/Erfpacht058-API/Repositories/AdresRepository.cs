@@ -62,5 +62,10 @@ namespace Erfpacht058_API.Repositories
         {
             return await _context.Adres.ToListAsync();
         }
+
+        async Task<Eigendom> IAdresRepository.GetEigendomById(int eigendomId)
+        {
+            return await _context.Eigendom.FindAsync(eigendomId);
+        }
     }
 }

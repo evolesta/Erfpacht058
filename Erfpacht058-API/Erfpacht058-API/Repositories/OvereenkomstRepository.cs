@@ -90,6 +90,11 @@ namespace Erfpacht058_API.Repositories
             return overeenkomst;
         }
 
+        async Task<Eigendom> IOvereenkomstRepository.GetEigendomById(int eigendomId)
+        {
+            return await _context.Eigendom.FindAsync(eigendomId);
+        }
+
         async Task<Overeenkomst> IOvereenkomstRepository.GetOvereenkomst(int id)
         {
             return await _context.Overeenkomst

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Erfpacht058_API.Data;
 using Erfpacht058_API.Models;
+using Erfpacht058_API.Models.Eigendom;
 using Erfpacht058_API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,6 +64,11 @@ namespace Erfpacht058_API.Repositories
         async Task<Bestand> IBestandRepository.GetBestand(int id)
         {
             return await _context.Bestand.FindAsync(id);
+        }
+
+        async Task<Eigendom> IBestandRepository.GetEigendomById(int eigendomId)
+        {
+            return await _context.Eigendom.FindAsync(eigendomId);
         }
 
         async Task<Bestand> IBestandRepository.UpdateBestand(int id, BestandDto bestandDto)

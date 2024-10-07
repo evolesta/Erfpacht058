@@ -6,5 +6,6 @@ namespace Erfpacht058_API.Repositories.Interfaces
     {
         Task<Herziening> AddHerzieningToEigendom(int eigendomId, Herziening herziening);
         Task<Herziening> UpdateHerziening(int eigendomId, HerzieningDto herzieningDto);
+        Task<Eigendom> GetEigendomById(int eigendomId);
     }
 }

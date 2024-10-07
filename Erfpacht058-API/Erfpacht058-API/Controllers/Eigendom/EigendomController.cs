@@ -105,7 +105,8 @@ namespace Erfpacht058_API.Controllers.Eigendom
             var eigendom = _mapper.Map<Eigendom>(eigendomDto);
 
             // Voer object op in database
-            return Ok(await _eigendomRepo.AddEigendom(eigendom));
+            var result = await _eigendomRepo.AddEigendom(eigendom);
+            return Ok(result);
         }
 
         // DELETE: api/Eigendom/5

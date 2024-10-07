@@ -8,5 +8,6 @@ namespace Erfpacht058_API.Repositories.Interfaces
         Task<IEnumerable<Export>> GetExports();
         Task<Export> GetExport(int id);
         Task<Export> AddExport(ExportDto exportDto, Gebruiker gebruiker);
+        Task<Template> GetTemplateById(int id); 
     }
 }

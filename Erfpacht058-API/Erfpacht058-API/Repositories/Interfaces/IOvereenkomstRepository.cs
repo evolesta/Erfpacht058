@@ -11,5 +11,6 @@ namespace Erfpacht058_API.Repositories.Interfaces
         Task<Overeenkomst> EditOvereenkomst(int id, OvereenkomstDto overeenkomstDto);
         Task<Overeenkomst> DeleteOvereenkomst(int id);
         Task<Eigendom> KoppelOvereenkomstAanEigendom(int eigendomId, int overeenkomstId);
+        Task<Eigendom> GetEigendomById(int eigendomId);
     }
 }

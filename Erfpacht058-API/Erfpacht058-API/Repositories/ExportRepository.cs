@@ -71,5 +71,10 @@ namespace Erfpacht058_API.Repositories
                 .Include(e => e.Gebruiker)
                 .ToListAsync();
         }
+
+        async Task<Template> IExportRepository.GetTemplateById(int id)
+        {
+            return await _context.Template.FindAsync(id);
+        }
     }
 }
